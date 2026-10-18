@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
 
+        // Behind cPanel / Cloudflare / a load balancer: trust X-Forwarded-* so Laravel knows the request was https.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'doctor.approved' => \App\Http\Middleware\EnsureDoctorApproved::class,

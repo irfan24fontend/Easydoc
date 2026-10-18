@@ -53,6 +53,14 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/auth.php';
 
+// A stray GET /logout (old tab, bookmark, http->https redirect) must not show a 405 error page.
+// Logging out itself stays POST-only (auth.php), so another site cannot log the user out.
+Route::get('/logout', function () {
+    return auth()->check()
+        ? redirect()->route(auth()->user()->homeRoute())
+        : redirect()->route('login');
+});
+
 /*
 |--------------------------------------------------------------------------
 | Super Admin Routes
