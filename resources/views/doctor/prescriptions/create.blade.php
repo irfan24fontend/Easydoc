@@ -1,0 +1,1781 @@
+@extends('layouts.doctor')
+
+@section('title', 'Create Prescription')
+
+@push('styles')
+    {{-- Tailwind is used by the existing prescription form. Disable its global reset so it does not restyle the dashboard shell. --}}
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = { corePlugins: { preflight: false } };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .prescription-builder { width: 100%; color: #1e293b; }
+        .prescription-builder *,
+        .prescription-builder *::before,
+        .prescription-builder *::after { box-sizing: border-box; }
+        .prescription-builder h1,
+        .prescription-builder h2,
+        .prescription-builder h3,
+        .prescription-builder h4,
+        .prescription-builder h5,
+        .prescription-builder h6,
+        .prescription-builder p,
+        .prescription-builder ul,
+        .prescription-builder ol { margin: 0; }
+        .prescription-builder ul,
+        .prescription-builder ol { padding: 0; list-style: none; }
+        .prescription-builder button,
+        .prescription-builder input,
+        .prescription-builder select,
+        .prescription-builder textarea { font-family: inherit; letter-spacing: inherit; }
+        .prescription-builder button { cursor: pointer; }
+        .prescription-builder input,
+        .prescription-builder select,
+        .prescription-builder textarea { min-width: 0; }
+        #queueList { max-height: 260px; overflow-y: auto; }
+        #appDialog ul { padding: 0; margin: 0; list-style: none; }
+        #appDialog p, #appDialog h3 { margin: 0; }
+        @media (max-width: 767px) {
+            .prescription-builder { min-width: 0; }
+        }
+    </style>
+@endpush
+
+@section('content')
+@php
+    $doctor = auth()->user()->doctor;
+    $parent = $parent ?? null;
+    $serial = $serial ?? null;
+
+    // Investigation visit-er patient, na hole serial-er patient (Start click korle ei patient-er info auto load hobe)
+    $pp = $parent?->patient ?? $serial?->patient;
+
+    // If returning from a validation error, restore the selected patient.
+    $selPatient = $pp;
+    if (!$selPatient && old('patient_id') && $doctor) {
+        $selPatient = \App\Models\Patient::where('doctor_id', $doctor->id)->find(old('patient_id'));
+    }
+    $initPatient = $selPatient
+        ? ['id' => $selPatient->id, 'code' => $selPatient->patient_code, 'name' => $selPatient->name]
+        : null;
+    $invCharge = (float) config('easydoc.investigation_advice_charge', 2);
+    $fullCharge = (float) ($doctor?->getPrescriptionCharge() ?? 0);
+    $balance = (float) ($doctor?->wallet?->balance ?? 0);
+    // Controller theke $activeChamber (status = true AND doctor_active = true) na ashle Save block hobe
+    $hasChamber = !empty($activeChamber ?? null);
+
+    // ---------------------------------------------------------------
+    // SERIAL QUEUE (optional): controller theke $serials pathale page-er bam-e "আজকের সিরিয়াল" dekhabe.
+    // Field naam alada hole shudhu ei map() ta mila nin.
+    // ---------------------------------------------------------------
+    $serialCol = collect($serials ?? []);
+    if ($serial && !$serialCol->contains('id', $serial->id)) {
+        $serialCol->prepend($serial);
+    }
+    $queue = $serialCol->map(function ($s) {
+        $p = data_get($s, 'patient');
+        return [
+            'id'          => data_get($s, 'id'),
+            'no'          => data_get($s, 'serial_number', data_get($s, 'serial_no')),
+            'status'      => strtolower((string) data_get($s, 'status', 'waiting')),
+            'patient_id'  => data_get($s, 'patient_id', data_get($p, 'id')),
+            'code'        => data_get($p, 'patient_code'),
+            'name'        => data_get($p, 'name', data_get($s, 'patient_name')),
+            'mobile'      => data_get($p, 'mobile', data_get($s, 'patient_mobile')),
+            'age'         => data_get($p, 'age', data_get($s, 'patient_age')),
+            'gender'      => data_get($p, 'gender', data_get($s, 'patient_gender')),
+            'blood_group' => data_get($p, 'blood_group'),
+            'address'     => data_get($p, 'address'),
+            'weight'      => data_get($s, 'weight', data_get($p, 'weight')),
+            'bp'          => data_get($s, 'bp'),
+            'pulse'       => data_get($s, 'pulse'),
+            'temperature' => data_get($s, 'temperature'),
+            'reason'      => data_get($s, 'reason'),
+        ];
+    })->values()->all();
+@endphp
+
+<div class="prescription-builder w-full">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="h4 fw-bold text-dark mb-1">Create Prescription</h1>
+            <p class="text-secondary small mb-0">রোগীর তথ্য, Clinical Vitals, Diagnosis ও Medicine দিয়ে প্রেসক্রিপশন তৈরি করুন।</p>
+        </div>
+        <a href="{{ route('doctor.prescriptions.index') }}" class="btn btn-outline-primary btn-sm fw-semibold">
+            <i class="fa-solid fa-list-ul me-1"></i> Prescription List
+        </a>
+    </div>
+
+    <form action="{{ route('doctor.prescriptions.store') }}" method="POST" id="prescriptionForm" autocomplete="off" novalidate>
+            @csrf
+            <input type="hidden" name="type" id="typeInput" value="{{ old('type', 'full') }}">
+            <input type="hidden" name="parent_prescription_id" value="{{ $parent->id ?? old('parent_prescription_id') }}">
+            <input type="hidden" name="serial_id" id="serialIdInput" value="{{ old('serial_id', $serial->id ?? '') }}">
+            <input type="hidden" name="patient_id" id="patientIdInput" value="{{ old('patient_id', $parent->patient_id ?? $serial->patient_id ?? '') }}">
+
+            @if($errors->any())
+                <div class="max-w-[1400px] mx-auto mb-4 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl text-sm">
+                    <ul class="list-disc pl-5">
+                        @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <main class="max-w-[1400px] mx-auto grid grid-cols-12 gap-6">
+
+                <!-- MODE TOGGLE + REPORT / SERIAL BANNER -->
+                <div class="col-span-12 space-y-3">
+                    @if($parent)
+                        <div class="bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl px-4 py-3 text-sm flex items-start gap-3">
+                            <i class="fa-solid fa-flask-vial mt-0.5"></i>
+                            <div>
+                                <p class="font-bold">Report দেখে চূড়ান্ত প্রেসক্রিপশন লিখছেন</p>
+                                <p class="text-xs mt-0.5">{{ $parent->created_at->format('d M Y') }} তারিখের Investigation Advice (#{{ $parent->id }}) থেকে তথ্য আনা হয়েছে। Investigation Findings ঘরে রিপোর্টের ফলাফল লিখুন, তারপর ঔষধ যোগ করুন।</p>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Serial banner (page-e serial niye ashle ba queue theke Start chaple dekhabe) -->
+                    <div id="serialBanner" class="{{ $serial ? '' : 'hidden' }} bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl px-4 py-3 text-sm flex items-start gap-3">
+                        <i class="fa-solid fa-ticket mt-0.5"></i>
+                        <div class="min-w-0">
+                            <p class="font-bold break-words" id="serialBannerTitle">@if($serial)সিরিয়াল #{{ $serial->serial_number }} · {{ $serial->patient->name ?? '' }}@endif</p>
+                            <p class="text-xs mt-0.5">সহকারীর নেওয়া তথ্য ও Vitals আগে থেকেই ভরা আছে।<span id="serialBannerReason">@if($serial && $serial->reason) সমস্যা: {{ $serial->reason }}@endif</span> সেভ করলে সিরিয়াল নিজে থেকে "সম্পন্ন" হয়ে যাবে।</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" id="btnFull" onclick="switchMode('full')" class="px-4 py-2 rounded-xl text-sm font-bold border">
+                            <i class="fa-solid fa-file-medical mr-1"></i> Full Prescription <span class="text-[11px] font-semibold opacity-80">(৳{{ rtrim(rtrim(number_format($fullCharge, 2), '0'), '.') }})</span>
+                        </button>
+                        <button type="button" id="btnInv" onclick="switchMode('investigation_only')" class="px-4 py-2 rounded-xl text-sm font-bold border">
+                            <i class="fa-solid fa-flask mr-1"></i> Investigation Advice <span class="text-[11px] font-semibold opacity-80">(৳{{ rtrim(rtrim(number_format($invCharge, 2), '0'), '.') }})</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LEFT: Patient + Vitals + Investigations -->
+                <div class="col-span-12 lg:col-span-4 space-y-6 min-w-0">
+
+                    <!-- Serial queue (shudhu $serials thakle) -->
+                    @if(!$parent && count($queue))
+                    <div id="queueCard" class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                        <div class="px-5 py-3 bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-slate-100 flex items-center justify-between gap-2">
+                            <h3 class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-list-ol text-indigo-600 mr-2"></i> আজকের সিরিয়াল</h3>
+                            <span id="queueCount" class="text-[11px] font-bold bg-indigo-600 text-white px-2.5 py-0.5 rounded-full">0</span>
+                        </div>
+                        <div id="queueList" class="p-3 space-y-2"></div>
+                    </div>
+                    @endif
+
+                    <!-- Patient Info -->
+                    <div id="stepPatient" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-circle-user text-indigo-600 mr-2 text-lg"></i> Patient Information</h3>
+                            <span id="patientStatus" class="text-[10px] font-bold px-2 py-0.5 rounded-full hidden"></span>
+                        </div>
+                        <!-- Selected patient banner (Patient ID) -->
+                        <div id="patientBanner" class="hidden"></div>
+
+                        <!-- Find existing patient by Mobile / Patient ID -->
+                        <div id="patientSearchWrap" class="mb-3">
+                            <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Find Existing Patient</label>
+                            <div class="flex gap-1">
+                                <input type="text" id="patientSearch" placeholder="Mobile or Patient ID (e.g., PT-0007)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <button type="button" id="patientSearchBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 rounded-lg">Search</button>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-1">একই মোবাইল নম্বরে একাধিক রোগী থাকতে পারে — তাই Patient ID দিয়েও খুঁজতে পারেন।</p>
+                        </div>
+                        <div id="patientMatches" class="hidden mb-3 space-y-2"></div>
+
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Mobile *</label>
+                                    <div class="flex gap-1">
+                                        <input type="text" name="patient_mobile" id="patientMobile" value="{{ old('patient_mobile', $pp->mobile ?? '') }}" placeholder="017XXXXXXXX" inputmode="numeric" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <button type="button" id="lookupBtn" class="bg-indigo-50 border border-indigo-100 text-indigo-600 px-2.5 rounded-lg hover:bg-indigo-100"><i class="fa-solid fa-magnifying-glass text-xs"></i></button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Name *</label>
+                                    <input type="text" name="patient_name" id="patientName" value="{{ old('patient_name', $pp->name ?? '') }}" placeholder="Full Name" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Age</label>
+                                    <input type="number" min="0" name="patient_age" id="patientAge" value="{{ old('patient_age', $pp->age ?? '') }}" placeholder="Years" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Weight</label>
+                                    <input type="text" name="patient_weight" id="patientWeight" value="{{ old('patient_weight', data_get($serial, 'weight', $pp->weight ?? '')) }}" placeholder="KG" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Gender</label>
+                                    @php $g = old('patient_gender', $pp->gender ?? ''); @endphp
+                                    <select name="patient_gender" id="patientGender" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">--</option>
+                                        <option value="Male" {{ strcasecmp($g, 'Male') == 0 ? 'selected' : '' }}>Male</option>
+                                        <option value="Female" {{ strcasecmp($g, 'Female') == 0 ? 'selected' : '' }}>Female</option>
+                                        <option value="Other" {{ strcasecmp($g, 'Other') == 0 ? 'selected' : '' }}>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Blood Group</label>
+                                    <input type="text" name="blood_group" id="patientBlood" value="{{ old('blood_group', $pp->blood_group ?? '') }}" placeholder="B+" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Address</label>
+                                    <input type="text" name="patient_address" id="patientAddress" value="{{ old('patient_address', $pp->address ?? '') }}" placeholder="Optional" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clinical Vitals -->
+                    <div id="stepClinical" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-4">
+                        <h3 class="font-bold text-slate-900 flex items-center mb-2"><i class="fa-solid fa-heart-pulse text-rose-500 mr-2 text-lg"></i> Clinical Vitals</h3>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase block">BP (mmHg)</span>
+                                <input type="text" name="bp" id="vBp" value="{{ old('bp', $parent->bp ?? $serial->bp ?? '') }}" placeholder="120/80" class="w-full bg-transparent border-0 p-0 text-sm font-semibold text-slate-700 focus:ring-0 focus:outline-none mt-1">
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase block">Pulse</span>
+                                <input type="text" name="pulse" id="vPulse" value="{{ old('pulse', $parent->pulse ?? $serial->pulse ?? '') }}" placeholder="72" class="w-full bg-transparent border-0 p-0 text-sm font-semibold text-slate-700 focus:ring-0 focus:outline-none mt-1">
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase block">Temp (°F)</span>
+                                <input type="text" name="temperature" id="vTemp" value="{{ old('temperature', $parent->temperature ?? $serial->temperature ?? '') }}" placeholder="98.6" class="w-full bg-transparent border-0 p-0 text-sm font-semibold text-slate-700 focus:ring-0 focus:outline-none mt-1">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Clinical Complaints</label>
+                            <textarea name="clinical_complaints" id="symptomsInput" rows="2" placeholder="e.g., Fever with chest pain..." class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('clinical_complaints', $parent->clinical_complaints ?? $serial->reason ?? '') }}</textarea>
+
+                            <button type="button" onclick="suggestDiagnosis()" id="diagBtn" class="mt-2 text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1.5 rounded-lg flex items-center gap-1 hover:opacity-90">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Suggest Diagnosis (AI)
+                            </button>
+                            <div id="diagSuggestions" class="flex flex-wrap gap-1.5 mt-2"></div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Risk Factors</label>
+                            <textarea name="risk_factors" id="riskInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('risk_factors', $parent->risk_factors ?? '') }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Diagnosis & Investigations -->
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-4">
+                        <h3 class="font-bold text-slate-900 flex items-center mb-1"><i class="fa-solid fa-stethoscope text-teal-600 mr-2 text-lg"></i> Diagnosis & Tests</h3>
+
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Diagnosis <span id="dxHint" class="normal-case font-normal text-slate-400"></span></label>
+                            <textarea name="diagnosis" id="diagnosisInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('diagnosis', $parent->diagnosis ?? '') }}</textarea>
+
+                            <div id="patternPanel" class="hidden mt-3 bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+                                <p class="text-xs font-bold text-emerald-800 flex items-center mb-2">
+                                    <i class="fa-solid fa-brain mr-1.5"></i> আপনার Usual Treatment এই Diagnosis-এর জন্য
+                                </p>
+                                <div id="patternList" class="space-y-2"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Investigations / Tests Advice <span id="invReq" class="text-rose-500 hidden">*</span></label>
+                            <textarea name="investigations" id="investigations" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">{{ old('investigations', $parent->investigations ?? '') }}</textarea>
+
+                            <!-- Quick test chips (JS diye render hoy, QUICK_TESTS array te notun test jog korun) -->
+                            <div id="quickTests" class="flex flex-wrap gap-1.5 mt-2"></div>
+                        </div>
+
+                        <div id="findingsWrap" class="{{ $parent ? 'bg-amber-50 border border-amber-200 rounded-xl p-3' : '' }}">
+                            <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Investigation Findings <span class="normal-case font-normal text-slate-400">(রিপোর্টের ফলাফল)</span></label>
+                            <textarea name="investigation_findings" id="investigationFindings" rows="3" placeholder="e.g., CBC: Hb 11.2, WBC 14000, Platelet 90000. NS-1: Positive" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500">{{ old('investigation_findings') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT -->
+                <div class="col-span-12 lg:col-span-8 space-y-6 min-w-0">
+
+                    <!-- Investigation-only note -->
+                    <div id="investigationNote" class="hidden bg-teal-50 border border-teal-200 rounded-2xl p-6">
+                        <h3 class="font-bold text-teal-900 flex items-center mb-2"><i class="fa-solid fa-flask mr-2"></i> Investigation Advice মোড</h3>
+                        <p class="text-sm text-teal-800">এই ভিজিটে কোনো ঔষধ লেখা হচ্ছে না। বাম দিকে রোগীর তথ্য ও পরীক্ষাগুলো লিখে সেভ করুন, রোগীর জন্য একটা Investigation Slip প্রিন্ট হবে।</p>
+                        <p class="text-sm text-teal-800 mt-2">রোগী রিপোর্ট নিয়ে ফিরলে মোবাইল নাম্বার দিয়ে খুঁজুন। সিস্টেম এই ভিজিটটা দেখাবে, <b>Continue with Reports</b> চাপলে সব তথ্য আগে থেকেই ভরা থাকবে।</p>
+                    </div>
+
+                    <!-- Medicine card -->
+                    <div id="medicineCard" class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 flex flex-col min-h-[560px]">
+                        <div class="flex justify-between items-center pb-4 border-b border-slate-100 mb-4 flex-wrap gap-2">
+                            <h3 class="font-bold text-lg text-slate-900 flex items-center"><span class="text-indigo-600 font-serif italic text-2xl mr-2">Rx</span> Medicine Prescription</h3>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <button type="button" onclick="checkConflicts()" id="conflictBtn" class="bg-gradient-to-r from-rose-500 to-orange-500 hover:opacity-90 text-white text-xs font-bold py-2 px-3 rounded-lg shadow-sm flex items-center gap-1">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> AI Conflict Check
+                                </button>
+                                <button type="button" onclick="generateAiMedicines()" id="aiMedBtn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white text-xs font-bold py-2 px-3 rounded-lg shadow-sm flex items-center gap-1">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate with AI
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- AI Suggestion Panel -->
+                        <div id="aiMedPanel" class="hidden mb-4 bg-purple-50 border border-purple-200 rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-purple-800 flex items-center"><i class="fa-solid fa-robot mr-1.5"></i> AI Suggested Treatment — রিভিউ করে Add করুন</span>
+                                <button type="button" onclick="document.getElementById('aiMedPanel').classList.add('hidden')" class="text-purple-400 hover:text-purple-600 text-xs"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <p class="text-[11px] text-purple-700 mb-3 italic">⚠ AI suggestions শুধুমাত্র সহায়ক — প্রেসক্রাইব করার আগে অবশ্যই ক্লিনিক্যালি যাচাই করুন।</p>
+                            <div id="aiMedList" class="space-y-2"></div>
+                            <div id="aiAdviceBox" class="hidden mt-3 bg-white border border-purple-100 rounded-lg p-3">
+                                <p class="text-xs font-bold text-purple-700 mb-1">Suggested Advice:</p>
+                                <p id="aiAdviceText" class="text-xs text-slate-600 mb-2"></p>
+                                <button type="button" onclick="useAiAdvice()" class="text-xs font-bold text-purple-600 hover:underline">+ Use this advice</button>
+                            </div>
+                        </div>
+
+                        <!-- AI Conflict Check result -->
+                        <div id="conflictBox" class="hidden mb-4"></div>
+
+                        <!-- Add Medicine Row -->
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 mb-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <div class="md:col-span-4 relative">
+                                <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Search Medicine</label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
+                                    <input type="text" id="med-search" placeholder="Type sec, napa, pcm..." autocomplete="off" class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="hidden" id="med-id">
+                                </div>
+                                <div id="search-results" class="hidden absolute left-0 right-0 md:right-4 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-52 overflow-y-auto text-sm"></div>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Type</label>
+                                <select id="med-type" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="Tablet">Tablet</option>
+                                    <option value="Capsule">Capsule</option>
+                                    <option value="Syrup">Syrup</option>
+                                    <option value="Injection">Injection</option>
+                                    <option value="Drop">Drop</option>
+                                    <option value="Cream">Cream</option>
+                                    <option value="Inhaler">Inhaler</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1" id="med-dose-label">Dose (M+A+N)</label>
+                                <input type="text" id="med-dose" placeholder="e.g., 1+0+1" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="med-dose-text" placeholder="২ চামচ" class="hidden w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Duration</label>
+                                <input type="text" id="med-duration" placeholder="৭ দিন" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="md:col-span-2 flex items-end">
+                                <button type="button" onclick="addMedicineRow()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-sm shadow-sm">
+                                    <i class="fa-solid fa-plus mr-1"></i> Add
+                                </button>
+                            </div>
+                            <div class="md:col-span-12">
+                                <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Instruction (optional)</label>
+                                <input type="text" id="med-instruction" placeholder="খাবার পরে" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+
+                        <!-- Quick chips -->
+                        <div class="flex flex-wrap gap-x-5 gap-y-3 mb-4 text-xs">
+                            <div>
+                                <span class="text-slate-400 font-semibold mr-1 block mb-1">Dose:</span>
+                                <div class="flex flex-wrap gap-1">
+                                    <span onclick="fillDose('1+0+0')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১+০+০</span>
+                                    <span onclick="fillDose('0+1+0')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">০+১+০</span>
+                                    <span onclick="fillDose('0+0+1')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">০+০+১</span>
+                                    <span onclick="fillDose('1+0+1')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১+০+১</span>
+                                    <span onclick="fillDose('1+1+0')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১+১+০</span>
+                                    <span onclick="fillDose('0+1+1')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">০+১+১</span>
+                                    <span onclick="fillDose('1+1+1')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১+১+১</span>
+                                    <span onclick="fillDose('2+0+2')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">২+০+২</span>
+                                    <span onclick="fillDose('1+2+1')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১+২+১</span>
+                                    <span onclick="fillDose('2+2+2')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">২+২+২</span>
+                                    <span onclick="fillDose('0.5+0+0.5')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">০.৫+০+০.৫</span>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 font-semibold mr-1 block mb-1">Duration:</span>
+                                <div class="flex flex-wrap gap-1">
+                                    <span onclick="fillDuration('৩ দিন')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">৩ দিন</span>
+                                    <span onclick="fillDuration('৫ দিন')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">৫ দিন</span>
+                                    <span onclick="fillDuration('৭ দিন')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">৭ দিন</span>
+                                    <span onclick="fillDuration('১০ দিন')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১০ দিন</span>
+                                    <span onclick="fillDuration('১৪ দিন')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১৪ দিন</span>
+                                    <span onclick="fillDuration('২১ দিন')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">২১ দিন</span>
+                                    <span onclick="fillDuration('১ মাস')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১ মাস</span>
+                                    <span onclick="fillDuration('৩ মাস')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">৩ মাস</span>
+                                    <span onclick="fillDuration('চলবে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">চলবে</span>
+                                    <span onclick="fillDuration('প্রয়োজনে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">প্রয়োজনে</span>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 font-semibold mr-1 block mb-1">Instr:</span>
+                                <div class="flex flex-wrap gap-1">
+                                    <span onclick="fillInstruction('খাবার পরে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">খাবার পরে</span>
+                                    <span onclick="fillInstruction('খাবার আগে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">খাবার আগে</span>
+                                    <span onclick="fillInstruction('সকালে খালি পেটে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">সকালে খালি পেটে</span>
+                                    <span onclick="fillInstruction('রাতে ঘুমানোর আগে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">রাতে ঘুমানোর আগে</span>
+                                    <span onclick="fillInstruction('প্রয়োজনে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">প্রয়োজনে</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Favorites -->
+                        <div class="mb-4" id="favWrap" style="display:none;">
+                            <span class="text-xs font-semibold text-slate-400 block mb-2"><i class="fa-solid fa-star text-amber-400 mr-1"></i> Quick Favorites:</span>
+                            <div class="flex flex-wrap gap-2" id="favChips"></div>
+                        </div>
+
+                        <!-- Table -->
+                        <div class="flex-grow overflow-x-auto">
+                            <table class="w-full text-left border-collapse min-w-[520px]">
+                                <thead>
+                                    <tr class="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                        <th class="py-2">Medicine</th>
+                                        <th class="py-2">Dose</th>
+                                        <th class="py-2">Duration</th>
+                                        <th class="py-2">Instruction</th>
+                                        <th class="py-2 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="prescription-list" class="text-sm divide-y divide-slate-50">
+                                    <tr id="empty-row">
+                                        <td colspan="5" class="text-xs text-slate-400 italic text-center py-8">No medications added yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Advice + Follow-up + Submit (দুই মোডেই দেখা যাবে) -->
+                    <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 space-y-3">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 block mb-1">Advice</label>
+                            <textarea name="advice" id="adviceInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('advice') }}</textarea>
+
+                            <!-- Quick Advice presets (JS diye render hoy, ADVICE_PRESETS array te notun advice jog korun) -->
+                            <div class="mt-3">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase block mb-1.5"><i class="fa-solid fa-bolt text-amber-400 mr-1"></i> Quick Advice</span>
+                                <div id="adviceTabs" class="flex flex-wrap gap-1.5 mb-2"></div>
+                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3">
+                                    <div id="adviceChips" class="flex flex-wrap gap-1.5"></div>
+                                    <button type="button" id="adviceAddAll" class="mt-2 text-[11px] font-bold text-indigo-600 hover:underline">+ এই গ্রুপের সবগুলো যোগ করুন</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div>
+                                <label class="text-xs font-semibold text-slate-500 block mb-1" id="followupLabel">Follow-up Date</label>
+                                <input type="date" name="followup_date" id="followupDate" value="{{ old('followup_date') }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="flex items-end md:col-span-2">
+                                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm shadow-md flex items-center justify-center transition-colors">
+                                    <i class="fa-solid fa-print mr-2"></i> <span id="submitLabel">Save & Print Prescription</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </form>
+</div>
+
+<!-- ===================== POPUP DIALOG (alert-er bodole) ===================== -->
+<div id="appDialog" class="hidden fixed inset-0 z-[9999] items-center justify-center p-4 bg-slate-900/50" aria-hidden="true">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 text-center max-h-[90vh] overflow-y-auto" role="dialog" aria-modal="true">
+        <div id="dlgIcon" class="mx-auto w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-3"></div>
+        <h3 id="dlgTitle" class="font-bold text-lg text-slate-900 mb-1"></h3>
+        <p id="dlgMessage" class="text-sm text-slate-600 whitespace-pre-line"></p>
+        <ul id="dlgItems" class="hidden mt-3 space-y-1.5 text-left"></ul>
+        <div class="flex flex-wrap gap-2 mt-5">
+            <button type="button" id="dlgCancel" class="hidden flex-1 min-w-[110px] px-4 py-2.5 rounded-xl text-sm font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"></button>
+            <button type="button" id="dlgExtra" class="hidden flex-1 min-w-[110px] px-4 py-2.5 rounded-xl text-sm font-semibold border border-indigo-200 bg-white text-indigo-700 hover:bg-indigo-50"></button>
+            <button type="button" id="dlgConfirm" class="flex-1 min-w-[110px] px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700"></button>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+        const SUGGEST_URL = "{{ route('doctor.prescriptions.medicine-suggest') }}";
+        const LOOKUP_URL = "{{ route('doctor.prescriptions.lookup-patient') }}";
+        const TOP_MED_URL = "{{ route('doctor.prescriptions.top-medicines') }}";
+        const AI_DIAG_URL = "{{ route('doctor.prescriptions.ai-diagnosis') }}";
+        const AI_MED_URL = "{{ route('doctor.prescriptions.ai-medicine') }}";
+        const PATTERN_URL = "{{ route('doctor.prescriptions.pattern-suggest') }}";
+        const CHECK_URL = "{{ route('doctor.prescriptions.check-interactions') }}";
+        const CSRF_TOKEN = "{{ csrf_token() }}";
+        const HAS_PARENT = @json((bool) $parent);
+        const INIT_PATIENT = @json($initPatient);
+        const FULL_CHARGE = {{ $fullCharge }};
+        const INV_CHARGE = {{ $invCharge }};
+        const BALANCE = {{ $balance }};
+        const HAS_CHAMBER = @json($hasChamber);
+        const CHAMBERS_URL = "{{ route('doctor.chambers.index') }}";
+        const START_URL = "{{ route('doctor.queue.start', ['serial' => '__ID__']) }}";
+        const SERVER_ERROR = @json(session('error'));
+        const SERVER_SUCCESS = @json(session('success'));
+        const SERIALS = @json($queue);
+        const OLD_MEDS = @json(array_values((array) old('medicines', [])));
+        const ASK_CONFLICT_CHECK = true;      // Save-er age "Conflict check koren ni" bole jiggesh korbe (false = bondho)
+        const CONFIRM_BEFORE_SAVE = false;    // true korle proti Save-e charge confirm popup ashbe
+        let lastAiAdvice = '';
+        let dirty = false;
+        let submitting = false;
+
+        const byId = (id) => document.getElementById(id);
+        const val = (id) => { const e = byId(id); return e ? e.value.trim() : ''; };
+        const money = (n) => '৳' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+        function escHtml(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        const medSearch = byId('med-search');
+        const medId = byId('med-id');
+        const medType = byId('med-type');
+        const medDose = byId('med-dose');
+        const medDoseText = byId('med-dose-text');
+        const medDoseLabel = byId('med-dose-label');
+        const searchResults = byId('search-results');
+        const prescriptionList = byId('prescription-list');
+        let searchDebounce;
+        let pendingGeneric = '';   // list theke bachai kora ouchudh-er generic (duplicate check-er jonno)
+
+        /* ================= POPUP DIALOG ================= */
+        // returns Promise: 'confirm' | 'cancel' | 'extra'
+        const DLG_ICONS = {
+            warning: ['fa-triangle-exclamation', 'bg-amber-100 text-amber-600'],
+            danger:  ['fa-circle-xmark',         'bg-rose-100 text-rose-600'],
+            info:    ['fa-circle-info',          'bg-indigo-100 text-indigo-600'],
+            success: ['fa-circle-check',         'bg-emerald-100 text-emerald-600'],
+        };
+
+        function appDialog(opts) {
+            const o = Object.assign({ type: 'warning', title: '', message: '', items: [], confirmText: 'ঠিক আছে', cancelText: null, extraText: null }, opts || {});
+            return new Promise(function (resolve) {
+                const root = byId('appDialog');
+                const ic = DLG_ICONS[o.type] || DLG_ICONS.warning;
+                byId('dlgIcon').className = 'mx-auto w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-3 ' + ic[1];
+                byId('dlgIcon').innerHTML = '<i class="fa-solid ' + ic[0] + '"></i>';
+                byId('dlgTitle').textContent = o.title;
+                byId('dlgMessage').textContent = o.message;
+
+                const ul = byId('dlgItems');
+                ul.innerHTML = o.items.map(function (t) {
+                    return '<li class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-700">' + escHtml(t) + '</li>';
+                }).join('');
+                ul.classList.toggle('hidden', !o.items.length);
+
+                const bC = byId('dlgConfirm'), bX = byId('dlgCancel'), bE = byId('dlgExtra');
+                bC.textContent = o.confirmText;
+                bC.className = 'flex-1 min-w-[110px] px-4 py-2.5 rounded-xl text-sm font-bold text-white ' +
+                    (o.type === 'danger' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-indigo-600 hover:bg-indigo-700');
+                bX.classList.toggle('hidden', !o.cancelText); if (o.cancelText) bX.textContent = o.cancelText;
+                bE.classList.toggle('hidden', !o.extraText);  if (o.extraText) bE.textContent = o.extraText;
+
+                const finish = function (r) {
+                    root.classList.add('hidden'); root.classList.remove('flex');
+                    root.setAttribute('aria-hidden', 'true');
+                    document.removeEventListener('keydown', onKey);
+                    root.onclick = null;
+                    resolve(r);
+                };
+                const onKey = function (e) {
+                    if (e.key === 'Escape') { e.preventDefault(); finish(o.cancelText ? 'cancel' : 'confirm'); }
+                };
+                bC.onclick = function () { finish('confirm'); };
+                bX.onclick = function () { finish('cancel'); };
+                bE.onclick = function () { finish('extra'); };
+                root.onclick = function (e) { if (e.target === root && o.cancelText) finish('cancel'); };
+                document.addEventListener('keydown', onKey);
+
+                root.classList.remove('hidden'); root.classList.add('flex');
+                root.setAttribute('aria-hidden', 'false');
+                bC.focus();
+            });
+        }
+
+        // Chamber chalu nei -> popup warning (OK chaple "আমার চেম্বার" page-e niye jabe)
+        async function showNoChamberDialog() {
+            const r = await appDialog({
+                type: 'danger',
+                title: 'কোনো চেম্বার চালু নেই',
+                message: 'প্রেসক্রিপশন লিখতে একটি চেম্বার চালু থাকতে হবে।\n"আমার চেম্বার" পেজ থেকে একটি চেম্বার চালু করুন।',
+                confirmText: 'আমার চেম্বারে যান',
+                cancelText: 'পরে করব',
+            });
+            if (r === 'confirm') { dirty = false; window.location.href = CHAMBERS_URL; }
+        }
+
+        function setSelect(sel, value) {
+            if (!sel || value == null || value === '') return;
+            const v = String(value).toLowerCase();
+            for (const o of sel.options) { if (o.value.toLowerCase() === v) { sel.value = o.value; return; } }
+        }
+
+        /* ================= MODE: Full / Investigation Advice ================= */
+        const ACTIVE_CLS = ['bg-indigo-600', 'text-white', 'border-indigo-600', 'shadow-md'];
+        const INACTIVE_CLS = ['bg-white', 'text-slate-600', 'border-slate-200'];
+        const fmtCharge = (n) => String(Number(n));
+
+        function currentMode() { return byId('typeInput').value === 'investigation_only' ? 'investigation_only' : 'full'; }
+        function currentCharge() { return currentMode() === 'investigation_only' ? INV_CHARGE : FULL_CHARGE; }
+        function medRowCount() { return document.querySelectorAll('#prescription-list tr:not(#empty-row)').length; }
+
+        function setMode(mode) {
+            const inv = mode === 'investigation_only';
+            byId('typeInput').value = mode;
+
+            byId('medicineCard').classList.toggle('hidden', inv);
+            byId('investigationNote').classList.toggle('hidden', !inv);
+            byId('findingsWrap').classList.toggle('hidden', inv);
+            byId('invReq').classList.toggle('hidden', !inv);
+            byId('dxHint').textContent = inv ? '(Provisional)' : '';
+            byId('followupLabel').textContent = inv ? 'Report নিয়ে আসার তারিখ' : 'Follow-up Date';
+            byId('submitLabel').textContent = inv
+                ? `Save Investigation Slip & Print (৳${fmtCharge(INV_CHARGE)})`
+                : `Save & Print Prescription (৳${fmtCharge(FULL_CHARGE)})`;
+
+            // Investigation mode-e ঔষধ submit hobe na
+            prescriptionList.querySelectorAll('input').forEach(i => { i.disabled = inv; });
+            if (inv) byId('patternPanel').classList.add('hidden');
+
+            const btnFull = byId('btnFull');
+            const btnInv = byId('btnInv');
+            btnFull.classList.remove(...ACTIVE_CLS, ...INACTIVE_CLS);
+            btnInv.classList.remove(...ACTIVE_CLS, ...INACTIVE_CLS);
+            btnFull.classList.add(...(inv ? INACTIVE_CLS : ACTIVE_CLS));
+            btnInv.classList.add(...(inv ? ACTIVE_CLS : INACTIVE_CLS));
+        }
+
+        async function switchMode(mode) {
+            if (mode === currentMode()) return;
+            if (mode === 'investigation_only' && medRowCount() > 0) {
+                const r = await appDialog({
+                    type: 'warning', title: 'Investigation Advice মোডে যাবেন?',
+                    message: 'এই মোডে ঔষধ লেখা হয় না। আপনার যোগ করা ' + medRowCount() + 'টি ঔষধ এই ভিজিটে সেভ হবে না (Full Prescription-এ ফিরলে তালিকা থাকবে)।',
+                    confirmText: 'মোড বদলান', cancelText: 'এখানেই থাকুন',
+                });
+                if (r !== 'confirm') return;
+            }
+            setMode(mode);
+        }
+
+        /* ================= Medicine search + autocomplete ================= */
+        function syncDoseField() {
+            const isSyrup = medType.value === 'Syrup';
+            medDose.classList.toggle('hidden', isSyrup);
+            medDoseText.classList.toggle('hidden', !isSyrup);
+            medDoseLabel.textContent = isSyrup ? 'Dose (e.g., ২ চামচ)' : 'Dose (M+A+N)';
+        }
+        medType.addEventListener('change', syncDoseField);
+
+        document.addEventListener('click', function (e) {
+            if (!medSearch.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.add('hidden');
+            }
+        });
+
+        medSearch.addEventListener('input', function () {
+            medId.value = ''; pendingGeneric = '';
+            clearTimeout(searchDebounce);
+            const term = this.value.trim();
+            if (term.length < 2) { searchResults.classList.add('hidden'); return; }
+
+            searchDebounce = setTimeout(() => {
+                fetch(`${SUGGEST_URL}?term=${encodeURIComponent(term)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const list = Array.isArray(data) ? data : (data.data || []);
+                        if (!list.length) { searchResults.classList.add('hidden'); return; }
+                        searchResults.innerHTML = list.map(item => `
+                            <div class="px-4 py-2 hover:bg-indigo-50 cursor-pointer flex justify-between items-center gap-2" data-id="${escHtml(item.id)}" data-label="${escHtml(item.label)}" data-generic="${escHtml(item.generic_name || '')}">
+                                <div>
+                                    <div class="font-semibold text-slate-700">${escHtml(item.label)}</div>
+                                    <div class="text-[11px] text-slate-400">${escHtml(item.generic_name || '')}</div>
+                                </div>
+                                ${item.is_sponsored ? '<span class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full whitespace-nowrap"><i class="fa-solid fa-star"></i> Sponsored</span>' : ''}
+                            </div>`).join('');
+                        searchResults.classList.remove('hidden');
+
+                        searchResults.querySelectorAll('div[data-id]').forEach(el => {
+                            el.addEventListener('click', function () {
+                                medSearch.value = this.dataset.label;
+                                medId.value = this.dataset.id;
+                                pendingGeneric = (this.dataset.generic || '').toLowerCase();
+                                searchResults.classList.add('hidden');
+                                (medType.value === 'Syrup' ? medDoseText : medDose).focus();
+                            });
+                        });
+                    })
+                    .catch(() => searchResults.classList.add('hidden'));
+            }, 250);
+        });
+
+        function fillDose(v) { (medType.value === 'Syrup' ? medDoseText : medDose).value = v; }
+        function fillDuration(v) { byId('med-duration').value = v; }
+        function fillInstruction(v) { byId('med-instruction').value = v; }
+
+        /* ================= Investigation quick-test chips ================= */
+        // Notun test jog korte chaile ei list-e ekta line add korun.
+        // Chip-er label alada hole ['Full Name', 'Short Label'] likhun. Test-er naame comma (,) dibenna.
+        const QUICK_TESTS = [
+            // --- common (ager gulo) ---
+            'CBC', 'ESR', 'Dengue NS-1', 'ECG', 'Lipid Profile',
+            ['Serum Creatinine', 'Creatinine'], 'RBS', ['Widal Test', 'Widal'], 'Urine R/E', 'X-Ray Chest',
+            // --- blood / sugar ---
+            'FBS', '2 Hrs ABF', 'HbA1c', 'Hb%', 'Platelet Count', 'PBF', 'CRP', 'Blood Grouping & Rh',
+            'Prothrombin Time (PT/INR)', 'D-Dimer',
+            // --- liver / kidney / minerals ---
+            'SGPT (ALT)', 'Serum Bilirubin', 'LFT', 'RFT', 'Serum Electrolytes', 'Serum Uric Acid', 'Serum Calcium',
+            // --- hormone / vitamin ---
+            'TSH', 'Thyroid Profile', 'Vitamin D', 'S. Ferritin', 'PSA', 'Pregnancy Test (UPT)',
+            // --- infection ---
+            'Blood Culture', 'Urine C/S', 'Stool R/E', 'Typhidot', 'Dengue IgG/IgM', 'MP (Malaria Parasite)',
+            'HBsAg', 'Anti-HCV', 'Sputum for AFB', 'Mantoux Test',
+            // --- cardiac ---
+            'Troponin-I', 'CK-MB', 'Echocardiogram',
+            // --- imaging ---
+            'USG W/A', 'USG KUB', 'CT Scan Brain', 'MRI',
+        ];
+        const QUICK_VISIBLE = 14;
+        let quickExpanded = false;
+
+        function renderQuickTests() {
+            const wrap = byId('quickTests');
+            const list = quickExpanded ? QUICK_TESTS : QUICK_TESTS.slice(0, QUICK_VISIBLE);
+
+            wrap.innerHTML = list.map(t => {
+                const value = Array.isArray(t) ? t[0] : t;
+                const label = Array.isArray(t) ? t[1] : t;
+                return `<span data-test="${escHtml(value)}" class="quick-test bg-teal-50 text-teal-700 border border-teal-100 px-2 py-0.5 rounded text-xs font-medium cursor-pointer hover:bg-teal-100">🔬 ${escHtml(label)}</span>`;
+            }).join('');
+
+            if (QUICK_TESTS.length > QUICK_VISIBLE) {
+                const hidden = QUICK_TESTS.length - QUICK_VISIBLE;
+                wrap.innerHTML += `<span class="quick-toggle px-2 py-0.5 rounded text-xs font-bold text-indigo-600 cursor-pointer hover:underline">${quickExpanded ? 'কম দেখুন ▲' : `আরও দেখুন (+${hidden}) ▼`}</span>`;
+            }
+        }
+
+        byId('quickTests').addEventListener('click', function (e) {
+            const chip = e.target.closest('.quick-test');
+            if (chip) { addQuickTest(chip.dataset.test); return; }
+            if (e.target.closest('.quick-toggle')) { quickExpanded = !quickExpanded; renderQuickTests(); }
+        });
+
+        function addQuickTest(name) {
+            const ta = byId('investigations');
+            const parts = ta.value.split(',').map(s => s.trim()).filter(Boolean);
+            if (!parts.includes(name)) parts.push(name);
+            ta.value = parts.join(', ');
+            dirty = true;
+        }
+
+        renderQuickTests();
+
+        /* ================= Patient search / select (Patient ID aware) ================= */
+        // Ekoi mobile-e ekadhik rogi thakte pare, tai mobile diye shudhu ekjon dhora hoy na.
+        // Doctor tālika theke sothik rogi (Patient ID shoho) bachai kore, noile "notun rogi" bachai kore.
+        const patientIdInput = byId('patientIdInput');
+        const serialIdInput = byId('serialIdInput');
+        const patientBanner = byId('patientBanner');
+        const patientMatches = byId('patientMatches');
+        const patientSearchInput = byId('patientSearch');
+        const patientMobileInput = byId('patientMobile');
+        let lastMatches = [];
+        let patientDecisionPending = false;   // same mobile-e ager rogi ache, kintu doctor ekhono bachai kore ni
+        let patientSearchInFlight = null;
+
+        function setPatientFields(p) {
+            byId('patientName').value = p.name || '';
+            byId('patientAge').value = p.age != null ? p.age : '';
+            byId('patientWeight').value = p.weight != null ? p.weight : '';
+            byId('patientGender').value = '';
+            setSelect(byId('patientGender'), p.gender);
+            byId('patientBlood').value = p.blood_group || '';
+            byId('patientAddress').value = p.address || '';
+        }
+
+        function showBanner(mode, p) {
+            if (mode === 'none') { patientBanner.className = 'hidden'; patientBanner.innerHTML = ''; return; }
+
+            if (mode === 'existing') {
+                patientBanner.className = 'mb-3 rounded-xl border px-3 py-2.5 text-sm flex items-center justify-between gap-2 bg-emerald-50 border-emerald-200 text-emerald-800';
+                patientBanner.innerHTML =
+                    '<div class="min-w-0"><i class="fa-solid fa-id-card-clip mr-1.5"></i><span class="font-bold">Patient ID: ' + escHtml((p && p.code) || '—') + '</span>' +
+                    '<span class="text-xs ml-2">' + escHtml((p && p.name) || '') + '</span></div>' +
+                    (HAS_PARENT
+                        ? '<span class="text-[10px] font-semibold">Investigation visit-er rogi</span>'
+                        : '<button type="button" class="change-patient text-xs font-bold underline">Change</button>');
+            } else {
+                patientBanner.className = 'mb-3 rounded-xl border px-3 py-2.5 text-sm flex items-center justify-between gap-2 bg-amber-50 border-amber-200 text-amber-800';
+                patientBanner.innerHTML =
+                    '<div><i class="fa-solid fa-user-plus mr-1.5"></i><span class="font-bold">নতুন রোগী</span>' +
+                    '<span class="text-xs ml-2">Save করলে নতুন Patient ID তৈরি হবে</span></div>' +
+                    '<button type="button" class="change-patient text-xs font-bold underline">Search existing</button>';
+            }
+
+            const btn = patientBanner.querySelector('.change-patient');
+            if (btn) btn.addEventListener('click', clearPatient);
+        }
+
+        function selectPatient(p) {
+            patientIdInput.value = p.id;
+            patientDecisionPending = false;
+            setPatientFields(p);
+            if (p.mobile) patientMobileInput.value = p.mobile;
+            showBanner('existing', p);
+            patientMatches.classList.add('hidden');
+            dirty = true;
+        }
+
+        function startNewPatient() {
+            patientIdInput.value = '';
+            patientDecisionPending = false;
+            setPatientFields({});
+            showBanner('new');
+            patientMatches.classList.add('hidden');
+            byId('patientName').focus();
+        }
+
+        function clearPatient() {
+            patientIdInput.value = '';
+            patientDecisionPending = false;
+            setPatientFields({});
+            patientMobileInput.value = '';
+            showBanner('none');
+            patientMatches.classList.add('hidden');
+            patientSearchInput.focus();
+        }
+
+        function renderMatches(data, q, auto) {
+            const list = data.patients || [];
+            lastMatches = list;
+            patientMatches.innerHTML = '';
+
+            if (!list.length) {
+                patientDecisionPending = false;
+                if (auto) { if (!patientIdInput.value) showBanner('new'); patientMatches.classList.add('hidden'); return; }
+                patientMatches.innerHTML = '<div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-600">"' + escHtml(q) + '" দিয়ে কোনো রোগী পাওয়া যায়নি। নতুন রোগীর তথ্য নিচে দিন।</div>';
+                patientMatches.classList.remove('hidden');
+                if (data.type === 'mobile') { patientMobileInput.value = q; showBanner('new'); }
+                return;
+            }
+
+            patientDecisionPending = true;
+
+            const header = document.createElement('div');
+            header.className = 'text-xs font-bold text-slate-600';
+            header.textContent = (data.type === 'mobile' && list.length > 1)
+                ? 'এই নম্বরে ' + list.length + ' জন রোগী আছে — সঠিক জনকে বেছে নিন:'
+                : 'পাওয়া রোগী — নির্বাচন করুন:';
+            patientMatches.appendChild(header);
+
+            list.forEach(function (p, idx) {
+                const card = document.createElement('div');
+                card.className = 'border border-slate-200 rounded-xl p-3 bg-white';
+                const meta = [p.age != null ? p.age + ' বছর' : '', p.gender || '', p.weight ? p.weight + ' kg' : ''].filter(Boolean).join(' · ');
+
+                let html =
+                    '<div class="flex items-start justify-between gap-2">' +
+                        '<div class="min-w-0">' +
+                            '<p class="text-sm font-bold text-slate-800">' + escHtml(p.name) +
+                                ' <span class="ml-1 text-[10px] font-bold bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded">' + escHtml(p.code || '') + '</span></p>' +
+                            '<p class="text-[11px] text-slate-500">' + escHtml(meta) + (p.mobile ? ' · ' + escHtml(p.mobile) : '') + '</p>' +
+                            '<p class="text-[11px] text-slate-400">' + (p.last_visit ? 'শেষ ভিজিট: ' + escHtml(p.last_visit) + ' · ' : '') + escHtml(p.visits) + ' টি ভিজিট</p>' +
+                        '</div>' +
+                        '<button type="button" class="pick-patient shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg" data-idx="' + idx + '">Select</button>' +
+                    '</div>';
+
+                (p.pending || []).forEach(function (x) {
+                    html +=
+                        '<div class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-2 flex items-center justify-between gap-2">' +
+                            '<div class="min-w-0">' +
+                                '<p class="text-[11px] font-semibold text-amber-800">⏳ Report-এর অপেক্ষায় · ' + escHtml(x.date) + '</p>' +
+                                '<p class="text-[11px] text-amber-700 truncate">' + escHtml(x.investigations || '') + '</p>' +
+                            '</div>' +
+                            '<a href="' + escHtml(x.url) + '" class="shrink-0 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg">Continue with Reports</a>' +
+                        '</div>';
+                });
+
+                card.innerHTML = html;
+                patientMatches.appendChild(card);
+            });
+
+            const newBtn = document.createElement('button');
+            newBtn.type = 'button';
+            newBtn.className = 'w-full border-2 border-dashed border-slate-300 hover:border-indigo-400 hover:bg-indigo-50 text-slate-600 text-xs font-bold rounded-xl py-2.5';
+            newBtn.innerHTML = '<i class="fa-solid fa-user-plus mr-1"></i> ' +
+                (data.type === 'mobile' ? 'এটি অন্য একজন — নতুন রোগী হিসেবে যোগ করুন' : 'নতুন রোগী যোগ করুন');
+            newBtn.addEventListener('click', startNewPatient);
+            patientMatches.appendChild(newBtn);
+
+            patientMatches.querySelectorAll('.pick-patient').forEach(function (b) {
+                b.addEventListener('click', function () { selectPatient(lastMatches[parseInt(b.dataset.idx, 10)]); });
+            });
+
+            patientMatches.classList.remove('hidden');
+        }
+
+        function searchPatients(q, auto) {
+            q = (q || '').trim();
+            if (!q) return Promise.resolve();
+
+            const p = (async function () {
+                try {
+                    const res = await fetch(LOOKUP_URL + '?q=' + encodeURIComponent(q), {
+                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    });
+                    if (!res.ok) throw new Error('lookup failed');
+                    renderMatches(await res.json(), q, !!auto);
+                } catch (err) {
+                    patientDecisionPending = false;
+                    if (!auto) {
+                        patientMatches.innerHTML = '<div class="bg-rose-50 border border-rose-200 rounded-lg p-3 text-xs text-rose-700">রোগী খুঁজতে সমস্যা হয়েছে, আবার চেষ্টা করুন।</div>';
+                        patientMatches.classList.remove('hidden');
+                    }
+                }
+            })();
+
+            patientSearchInFlight = p;
+            p.finally(function () { if (patientSearchInFlight === p) patientSearchInFlight = null; });
+            return p;
+        }
+
+        // Mobile field-er pasher search button / Enter
+        byId('lookupBtn').addEventListener('click', function () { searchPatients(patientMobileInput.value, false); });
+        patientMobileInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); searchPatients(patientMobileInput.value, false); }
+        });
+
+        // Mobile likhe field theke berolei auto check: ei number-e ager rogi thakle tālika dekhabe
+        patientMobileInput.addEventListener('change', function () {
+            if (HAS_PARENT || patientIdInput.value) return;
+            patientDecisionPending = false;
+            searchPatients(patientMobileInput.value, true);
+        });
+
+        // "Find Existing Patient" box (Mobile ba Patient ID)
+        byId('patientSearchBtn').addEventListener('click', function () { searchPatients(patientSearchInput.value, false); });
+        patientSearchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); searchPatients(patientSearchInput.value, false); }
+        });
+
+        // Investigation visit theke ashle patient fix, search lukano
+        if (HAS_PARENT) { byId('patientSearchWrap').classList.add('hidden'); }
+        if (INIT_PATIENT && INIT_PATIENT.id) { showBanner('existing', INIT_PATIENT); }
+
+        /* ================= Serial queue: "Start" → rogir info auto load ================= */
+        const queueList = byId('queueList');
+        const DONE_STATUS = ['done', 'cancelled'];
+        const isDone = (s) => DONE_STATUS.indexOf(s) !== -1;
+        let activeSerialId = serialIdInput.value ? String(serialIdInput.value) : '';
+
+        function renderQueue() {
+            if (!queueList) return;
+            byId('queueCount').textContent = SERIALS.filter(s => !isDone(s.status)).length;
+            queueList.innerHTML = SERIALS.map(function (s) {
+                const done = isDone(s.status);
+                const active = String(s.id) === activeSerialId;
+                const meta = [s.age != null && s.age !== '' ? s.age + ' বছর' : '', s.gender || '', s.mobile || ''].filter(Boolean).join(' · ');
+                const vit = [s.bp ? 'BP ' + s.bp : '', s.pulse ? 'P ' + s.pulse : '', s.temperature ? s.temperature + '°F' : '', s.weight ? s.weight + 'kg' : ''].filter(Boolean).join(' · ');
+                return '<div class="flex items-center gap-3 rounded-xl border px-3 py-2 ' +
+                        (active ? 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-100' : 'border-slate-100 bg-white hover:border-indigo-200') + (done ? ' opacity-60' : '') + '">' +
+                    '<div class="w-9 h-9 shrink-0 rounded-lg flex items-center justify-center text-sm font-bold ' + (active ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-700') + '">' + escHtml(s.no != null ? s.no : '#') + '</div>' +
+                    '<div class="min-w-0 flex-1">' +
+                        '<p class="text-sm font-bold text-slate-800 truncate">' + escHtml(s.name || 'নামহীন রোগী') +
+                            (s.code ? ' <span class="ml-1 text-[10px] font-bold bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded">' + escHtml(s.code) + '</span>' : '') + '</p>' +
+                        '<p class="text-[11px] text-slate-400 truncate">' + escHtml(meta) + '</p>' +
+                        (vit ? '<p class="text-[11px] font-semibold text-teal-700 truncate">' + escHtml(vit) + '</p>' : '') +
+                    '</div>' +
+                    (done ? '<span class="shrink-0 text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">সম্পন্ন</span>'
+                          : '<button type="button" class="q-start shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg" data-id="' + escHtml(s.id) + '"><i class="fa-solid fa-play mr-1"></i>' + (active ? 'চলছে' : 'Start') + '</button>') +
+                '</div>';
+            }).join('');
+        }
+
+        function clearVisit() {
+            ['vBp', 'vPulse', 'vTemp', 'symptomsInput', 'riskInput', 'diagnosisInput', 'investigations', 'investigationFindings', 'adviceInput', 'followupDate']
+                .forEach(id => { byId(id).value = ''; });
+            prescriptionList.innerHTML = '';
+            checkEmpty();
+            ['patternPanel', 'aiMedPanel', 'conflictBox'].forEach(id => byId(id).classList.add('hidden'));
+            byId('diagSuggestions').innerHTML = '';
+            if (typeof renderAdvicePresets === 'function') renderAdvicePresets();
+        }
+
+        async function startSerial(s) {
+            if (!s) return;
+            const switching = String(s.id) !== activeSerialId;
+
+            if (switching && dirty && (val('patientName') || medRowCount() > 0)) {
+                const r = await appDialog({
+                    type: 'warning', title: 'অন্য রোগী শুরু করবেন?',
+                    message: 'বর্তমান ফর্মের তথ্য (রোগী' + (medRowCount() ? ' ও ' + medRowCount() + 'টি ঔষধ' : '') + ') মুছে গিয়ে "' + (s.name || 'নতুন রোগী') + '"-এর তথ্য বসবে।',
+                    confirmText: 'হ্যাঁ, শুরু করুন', cancelText: 'না',
+                });
+                if (r !== 'confirm') return;
+            }
+            if (switching) clearVisit();
+
+            // Patient info
+            setPatientFields({ name: s.name, age: s.age, weight: s.weight, gender: s.gender, blood_group: s.blood_group, address: s.address });
+            patientMobileInput.value = s.mobile || '';
+            patientIdInput.value = s.patient_id || '';
+            patientDecisionPending = false;
+            patientMatches.classList.add('hidden');
+            if (s.patient_id) showBanner('existing', { code: s.code, name: s.name });
+            else showBanner('new');
+
+            // Vitals + complaints
+            if (s.bp) byId('vBp').value = s.bp;
+            if (s.pulse) byId('vPulse').value = s.pulse;
+            if (s.temperature) byId('vTemp').value = s.temperature;
+            if (s.reason) byId('symptomsInput').value = s.reason;
+
+            // Serial banner
+            byId('serialBanner').classList.remove('hidden');
+            byId('serialBannerTitle').textContent = 'সিরিয়াল #' + (s.no != null ? s.no : '') + ' · ' + (s.name || '');
+            byId('serialBannerReason').textContent = s.reason ? ' সমস্যা: ' + s.reason : '';
+
+            activeSerialId = String(s.id);
+            serialIdInput.value = s.id;
+
+            // Server-e serial "চলছে" kore dei (ager chalu thaka ta abar "অপেক্ষায়"), jate doctor-er kiu-te thik dekhay
+            SERIALS.forEach(x => { if (x.status === 'in_progress' && String(x.id) !== String(s.id)) x.status = 'waiting'; });
+            s.status = 'in_progress';
+            fetch(START_URL.replace('__ID__', s.id), {
+                method: 'PATCH',
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': CSRF_TOKEN },
+            }).catch(() => {});
+
+            renderQueue();
+            dirty = true;
+
+            byId('stepClinical').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            byId('symptomsInput').focus({ preventScroll: true });
+        }
+
+        if (queueList) {
+            queueList.addEventListener('click', function (e) {
+                const b = e.target.closest('.q-start'); if (!b) return;
+                startSerial(SERIALS.find(x => String(x.id) === String(b.dataset.id)));
+            });
+            renderQueue();
+        }
+
+        /* ================= Favorites ================= */
+        fetch(TOP_MED_URL)
+            .then(res => res.json())
+            .then(data => {
+                if (!Array.isArray(data) || !data.length) return;
+                byId('favWrap').style.display = 'block';
+                byId('favChips').innerHTML = data.map(m => `
+                    <span data-id="${escHtml(m.id)}" data-label="${escHtml(m.label)}" data-generic="${escHtml(m.generic_name || '')}" class="fav-chip bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer hover:bg-indigo-100">💊 ${escHtml(m.label)}</span>
+                `).join('');
+                document.querySelectorAll('.fav-chip').forEach(chip => {
+                    chip.addEventListener('click', function () {
+                        medSearch.value = this.dataset.label;
+                        medId.value = this.dataset.id;
+                        pendingGeneric = (this.dataset.generic || '').toLowerCase();
+                        (medType.value === 'Syrup' ? medDoseText : medDose).focus();
+                    });
+                });
+            })
+            .catch(() => {});
+
+        /* ================= Usual Treatment (doctor's own pattern) ================= */
+        let patternDebounce;
+        byId('diagnosisInput').addEventListener('input', function () {
+            clearTimeout(patternDebounce);
+            const diagnosis = this.value.trim();
+            const panel = byId('patternPanel');
+            if (diagnosis.length < 3 || currentMode() === 'investigation_only') {
+                panel.classList.add('hidden');
+                return;
+            }
+
+            patternDebounce = setTimeout(() => {
+                fetch(`${PATTERN_URL}?diagnosis=${encodeURIComponent(diagnosis)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!Array.isArray(data) || !data.length) { panel.classList.add('hidden'); return; }
+
+                        const list = byId('patternList');
+                        list.innerHTML = data.map(m => `
+                            <div class="bg-white border border-emerald-100 rounded-lg p-3 flex justify-between items-center gap-3">
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-slate-800">${escHtml(m.label)} <span class="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full ml-1">${escHtml(m.used_count)} বার ব্যবহৃত</span></p>
+                                    <p class="text-[11px] text-slate-400">${escHtml(m.generic_name)} • ${escHtml(m.dose)} • ${escHtml(m.duration || '')} • ${escHtml(m.instruction || '')}</p>
+                                </div>
+                                <button type="button" class="pattern-add-btn shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg"
+                                    data-id="${escHtml(m.medicine_id || '')}" data-name="${escHtml(m.medicine_name)}" data-type="${escHtml(m.medicine_type)}" data-generic="${escHtml(m.generic_name || '')}"
+                                    data-dose="${escHtml(m.dose)}" data-duration="${escHtml(m.duration || '')}" data-instruction="${escHtml(m.instruction || '')}">
+                                    + Add
+                                </button>
+                            </div>
+                        `).join('');
+                        panel.classList.remove('hidden');
+
+                        list.querySelectorAll('.pattern-add-btn').forEach(b => {
+                            b.addEventListener('click', function () {
+                                medSearch.value = this.dataset.name;
+                                medId.value = this.dataset.id;
+                                pendingGeneric = (this.dataset.generic || '').toLowerCase();
+                                setSelect(medType, this.dataset.type);
+                                syncDoseField();
+                                if (medType.value === 'Syrup') medDoseText.value = this.dataset.dose;
+                                else medDose.value = this.dataset.dose;
+                                byId('med-duration').value = this.dataset.duration;
+                                byId('med-instruction').value = this.dataset.instruction;
+                                addMedicineRow();
+                            });
+                        });
+                    })
+                    .catch(() => panel.classList.add('hidden'));
+            }, 500);
+        });
+
+        /* ================= Add medicine row ================= */
+        function parseDose(str) {
+            const bn = { '০':'0','১':'1','২':'2','৩':'3','৪':'4','৫':'5','৬':'6','৭':'7','৮':'8','৯':'9' };
+            const ascii = String(str || '').replace(/[০-৯]/g, d => bn[d]);
+            const parts = ascii.split('+').map(v => { const x = parseFloat(v); return isNaN(x) ? 0 : x; });
+            while (parts.length < 3) parts.push(0);
+            return parts.slice(0, 3);
+        }
+
+        const PREFIX_MAP = { Tablet: 'Tab.', Capsule: 'Cap.', Syrup: 'Syr.', Injection: 'Inj.', Drop: 'Drop', Cream: 'Cream', Inhaler: 'Inhaler', Other: '' };
+        let medIdx = 0;
+
+        function appendMedicineRow(e) {
+            const emptyRow = byId('empty-row');
+            if (emptyRow) emptyRow.remove();
+
+            const index = medIdx++;
+            const nums = e.doseText ? [0, 0, 0] : parseDose(e.dose);
+            const displayLabel = (PREFIX_MAP[e.type] ? PREFIX_MAP[e.type] + ' ' : '') + e.name;
+
+            const tr = document.createElement('tr');
+            tr.dataset.generic = (e.generic || '').toLowerCase();
+            tr.innerHTML = `
+                <td class="py-3 font-semibold text-slate-900">
+                    💊 ${escHtml(displayLabel)}
+                    ${e.id ? '' : '<span class="ml-1 text-[10px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full" title="Medicine তালিকা (DB) থেকে নির্বাচন করা হয়নি">DB-তে নেই</span>'}
+                    <input type="hidden" name="medicines[${index}][medicine_id]" value="${escHtml(e.id)}">
+                    <input type="hidden" name="medicines[${index}][medicine_name]" value="${escHtml(e.name)}">
+                    <input type="hidden" name="medicines[${index}][medicine_type]" value="${escHtml(e.type)}">
+                </td>
+                <td class="py-3 text-slate-600">
+                    <span class="bg-slate-100 px-2 py-0.5 rounded text-xs whitespace-nowrap">${escHtml(e.doseText || e.dose)}</span>
+                    <input type="hidden" name="medicines[${index}][dose_morning]" value="${nums[0]}">
+                    <input type="hidden" name="medicines[${index}][dose_noon]" value="${nums[1]}">
+                    <input type="hidden" name="medicines[${index}][dose_night]" value="${nums[2]}">
+                    <input type="hidden" name="medicines[${index}][dose_text]" value="${escHtml(e.doseText || '')}">
+                </td>
+                <td class="py-3 text-slate-600">
+                    ${escHtml(e.duration)}
+                    <input type="hidden" name="medicines[${index}][duration]" value="${escHtml(e.duration)}">
+                </td>
+                <td class="py-3 text-slate-600">
+                    ${escHtml(e.instruction)}
+                    <input type="hidden" name="medicines[${index}][instruction]" value="${escHtml(e.instruction)}">
+                </td>
+                <td class="py-3 text-right">
+                    <button type="button" onclick="this.closest('tr').remove(); checkEmpty(); dirty = true;" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                </td>
+            `;
+            prescriptionList.appendChild(tr);
+        }
+
+        async function addMedicineRow() {
+            const name = medSearch.value.trim();
+            const id = medId.value;
+            const type = medType.value;
+            const isSyrup = type === 'Syrup';
+            const dose = isSyrup ? '' : medDose.value.trim();
+            const doseText = isSyrup ? medDoseText.value.trim() : '';
+            const duration = byId('med-duration').value.trim();
+            const instruction = byId('med-instruction').value.trim();
+
+            if (!name) {
+                await appDialog({ type: 'warning', title: 'ঔষধের নাম দিন', message: 'আগে ঔষধের নাম লিখে নিচে আসা তালিকা থেকে নির্বাচন করুন।' });
+                medSearch.focus(); return;
+            }
+            if (!dose && !doseText) {
+                await appDialog({ type: 'warning', title: 'ডোজ দিন', message: '"' + name + '" এর ডোজ লিখুন বা নিচের কুইক বাটন থেকে বাছুন।' });
+                (isSyrup ? medDoseText : medDose).focus(); return;
+            }
+            if (!id) {
+                const r = await appDialog({
+                    type: 'warning', title: 'ঔষধটি আপনার তালিকায় নেই',
+                    message: '"' + name + '" তালিকা (DB) থেকে নির্বাচন করা হয়নি। এটি যোগ করলে AI Conflict Check ও usage tracking-এ ধরা পড়বে না।',
+                    confirmText: 'তবুও যোগ করুন', cancelText: 'বাতিল',
+                });
+                if (r !== 'confirm') { medSearch.focus(); return; }
+            }
+            if (id && getMedicineIds().indexOf(parseInt(id, 10)) !== -1) {
+                const r = await appDialog({
+                    type: 'warning', title: 'ঔষধটি ইতিমধ্যে যোগ করা আছে',
+                    message: '"' + name + '" তালিকায় আগেই আছে। আবার যোগ করবেন?',
+                    confirmText: 'আবার যোগ করুন', cancelText: 'বাতিল',
+                });
+                if (r !== 'confirm') return;
+            } else if (pendingGeneric) {
+                const same = Array.from(prescriptionList.querySelectorAll('tr')).find(tr => tr.dataset.generic && tr.dataset.generic === pendingGeneric);
+                if (same) {
+                    const r = await appDialog({
+                        type: 'warning', title: 'একই generic আবার?',
+                        message: 'তালিকায় আগেই একই generic (' + pendingGeneric + ') আছে। দুটি ঔষধ একসাথে দিলে ডোজ দ্বিগুণ হয়ে যেতে পারে।',
+                        confirmText: 'তবুও যোগ করুন', cancelText: 'বাতিল',
+                    });
+                    if (r !== 'confirm') return;
+                }
+            }
+
+            appendMedicineRow({ id, name, type, dose, doseText, duration, instruction, generic: pendingGeneric });
+            dirty = true;
+
+            medSearch.value = ''; medId.value = ''; pendingGeneric = '';
+            medType.value = 'Tablet';
+            syncDoseField();
+            medDose.value = '';
+            medDoseText.value = '';
+            byId('med-duration').value = '';
+            byId('med-instruction').value = '';
+            medSearch.focus();
+        }
+
+        function checkEmpty() {
+            if (prescriptionList.children.length === 0) {
+                prescriptionList.innerHTML = `<tr id="empty-row"><td colspan="5" class="text-xs text-slate-400 italic text-center py-8">No medications added yet.</td></tr>`;
+            }
+        }
+
+        // Validation fail hole ager ঔষধ গুলো ফিরিয়ে আনা
+        (OLD_MEDS || []).forEach(function (m) {
+            const doseText = m.dose_text || '';
+            const num = v => { const x = parseFloat(v); return isNaN(x) ? 0 : x; };
+            appendMedicineRow({
+                id: m.medicine_id || '', name: m.medicine_name || '', type: m.medicine_type || 'Tablet',
+                dose: doseText ? '' : [num(m.dose_morning), num(m.dose_noon), num(m.dose_night)].join('+'),
+                doseText: doseText, duration: m.duration || '', instruction: m.instruction || '', generic: '',
+            });
+        });
+
+        /* ================= AI: Conflict Check ================= */
+        const CONFLICT_STYLE = {
+            contraindicated: { box: 'bg-rose-50 border-rose-300 text-rose-900',     tag: 'bg-rose-600 text-white',   label: 'একসাথে দেওয়া নিষেধ' },
+            major:           { box: 'bg-orange-50 border-orange-300 text-orange-900', tag: 'bg-orange-600 text-white', label: 'গুরুতর (Major)' },
+            moderate:        { box: 'bg-amber-50 border-amber-300 text-amber-900',   tag: 'bg-amber-500 text-white',  label: 'মাঝারি (Moderate)' },
+            minor:           { box: 'bg-sky-50 border-sky-300 text-sky-900',         tag: 'bg-sky-600 text-white',    label: 'সামান্য (Minor)' },
+        };
+        const AI_CONFLICT_NOTE = 'এটি AI-এর বিশ্লেষণ; AI ভুল করতে পারে বা কিছু বাদ দিতে পারে। চূড়ান্ত সিদ্ধান্ত চিকিৎসকের।';
+        let conflictSignature = null;
+        let conflictResult = null;
+
+        function getMedicineIds() {
+            return Array.from(document.querySelectorAll('#prescription-list input[name$="[medicine_id]"]'))
+                .map(i => parseInt(i.value, 10))
+                .filter(Boolean);
+        }
+
+        function medSignature(ids) {
+            return ids.slice().sort((a, b) => a - b).join(',');
+        }
+
+        function renderConflicts(data, unchecked) {
+            const box = byId('conflictBox');
+            const uncheckedNote = unchecked > 0
+                ? `<p class="text-[11px] text-slate-500 mt-2">⚠ ${unchecked}টি ঔষধ আপনার DB-র তালিকা থেকে নির্বাচন করা হয়নি, তাই সেগুলো চেক হয়নি।</p>`
+                : '';
+
+            if (data.has_warnings) {
+                box.innerHTML = `
+                    <div class="border border-rose-200 bg-white rounded-xl p-4">
+                        <p class="text-sm font-bold text-rose-700 mb-3"><i class="fa-solid fa-robot mr-1.5"></i> AI ${data.warnings.length}টি সতর্কতা পেয়েছে</p>
+                        <div class="space-y-2">
+                            ${data.warnings.map(w => {
+                                const s = CONFLICT_STYLE[w.severity] || CONFLICT_STYLE.moderate;
+                                return `
+                                <div class="border rounded-lg p-3 ${s.box}">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span class="text-sm font-bold">${escHtml(w.pair)}</span>
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${s.tag}">${s.label}</span>
+                                        ${w.type === 'duplicate' ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-600 text-white">একই ধরনের ঔষধ</span>' : ''}
+                                    </div>
+                                    <p class="text-xs mt-1.5">${escHtml(w.effect)}</p>
+                                    ${w.recommendation ? `<p class="text-xs mt-1"><b>পরামর্শ:</b> ${escHtml(w.recommendation)}</p>` : ''}
+                                </div>`;
+                            }).join('')}
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-3 italic">${escHtml(AI_CONFLICT_NOTE)}</p>
+                        ${uncheckedNote}
+                    </div>`;
+            } else {
+                box.innerHTML = `
+                    <div class="border border-emerald-200 bg-emerald-50 rounded-xl p-4">
+                        <p class="text-sm font-bold text-emerald-800"><i class="fa-solid fa-circle-check mr-1.5"></i> চমৎকার! AI নির্বাচিত ${data.checked}টি ঔষধের মধ্যে কোনো উল্লেখযোগ্য conflict পায়নি।</p>
+                        <p class="text-[11px] text-emerald-700 mt-1 italic">${escHtml(AI_CONFLICT_NOTE)}</p>
+                        ${uncheckedNote}
+                    </div>`;
+            }
+            box.classList.remove('hidden');
+        }
+
+        async function checkConflicts() {
+            const ids = getMedicineIds();
+            const totalRows = medRowCount();
+
+            if (ids.length < 2) {
+                conflictSignature = null; conflictResult = null;
+                await appDialog({ type: 'info', title: 'কমপক্ষে ২টি ঔষধ লাগবে', message: 'Conflict দেখতে তালিকা (DB) থেকে নির্বাচন করা অন্তত ২টি ঔষধ যোগ করুন।' });
+                return;
+            }
+
+            const btn = byId('conflictBtn');
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-wait');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI চেক করছে...';
+
+            try {
+                const res = await fetch(CHECK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                    },
+                    body: JSON.stringify({
+                        medicine_ids: ids,
+                        age: byId('patientAge').value,
+                        gender: byId('patientGender').value,
+                        risk_factors: val('riskInput'),
+                        diagnosis: val('diagnosisInput'),
+                    }),
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.error || data.message || ('Request failed (status ' + res.status + ')'));
+                conflictSignature = medSignature(ids);
+                conflictResult = data;
+                renderConflicts(data, totalRows - ids.length);
+            } catch (err) {
+                console.error(err);
+                await appDialog({ type: 'danger', title: 'AI Conflict Check ব্যর্থ হয়েছে', message: err.message || 'আবার চেষ্টা করুন।' });
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-70', 'cursor-wait');
+                btn.innerHTML = original;
+            }
+        }
+
+        // Medicine list bodlale ager conflict result ar valid noy — lukiye din
+        new MutationObserver(function () {
+            if (conflictSignature !== null && medSignature(getMedicineIds()) !== conflictSignature) {
+                byId('conflictBox').classList.add('hidden');
+                conflictSignature = null; conflictResult = null;
+            }
+        }).observe(prescriptionList, { childList: true, subtree: true });
+
+        /* ================= AI: Suggest Diagnosis ================= */
+        async function suggestDiagnosis() {
+            const symptoms = val('symptomsInput');
+            if (!symptoms) {
+                await appDialog({ type: 'info', title: 'আগে উপসর্গ লিখুন', message: 'AI Diagnosis পরামর্শের জন্য "Clinical Complaints" ঘরে রোগীর উপসর্গ লিখুন।' });
+                byId('symptomsInput').focus(); return;
+            }
+
+            const btn = byId('diagBtn');
+            const original = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Thinking...';
+
+            try {
+                const res = await fetch(AI_DIAG_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                    },
+                    body: JSON.stringify({
+                        symptoms,
+                        age: byId('patientAge').value,
+                        gender: byId('patientGender').value,
+                        bp: val('vBp'),
+                        pulse: val('vPulse'),
+                        temperature: val('vTemp'),
+                        risk_factors: val('riskInput'),
+                    }),
+                });
+                const text = await res.text();
+                let data;
+                try { data = JSON.parse(text); }
+                catch (e) { throw new Error(`Server didn't return JSON (status ${res.status}). ` + text.slice(0, 200)); }
+                if (!res.ok && !data.error) throw new Error(`Request failed (status ${res.status}).`);
+                if (data.error) throw new Error(data.error);
+
+                const list = data.diagnoses || [];
+                const wrap = byId('diagSuggestions');
+                wrap.innerHTML = list.map(d => `
+                    <span class="ai-diag-chip bg-purple-50 text-purple-700 border border-purple-200 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer hover:bg-purple-100" data-val="${escHtml(d)}">✨ ${escHtml(d)}</span>
+                `).join('');
+                wrap.querySelectorAll('.ai-diag-chip').forEach(chip => {
+                    chip.addEventListener('click', function () {
+                        const dx = byId('diagnosisInput');
+                        dx.value = this.dataset.val;
+                        dx.dispatchEvent(new Event('input', { bubbles: true }));
+                    });
+                });
+                if (!list.length) await appDialog({ type: 'info', title: 'কোনো পরামর্শ পাওয়া যায়নি', message: 'AI এই উপসর্গ থেকে কোনো Diagnosis দেয়নি। উপসর্গ আরও বিস্তারিত লিখে আবার চেষ্টা করুন।' });
+            } catch (err) {
+                console.error(err);
+                await appDialog({ type: 'danger', title: 'AI suggestion ব্যর্থ হয়েছে', message: err.message || 'আবার চেষ্টা করুন।' });
+            } finally {
+                btn.disabled = false; btn.innerHTML = original;
+            }
+        }
+
+        /* ================= AI: Generate Medicines ================= */
+        async function generateAiMedicines() {
+            const diagnosis = val('diagnosisInput');
+            const symptoms = val('symptomsInput');
+            if (!diagnosis) {
+                await appDialog({ type: 'info', title: 'আগে Diagnosis লিখুন', message: 'AI ঔষধ পরামর্শের জন্য Diagnosis লিখুন (বা "Suggest Diagnosis (AI)" ব্যবহার করুন)।' });
+                byId('diagnosisInput').focus(); return;
+            }
+
+            const btn = byId('aiMedBtn');
+            const original = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+
+            try {
+                const res = await fetch(AI_MED_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    body: JSON.stringify({
+                        diagnosis,
+                        symptoms,
+                        age: byId('patientAge').value,
+                        gender: byId('patientGender').value,
+                        risk_factors: val('riskInput'),
+                    }),
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || data.error) throw new Error(data.error || data.message || ('Request failed (status ' + res.status + ')'));
+
+                const meds = data.medicines || [];
+                if (!meds.length) {
+                    await appDialog({ type: 'info', title: 'কোনো ঔষধ পরামর্শ নেই', message: 'AI এই Diagnosis-এর জন্য কোনো ঔষধ সাজেস্ট করেনি।' });
+                    return;
+                }
+
+                const list = byId('aiMedList');
+                list.innerHTML = meds.map((m) => `
+                    <div class="bg-white border border-purple-100 rounded-lg p-3 flex justify-between items-center gap-3">
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold text-slate-800">${escHtml(m.label)} ${m.is_sponsored ? '<span class="text-[9px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full ml-1"><i class="fa-solid fa-star"></i> Sponsored</span>' : ''}</p>
+                            <p class="text-[11px] text-slate-400">${escHtml(m.generic_name)} • ${escHtml(m.dose)} • ${escHtml(m.duration)} • ${escHtml(m.instruction)}</p>
+                        </div>
+                        <button type="button" class="ai-add-btn shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg"
+                            data-id="${escHtml(m.medicine_id || '')}" data-label="${escHtml(m.label)}" data-generic="${escHtml(m.generic_name || '')}" data-dose="${escHtml(m.dose)}" data-duration="${escHtml(m.duration)}" data-instruction="${escHtml(m.instruction)}">
+                            + Add
+                        </button>
+                    </div>
+                `).join('');
+
+                list.querySelectorAll('.ai-add-btn').forEach(b => {
+                    b.addEventListener('click', function () {
+                        medSearch.value = this.dataset.label;
+                        medId.value = this.dataset.id;
+                        pendingGeneric = (this.dataset.generic || '').toLowerCase();
+                        syncDoseField();
+                        (medType.value === 'Syrup' ? medDoseText : medDose).value = this.dataset.dose;
+                        byId('med-duration').value = this.dataset.duration;
+                        byId('med-instruction').value = this.dataset.instruction;
+                        addMedicineRow();
+                    });
+                });
+
+                lastAiAdvice = data.advice || '';
+                byId('aiAdviceText').textContent = lastAiAdvice;
+                byId('aiAdviceBox').classList.toggle('hidden', !lastAiAdvice);
+                byId('aiMedPanel').classList.remove('hidden');
+            } catch (err) {
+                console.error(err);
+                await appDialog({ type: 'danger', title: 'AI suggestion ব্যর্থ হয়েছে', message: err.message || 'আবার চেষ্টা করুন।' });
+            } finally {
+                btn.disabled = false; btn.innerHTML = original;
+            }
+        }
+
+        function useAiAdvice() {
+            const a = byId('adviceInput');
+            a.value = a.value ? (a.value + '\n' + lastAiAdvice) : lastAiAdvice;
+            dirty = true;
+            if (typeof renderAdvicePresets === 'function') renderAdvicePresets();
+        }
+
+        /* ================= Submit: sob important popup ekhane ================= */
+        async function preSubmitChecks() {
+            const inv = currentMode() === 'investigation_only';
+
+            if (patientSearchInFlight) { await patientSearchInFlight; }
+
+            if (!HAS_CHAMBER) {
+                await showNoChamberDialog();
+                return false;
+            }
+
+            if (!val('patientMobile') || !val('patientName')) {
+                await appDialog({ type: 'warning', title: 'রোগীর তথ্য অসম্পূর্ণ', message: 'রোগীর নাম ও মোবাইল নম্বর দিতে হবে।' });
+                (val('patientMobile') ? byId('patientName') : patientMobileInput).focus();
+                byId('stepPatient').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+
+            // Ei number-e ager rogi ache kintu doctor sothik rogi/notun rogi bachai kore ni
+            if (patientDecisionPending && !patientIdInput.value) {
+                await appDialog({ type: 'warning', title: 'রোগী নির্বাচন করুন', message: 'এই নম্বরে আগে থেকেই রোগী আছে। তালিকা থেকে সঠিক রোগী নির্বাচন করুন, অথবা "নতুন রোগী হিসেবে যোগ করুন" বাছুন।' });
+                patientMatches.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+
+            if (inv) {
+                if (!val('investigations')) {
+                    await appDialog({ type: 'warning', title: 'Investigation লিখুন', message: 'Investigation Advice দিতে হলে অন্তত একটি পরীক্ষা লিখুন।' });
+                    byId('investigations').focus(); return false;
+                }
+            } else if (medRowCount() === 0) {
+                await appDialog({ type: 'warning', title: 'কোনো ঔষধ যোগ করা হয়নি', message: 'Full Prescription-এ অন্তত একটি ঔষধ যোগ করতে হবে।' });
+                byId('medicineCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+
+            const charge = currentCharge();
+            if (BALANCE < charge) {
+                await appDialog({
+                    type: 'danger', title: 'Wallet ব্যালেন্স যথেষ্ট নয়',
+                    message: 'এই Save-এর জন্য ' + money(charge) + ' লাগবে, কিন্তু আপনার ব্যালেন্স ' + money(BALANCE) + '। Super Admin দিয়ে Wallet রিচার্জ করান।',
+                });
+                return false;
+            }
+
+            if (!inv) {
+                const ids = getMedicineIds();
+                const fresh = conflictResult && conflictSignature === medSignature(ids);
+
+                if (ids.length >= 2 && !fresh && ASK_CONFLICT_CHECK) {
+                    const r = await appDialog({
+                        type: 'warning', title: 'Conflict Check করা হয়নি',
+                        message: 'আপনি ' + ids.length + 'টি ঔষধ দিয়েছেন, কিন্তু একে অপরের সাথে conflict আছে কিনা AI দিয়ে দেখা হয়নি। এখন দেখে নেবেন?',
+                        confirmText: 'এখন Check করি', extraText: 'এভাবেই Save করুন',
+                    });
+                    if (r === 'confirm') {
+                        byId('conflictBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        checkConflicts();
+                        return false;
+                    }
+                    if (r === 'cancel') return false;
+                }
+
+                if (fresh && conflictResult.has_warnings) {
+                    const serious = (conflictResult.warnings || []).filter(w => w.severity === 'contraindicated' || w.severity === 'major');
+                    if (serious.length) {
+                        const r = await appDialog({
+                            type: 'danger', title: serious.length + 'টি গুরুতর Conflict আছে',
+                            message: 'AI নিচের গুরুতর সমস্যাগুলো পেয়েছে। তবুও Save করবেন?',
+                            items: serious.map(w => w.pair + ' — ' + w.effect),
+                            confirmText: 'তবুও Save করুন', cancelText: 'ঔষধ দেখি',
+                        });
+                        if (r !== 'confirm') { byId('conflictBox').scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; }
+                    }
+                }
+            }
+
+            if (CONFIRM_BEFORE_SAVE) {
+                const r = await appDialog({
+                    type: 'info', title: 'Save করে প্রিন্ট করবেন?',
+                    message: 'Wallet থেকে ' + money(charge) + ' কাটা হবে। Save-এর পর ব্যালেন্স হবে ' + money(BALANCE - charge) + '।',
+                    confirmText: 'Save & Print', cancelText: 'ফিরে যাই',
+                });
+                if (r !== 'confirm') return false;
+            }
+            return true;
+        }
+
+        const rxForm = byId('prescriptionForm');
+        rxForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            if (submitting) return;
+            const btn = byId('submitBtn');
+            btn.disabled = true;
+            const ok = await preSubmitChecks();
+            if (!ok) { btn.disabled = false; return; }
+
+            submitting = true;
+            dirty = false;
+            byId('submitLabel').textContent = 'Saving...';
+            rxForm.submit();   // form.submit() 'submit' event fire kore na, tai loop hobe na
+        });
+
+        // Enter chaple form submit hobe na (textarea/button chhara)
+        rxForm.addEventListener('keydown', function (e) {
+            if (e.key !== 'Enter') return;
+            const t = e.target;
+            if (t.tagName === 'TEXTAREA' || t.tagName === 'BUTTON' || t.type === 'submit') return;
+            e.preventDefault();
+            if (t === medSearch) return;
+            if (t.id === 'med-dose' || t.id === 'med-dose-text' || t.id === 'med-duration' || t.id === 'med-instruction') addMedicineRow();
+        });
+
+        /* ================= Quick Advice presets ================= */
+        // Notun advice jog korte chaile je group-e ekta line add korun. Notun group-o banano jabe.
+        const ADVICE_PRESETS = [
+            { key: 'general', icon: '🩺', label: 'সাধারণ', items: [
+                'প্রচুর পানি পান করুন।',
+                'পর্যাপ্ত বিশ্রাম নিন।',
+                'ঔষধ নিয়মিত ও সময়মতো খান, কোর্স শেষ করুন।',
+                'সুষম ও পুষ্টিকর খাবার খান।',
+                'তৈলাক্ত, ঝাল ও ভাজাপোড়া খাবার এড়িয়ে চলুন।',
+                'ধূমপান ও তামাক এড়িয়ে চলুন।',
+                'রিপোর্ট নিয়ে আবার দেখা করুন।',
+                'সমস্যা বাড়লে বা নতুন উপসর্গ দেখা দিলে দ্রুত যোগাযোগ করুন।',
+            ]},
+            { key: 'heart', icon: '❤️', label: 'হৃদরোগ', items: [
+                'লবণ কম খান।',
+                'তৈলাক্ত, চর্বিযুক্ত ও ভাজাপোড়া খাবার এড়িয়ে চলুন।',
+                'ধূমপান সম্পূর্ণ বন্ধ করুন।',
+                'ভারী কাজ ও অতিরিক্ত পরিশ্রম এড়িয়ে চলুন, ডাক্তারের পরামর্শ মতো হালকা হাঁটুন।',
+                'নিয়মিত BP ও Pulse মাপুন।',
+                'ঔষধ নিজে থেকে বন্ধ করবেন না।',
+                'বুকে ব্যথা, শ্বাসকষ্ট বা অতিরিক্ত ঘাম হলে সাথে সাথে হাসপাতালে যান।',
+            ]},
+            { key: 'diabetes', icon: '🍬', label: 'ডায়াবেটিস', items: [
+                'চিনি ও মিষ্টি জাতীয় খাবার এড়িয়ে চলুন।',
+                'ভাত/রুটি পরিমিত খান, শাকসবজি বেশি খান।',
+                'প্রতিদিন অন্তত ৩০ মিনিট হাঁটুন।',
+                'নিয়মিত Blood Sugar পরীক্ষা করুন।',
+                'ঔষধ/ইনসুলিন সময়মতো নিন, খাবার বাদ দেবেন না।',
+                'পায়ের যত্ন নিন, খালি পায়ে হাঁটবেন না।',
+                'অতিরিক্ত ঘাম, কাঁপুনি বা মাথা ঘোরালে চিনি/গ্লুকোজ খান এবং ডাক্তারের সাথে যোগাযোগ করুন।',
+            ]},
+            { key: 'stroke', icon: '🧠', label: 'স্ট্রোক', items: [
+                'BP নিয়মিত নিয়ন্ত্রণে রাখুন।',
+                'লবণ ও তৈলাক্ত খাবার কম খান।',
+                'ধূমপান ও তামাক সম্পূর্ণ বন্ধ করুন।',
+                'ডাক্তারের পরামর্শ মতো ঔষধ নিয়মিত খান, নিজে থেকে বন্ধ করবেন না।',
+                'ফিজিওথেরাপি ও ব্যায়াম নিয়মিত করুন।',
+                'হঠাৎ মুখ বেঁকে যাওয়া, হাত-পা দুর্বল হওয়া বা কথা জড়িয়ে গেলে সাথে সাথে হাসপাতালে নিন।',
+            ]},
+            { key: 'bp', icon: '💓', label: 'উচ্চ রক্তচাপ', items: [
+                'লবণ কম খান, খাবারে অতিরিক্ত কাঁচা লবণ নেবেন না।',
+                'নিয়মিত BP মাপুন ও লিখে রাখুন।',
+                'মানসিক চাপ এড়িয়ে চলুন, পর্যাপ্ত ঘুমান।',
+                'ওজন নিয়ন্ত্রণে রাখুন।',
+                'প্রতিদিন হালকা ব্যায়াম বা হাঁটাহাঁটি করুন।',
+            ]},
+            { key: 'fever', icon: '🌡️', label: 'জ্বর/ডেঙ্গু', items: [
+                'প্রচুর তরল (পানি, ORS, ডাবের পানি) পান করুন।',
+                'পূর্ণ বিশ্রামে থাকুন।',
+                'ডাক্তারের পরামর্শ ছাড়া এসপিরিন বা অন্য ব্যথানাশক (NSAID) খাবেন না।',
+                'জ্বর ৩ দিনের বেশি থাকলে আবার দেখা করুন।',
+                'রক্তক্ষরণ, তীব্র পেটে ব্যথা, বারবার বমি বা অতিরিক্ত দুর্বলতা হলে সাথে সাথে হাসপাতালে যান।',
+            ]},
+            { key: 'gastric', icon: '🍽️', label: 'গ্যাস্ট্রিক', items: [
+                'নিয়মিত সময়ে খাবার খান, দীর্ঘক্ষণ খালি পেটে থাকবেন না।',
+                'ঝাল, তেল-মসলাযুক্ত ও টক খাবার এড়িয়ে চলুন।',
+                'চা-কফি ও ধূমপান কমান।',
+                'খাবারের পর সাথে সাথে শুয়ে পড়বেন না।',
+                'রাতের খাবার ঘুমের ২-৩ ঘণ্টা আগে খান।',
+            ]},
+            { key: 'resp', icon: '🫁', label: 'শ্বাসকষ্ট/কাশি', items: [
+                'ধুলাবালি, ধোঁয়া ও ঠান্ডা এড়িয়ে চলুন।',
+                'ধূমপান থেকে দূরে থাকুন।',
+                'ইনহেলার ডাক্তারের নির্দেশ মতো ব্যবহার করুন।',
+                'কুসুম গরম পানি পান করুন ও গরম পানির ভাপ নিন।',
+                'শ্বাসকষ্ট হঠাৎ বেড়ে গেলে সাথে সাথে হাসপাতালে যান।',
+            ]},
+        ];
+        let adviceGroup = ADVICE_PRESETS[0].key;
+
+        function currentAdviceItems() {
+            const g = ADVICE_PRESETS.find(x => x.key === adviceGroup) || ADVICE_PRESETS[0];
+            return g.items;
+        }
+
+        function renderAdvicePresets() {
+            byId('adviceTabs').innerHTML = ADVICE_PRESETS.map(g => {
+                const on = g.key === adviceGroup;
+                return `<button type="button" data-group="${escHtml(g.key)}" class="advice-tab px-2.5 py-1 rounded-full text-xs font-bold border ${on ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-indigo-50'}">${g.icon} ${escHtml(g.label)}</button>`;
+            }).join('');
+
+            const ta = byId('adviceInput').value;
+            byId('adviceChips').innerHTML = currentAdviceItems().map((txt, i) => {
+                const used = ta.indexOf(txt) !== -1;
+                return `<span data-i="${i}" class="advice-chip ${used ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white text-slate-700 border-slate-200 hover:bg-indigo-50 hover:border-indigo-200'} border px-2.5 py-1 rounded-lg text-xs cursor-pointer" title="ক্লিক করে Advice-এ যোগ করুন">${used ? '✓ ' : '+ '}${escHtml(txt)}</span>`;
+            }).join('');
+        }
+
+        function addAdviceLines(lines) {
+            const ta = byId('adviceInput');
+            const existing = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+            lines.forEach(l => { if (existing.indexOf(l) === -1) existing.push(l); });
+            ta.value = existing.join('\n');
+            ta.rows = Math.min(10, Math.max(2, existing.length));
+            dirty = true;
+            renderAdvicePresets();
+        }
+
+        byId('adviceTabs').addEventListener('click', function (e) {
+            const b = e.target.closest('.advice-tab'); if (!b) return;
+            adviceGroup = b.dataset.group;
+            renderAdvicePresets();
+        });
+        byId('adviceChips').addEventListener('click', function (e) {
+            const c = e.target.closest('.advice-chip'); if (!c) return;
+            addAdviceLines([currentAdviceItems()[parseInt(c.dataset.i, 10)]]);
+        });
+        byId('adviceAddAll').addEventListener('click', function () { addAdviceLines(currentAdviceItems()); });
+        byId('adviceInput').addEventListener('input', renderAdvicePresets);
+        renderAdvicePresets();
+
+        /* ================= Unsaved changes warning ================= */
+        rxForm.addEventListener('input', function () { dirty = true; });
+        rxForm.addEventListener('change', function () { dirty = true; });
+        window.addEventListener('beforeunload', function (e) {
+            if (dirty && !submitting) { e.preventDefault(); e.returnValue = ''; }
+        });
+
+        /* ================= Init ================= */
+        syncDoseField();
+        checkEmpty();
+        setMode(byId('typeInput').value || 'full');
+        dirty = false;
+
+        // Page khulei important popup (banner-er bodole)
+        window.addEventListener('load', function () {
+            if (!HAS_CHAMBER) { showNoChamberDialog(); return; }
+            if (SERVER_ERROR) {
+                appDialog({ type: 'danger', title: 'Save করা যায়নি', message: SERVER_ERROR });
+            }
+        });
+    </script>
+@endpush
