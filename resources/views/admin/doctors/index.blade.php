@@ -69,6 +69,25 @@
             </a>
         </div>
 
+        <!-- Approval filter -->
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            @php
+                $tabs = [
+                    ['key' => null,       'label' => 'All',      'count' => $counts['all']],
+                    ['key' => 'pending',  'label' => 'Pending review', 'count' => $counts['pending']],
+                    ['key' => 'approved', 'label' => 'Approved', 'count' => $counts['approved']],
+                    ['key' => 'rejected', 'label' => 'Rejected', 'count' => $counts['rejected']],
+                ];
+            @endphp
+            @foreach($tabs as $tab)
+                <a href="{{ route('admin.doctors.index', $tab['key'] ? ['status' => $tab['key']] : []) }}"
+                   class="btn btn-sm rounded-pill px-3 {{ ($status ?? null) === $tab['key'] ? 'btn-dark' : 'btn-light border' }}">
+                    {{ $tab['label'] }}
+                    <span class="badge {{ $tab['key'] === 'pending' && $tab['count'] > 0 ? 'bg-warning text-dark' : 'bg-secondary-subtle text-secondary' }} ms-1">{{ $tab['count'] }}</span>
+                </a>
+            @endforeach
+        </div>
+
         <!-- Roster Data Grid -->
         <div class="glass-card overflow-hidden">
             <div class="table-responsive">
@@ -125,15 +144,19 @@
                                 </td>
 
                                 <td>
-                                    <span class="badge px-2.5 py-1.5 rounded-pill" style="background-color: #d1fae5; color: #065f46; font-size: 0.75rem; font-weight: 600;">
-                                        Active
-                                    </span>
+                                    @if($doctor->isPending())
+                                        <span class="badge px-2.5 py-1.5 rounded-pill" style="background-color: #fef3c7; color: #92400e; font-size: 0.75rem; font-weight: 600;">Pending review</span>
+                                    @elseif($doctor->isRejected())
+                                        <span class="badge px-2.5 py-1.5 rounded-pill" style="background-color: #fee2e2; color: #991b1b; font-size: 0.75rem; font-weight: 600;">Rejected</span>
+                                    @else
+                                        <span class="badge px-2.5 py-1.5 rounded-pill" style="background-color: #d1fae5; color: #065f46; font-size: 0.75rem; font-weight: 600;">Approved</span>
+                                    @endif
                                 </td>
 
                                 <td>
                                     <div class="d-flex justify-content-end gap-2">
                                         <a href="{{ route('admin.doctors.show', $doctor->id) }}" class="btn-action-text view">
-                                            View
+                                            {{ $doctor->isPending() ? 'Review' : 'View' }}
                                         </a>
 
                                         <a href="{{ route('admin.doctors.edit', $doctor->id) }}" class="btn-action-text edit">

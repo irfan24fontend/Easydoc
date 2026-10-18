@@ -17,9 +17,13 @@
                     <span>Dashboard</span>
                 </a>
 
+                @php $pendingDoctors = \App\Models\Doctor::where('approval_status', 'pending')->count(); @endphp
                 <a href="{{ route('admin.doctors.index') }}" class="side-link {{ Request::is('admin/doctors*') ? 'active' : '' }}">
                     <i class="fa-solid fa-user-doctor"></i>
                     <span>Doctors</span>
+                    @if($pendingDoctors > 0)
+                        <span title="Approval pending" style="margin-left:auto;font-size:11px;font-weight:800;background:#f59e0b;color:#0f172a;padding:1px 8px;border-radius:999px;">{{ $pendingDoctors }}</span>
+                    @endif
                 </a>
 
                 <a href="{{ route('admin.chambers.index') }}" class="side-link {{ Request::is('admin/chambers*') ? 'active' : '' }}">

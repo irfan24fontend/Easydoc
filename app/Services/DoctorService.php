@@ -99,6 +99,11 @@ class DoctorService
 
                 'photo' => $photo,
 
+                // Doctors created by the Super Admin are approved immediately
+                'approval_status' => Doctor::STATUS_APPROVED,
+
+                'approved_at' => now(),
+
             ]);
 
 

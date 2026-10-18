@@ -100,7 +100,7 @@
 
         overlay.addEventListener('click', () => setOpen(false));
         document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
-        links.forEach(a => a.addEventListener('click', () => { if (isMobile() && !a.classList.contains('disabled')) setOpen(false); }));
+        links.forEach(a => a.addEventListener('click', () => { if (isMobile() && !a.classList.contains('disabled') && !a.classList.contains('has-sub')) setOpen(false); }));
         mq.addEventListener('change', () => { setOpen(false); update(); });
 
         update();

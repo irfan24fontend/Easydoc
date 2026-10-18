@@ -63,6 +63,52 @@
             </div>
         </div>
 
+        {{-- Registration review --}}
+        <div class="glass-card p-4 mb-4" style="border-left: 5px solid {{ $doctor->isPending() ? '#f59e0b' : ($doctor->isRejected() ? '#dc2626' : '#10b981') }};">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div>
+                    <div class="meta-label mb-1">Registration status</div>
+                    @if($doctor->isPending())
+                        <span class="badge rounded-pill px-3 py-2" style="background:#fef3c7;color:#92400e;">Pending review</span>
+                        <p class="small text-muted mt-2 mb-0">Check the BMDC number and certificate below, then approve or reject.</p>
+                    @elseif($doctor->isRejected())
+                        <span class="badge rounded-pill px-3 py-2" style="background:#fee2e2;color:#991b1b;">Rejected</span>
+                        @if($doctor->rejection_reason)<p class="small mt-2 mb-0"><strong>Reason:</strong> {{ $doctor->rejection_reason }}</p>@endif
+                    @else
+                        <span class="badge rounded-pill px-3 py-2" style="background:#d1fae5;color:#065f46;">Approved</span>
+                        @if($doctor->approved_at)<p class="small text-muted mt-2 mb-0">Approved on {{ $doctor->approved_at->format('d M Y, h:i A') }}</p>@endif
+                    @endif
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    @if($doctor->bmdc_certificate)
+                        <a href="{{ route('admin.doctors.certificate', $doctor->id) }}" target="_blank" rel="noopener" class="btn btn-outline-dark rounded-pill px-4">
+                            <i class="fas fa-file-shield me-1"></i> View BMDC certificate
+                        </a>
+                    @endif
+                    @unless($doctor->isApproved())
+                        <form method="POST" action="{{ route('admin.doctors.approve', $doctor->id) }}" class="m-0" onsubmit="return confirm('Approve this doctor?')">
+                            @csrf @method('PATCH')
+                            <button type="submit" class="btn btn-success rounded-pill px-4"><i class="fas fa-check me-1"></i> Approve</button>
+                        </form>
+                    @endunless
+                </div>
+            </div>
+
+            @unless($doctor->isRejected())
+                <form method="POST" action="{{ route('admin.doctors.reject', $doctor->id) }}" class="mt-4 pt-3 border-top" onsubmit="return confirm('{{ $doctor->isApproved() ? 'Suspend this doctor? They will lose access immediately.' : 'Reject this application?' }}')">
+                    @csrf @method('PATCH')
+                    <label class="meta-label mb-2" for="rejection_reason">{{ $doctor->isApproved() ? 'Suspend access (reason is shown to the doctor)' : 'Reject application (reason is shown to the doctor)' }}</label>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <input type="text" id="rejection_reason" name="rejection_reason" value="{{ old('rejection_reason') }}" minlength="5" maxlength="500" required
+                               class="form-control @error('rejection_reason') is-invalid @enderror" style="max-width: 560px;" placeholder="e.g. BMDC number does not match the certificate">
+                        <button type="submit" class="btn btn-outline-danger rounded-pill px-4">{{ $doctor->isApproved() ? 'Suspend' : 'Reject' }}</button>
+                    </div>
+                    @error('rejection_reason') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                </form>
+            @endunless
+        </div>
+
         <div class="row g-4">
             <!-- Left Column: Primary Identity Card -->
             <div class="col-lg-4">
@@ -155,6 +201,14 @@
                         <div class="data-row d-flex align-items-center justify-content-between">
                             <span class="meta-label">Academic Qualifications</span>
                             <span class="meta-value text-muted">{{ $doctor->qualification }}</span>
+                        </div>
+                        <div class="data-row d-flex align-items-center justify-content-between">
+                            <span class="meta-label">Medical College</span>
+                            <span class="meta-value">{{ $doctor->medical_college ?? '—' }}</span>
+                        </div>
+                        <div class="data-row d-flex align-items-center justify-content-between">
+                            <span class="meta-label">Date of Birth</span>
+                            <span class="meta-value">{{ $doctor->date_of_birth?->format('d M Y') ?? '—' }}</span>
                         </div>
                     </div>
                 </div>

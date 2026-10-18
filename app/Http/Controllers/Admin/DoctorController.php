@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateDoctorRequest;
 use App\Models\Doctor;
 use App\Services\DoctorService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DoctorController extends Controller
 {
@@ -18,16 +19,29 @@ class DoctorController extends Controller
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
-        $doctors = Doctor::with('user')
-            ->latest()
-            ->paginate(10);
+        $status = $request->query('status');
 
+        $doctors = Doctor::with('user')
+            ->when(
+                in_array($status, [Doctor::STATUS_PENDING, Doctor::STATUS_APPROVED, Doctor::STATUS_REJECTED], true),
+                fn ($q) => $q->where('approval_status', $status)
+            )
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        $counts = [
+            'all'      => Doctor::count(),
+            'pending'  => Doctor::where('approval_status', Doctor::STATUS_PENDING)->count(),
+            'approved' => Doctor::where('approval_status', Doctor::STATUS_APPROVED)->count(),
+            'rejected' => Doctor::where('approval_status', Doctor::STATUS_REJECTED)->count(),
+        ];
 
         return view(
             'admin.doctors.index',
-            compact('doctors')
+            compact('doctors', 'counts', 'status')
         );
     }
 
@@ -155,5 +169,48 @@ class DoctorController extends Controller
 
     }
 
+
+    // ------------------------------------------------------------------
+    // Registration review
+    // ------------------------------------------------------------------
+
+    public function approve(Doctor $doctor)
+    {
+        $doctor->update([
+            'approval_status'  => Doctor::STATUS_APPROVED,
+            'approved_at'      => now(),
+            'approved_by'      => auth()->id(),
+            'rejection_reason' => null,
+        ]);
+
+        return back()->with('success', 'Doctor approved. এখন তিনি সিস্টেম ব্যবহার করতে পারবেন।');
+    }
+
+    public function reject(Request $request, Doctor $doctor)
+    {
+        $data = $request->validate([
+            'rejection_reason' => ['required', 'string', 'min:5', 'max:500'],
+        ]);
+
+        $doctor->update([
+            'approval_status'  => Doctor::STATUS_REJECTED,
+            'approved_at'      => null,
+            'approved_by'      => auth()->id(),
+            'rejection_reason' => $data['rejection_reason'],
+        ]);
+
+        return back()->with('success', 'Doctor-এর আবেদন বাতিল (reject) করা হয়েছে।');
+    }
+
+    /** BMDC certificate is stored privately; only the Super Admin can open it. */
+    public function certificate(Doctor $doctor)
+    {
+        abort_unless(
+            $doctor->bmdc_certificate && Storage::disk('local')->exists($doctor->bmdc_certificate),
+            404
+        );
+
+        return Storage::disk('local')->response($doctor->bmdc_certificate);
+    }
 
 }

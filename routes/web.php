@@ -8,13 +8,16 @@ use App\Http\Controllers\Admin\MedicineController;
 use App\Http\Controllers\Admin\PrescriptionTemplateController;
 use App\Http\Controllers\Admin\WalletController;
 use App\Http\Controllers\Assistant\SerialController as AssistantSerialController;
+use App\Http\Controllers\Doctor\ApprovalStatusController;
 use App\Http\Controllers\Doctor\AssistantController;
 use App\Http\Controllers\Doctor\ChamberController as DoctorChamberController;
 use App\Http\Controllers\Doctor\DashboardController as DoctorDashboardController;
 use App\Http\Controllers\Doctor\PrescriptionController;
 use App\Http\Controllers\Doctor\PatientController;
+use App\Http\Controllers\Doctor\PublicProfileController;
 use App\Http\Controllers\Doctor\QueueController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicDoctorController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,6 +28,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Shareable public doctor profile (no login needed)
+Route::get('/dr/{slug}', [PublicDoctorController::class, 'show'])
+    ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->middleware('throttle:120,1')
+    ->name('public.doctor.show');
 
 // Redirect users to their own dashboard after login.
 Route::get('/dashboard', function () {
@@ -55,6 +64,17 @@ Route::middleware(['auth', 'role:super_admin'])
     ->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+        // Doctor registration review (approve / reject / private BMDC certificate)
+        Route::patch('doctors/{doctor}/approve', [DoctorController::class, 'approve'])
+            ->whereNumber('doctor')
+            ->name('doctors.approve');
+        Route::patch('doctors/{doctor}/reject', [DoctorController::class, 'reject'])
+            ->whereNumber('doctor')
+            ->name('doctors.reject');
+        Route::get('doctors/{doctor}/certificate', [DoctorController::class, 'certificate'])
+            ->whereNumber('doctor')
+            ->name('doctors.certificate');
+
         Route::resource('doctors', DoctorController::class);
         Route::resource('templates', PrescriptionTemplateController::class);
         Route::resource('chambers', ChamberController::class);
@@ -79,11 +99,27 @@ Route::middleware(['auth', 'role:super_admin'])
 | Specific/static prescription routes are declared before routes containing
 | {prescription}, so Laravel does not mistake a static path for a model ID.
 */
+
+// Newly registered doctors can log in and see only this page until the Super Admin approves them.
 Route::middleware(['auth', 'role:doctor'])
     ->prefix('doctor')
     ->name('doctor.')
     ->group(function () {
+        Route::get('approval-status', [ApprovalStatusController::class, 'show'])->name('approval.status');
+    });
+
+Route::middleware(['auth', 'role:doctor', 'doctor.approved'])
+    ->prefix('doctor')
+    ->name('doctor.')
+    ->group(function () {
         Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('dashboard');
+
+        // Public profile (one per doctor): create + manage
+        Route::get('public-profile/create', [PublicProfileController::class, 'create'])->name('public-profile.create');
+        Route::post('public-profile', [PublicProfileController::class, 'store'])->name('public-profile.store');
+        Route::get('public-profile', [PublicProfileController::class, 'edit'])->name('public-profile.edit');
+        Route::put('public-profile', [PublicProfileController::class, 'update'])->name('public-profile.update');
+        Route::patch('public-profile/publish', [PublicProfileController::class, 'toggle'])->name('public-profile.toggle');
 
         // Chambers (doctor shudhu nijer chamber dekhte pare; create/edit Super Admin kore)
         Route::get('chambers', [DoctorChamberController::class, 'index'])->name('chambers.index');
