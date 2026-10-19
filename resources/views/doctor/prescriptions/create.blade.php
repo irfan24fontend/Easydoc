@@ -709,7 +709,7 @@
                                     <div class="font-semibold text-slate-700">${escHtml(item.label)}</div>
                                     <div class="text-[11px] text-slate-400">${escHtml(item.generic_name || '')}${item.company ? ' · ' + escHtml(item.company) : ''}</div>
                                 </div>
-                                ${item.is_favorite_company ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap" style="background:#d1fae5;color:#065f46"><i class="fa-solid fa-star"></i> আপনার ব্র্যান্ড</span>' : ''}
+                                ${item.is_favorite_company ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap" style="background:#d1fae5;color:#065f46"><i class="fa-solid fa-star"></i> Best</span>' : ''}
                                 ${item.is_sponsored ? '<span class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full whitespace-nowrap"><i class="fa-solid fa-star"></i> Sponsored</span>' : ''}
                             </div>`).join('');
                         searchResults.classList.remove('hidden');
