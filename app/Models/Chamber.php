@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Chamber extends Model
 {
+    public const REQUEST_WAITING  = 'waiting_request';
+    public const REQUEST_APPROVED = 'approved';
+    public const REQUEST_REJECTED = 'rejected';
+
     protected $fillable = [
         'doctor_id',
         'prescription_template_id',
@@ -17,13 +21,23 @@ class Chamber extends Model
         'address',
         'visiting_days',
         'visiting_time',
-        'status',          // Super Admin-er onumoti
+        'status',          // Super Admin-er onumoti (true = active)
+        'request_status',  // waiting_request | approved | rejected
         'doctor_active',   // Doctor-er nijer switch
+        'pad_image',
+        'requested_at',
+        'reviewed_at',
+        'reviewed_by',
+        'reject_reason',
+        'fee_charged',
     ];
 
     protected $casts = [
         'status'        => 'boolean',
         'doctor_active' => 'boolean',
+        'requested_at'  => 'datetime',
+        'reviewed_at'   => 'datetime',
+        'fee_charged'   => 'decimal:2',
     ];
 
     public function doctor()
@@ -39,11 +53,28 @@ class Chamber extends Model
     /** Chamber ekhon prescription-er jonno chalu (Super Admin Active + Doctor chalu) */
     public function isOperational(): bool
     {
-        return $this->status && $this->doctor_active;
+        return $this->request_status === self::REQUEST_APPROVED
+            && $this->status
+            && $this->doctor_active;
     }
 
     public function scopeOperational(Builder $query): Builder
     {
-        return $query->where('status', true)->where('doctor_active', true);
+        return $query->where('request_status', self::REQUEST_APPROVED)
+            ->where('status', true)
+            ->where('doctor_active', true);
+    }
+
+    /** UI-te dekhanor status: active | inactive | waiting_request | rejected */
+    public function getDisplayStatusAttribute(): string
+    {
+        if ($this->request_status === self::REQUEST_WAITING) {
+            return 'waiting_request';
+        }
+        if ($this->request_status === self::REQUEST_REJECTED) {
+            return 'rejected';
+        }
+
+        return $this->status ? 'active' : 'inactive';
     }
 }

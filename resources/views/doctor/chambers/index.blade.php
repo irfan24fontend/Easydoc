@@ -139,16 +139,37 @@
     .cf-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.45rem; margin: 0 auto; background: #fef3c7; color: #d97706; }
     .cf-icon.green { background: #dcfce7; color: #16a34a; }
 
+    /* ---------- Chamber request additions ---------- */
+    .ch-btn-new { display: inline-flex; align-items: center; gap: 8px; margin-top: .9rem; background: #fff; color: #4338ca; font-weight: 800; font-size: .86rem; padding: .55rem 1.05rem; border-radius: 12px; text-decoration: none; box-shadow: 0 6px 16px rgba(15,23,42,.18); transition: transform .15s, box-shadow .15s; position: relative; z-index: 1; }
+    .ch-btn-new:hover { color: #3730a3; transform: translateY(-1px); box-shadow: 0 10px 22px rgba(15,23,42,.22); }
+    .ch-btn-new span { background: #eef2ff; color: #4338ca; border-radius: 999px; padding: .05rem .55rem; font-size: .72rem; }
+    .ch-card.pending::before { background: linear-gradient(90deg, #6366f1, #a5b4fc); }
+    .ch-card.pending .ch-icon { background: linear-gradient(135deg,#a5b4fc,#818cf8); box-shadow: none; }
+    .ch-card.rejected { background: #fafafa; }
+    .ch-card.rejected::before { background: linear-gradient(90deg, #9ca3af, #d1d5db); }
+    .ch-card.rejected .ch-icon { background: #d1d5db; box-shadow: none; }
+    .ch-card.rejected .ch-body { opacity: .65; }
+    .ch-flag.pending { background: #e0e7ff; color: #3730a3; }
+    .ch-flag.rejected { background: #f3f4f6; color: #4b5563; }
+    .ch-note { font-size: .78rem; border-radius: 10px; padding: .55rem .7rem; line-height: 1.45; }
+    .ch-note.pending { background: #eef2ff; border: 1px solid #c7d2fe; color: #3730a3; }
+    .ch-note.rejected { background: #f9fafb; border: 1px solid #e5e7eb; color: #4b5563; }
+    .pill.wait { background: #e0e7ff; color: #3730a3; }
+
     @media (prefers-reduced-motion: reduce) { .ch-card, .live-dot { animation: none; } }
 </style>
 @endpush
 
 @section('content')
 @php
-    $total      = $chambers->count();
-    $lockedCnt  = $chambers->filter(fn ($c) => !$c->status)->count();
+    $approved    = $chambers->filter(fn ($c) => ($c->request_status ?? 'approved') === 'approved');
+    $pendingCnt  = $chambers->filter(fn ($c) => ($c->request_status ?? '') === 'waiting_request')->count();
+    $rejectedCnt = $chambers->filter(fn ($c) => ($c->request_status ?? '') === 'rejected')->count();
+    $requestFee  = \App\Services\ChamberRequestService::FEE;
+    $total      = $approved->count();
+    $lockedCnt  = $approved->filter(fn ($c) => !$c->status)->count();
     $enabledCnt = $total - $lockedCnt;
-    $workingCnt = $chambers->filter(fn ($c) => $c->status && $c->doctor_active)->count();
+    $workingCnt = $approved->filter(fn ($c) => $c->status && $c->doctor_active)->count();
     $offCnt     = $enabledCnt - $workingCnt;
 @endphp
 
@@ -160,7 +181,10 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 position-relative" style="z-index:1;">
                 <div>
                     <h1>আমার চেম্বার <span class="fw-normal opacity-75" style="font-size:1rem;">/ My Chambers</span></h1>
-                    <p>Super Admin যে চেম্বারগুলো যোগ করেছেন সেগুলো এখানে দেখুন। যে চেম্বারে প্রেসক্রিপশন লিখবেন, সেটির সুইচ চালু করুন।</p>
+                    <p>নতুন চেম্বারের জন্য রিকোয়েস্ট পাঠান। Super Admin অনুমোদন করলে এখানে দেখা যাবে। যে চেম্বারে প্রেসক্রিপশন লিখবেন, সেটির সুইচ চালু করুন।</p>
+                    <a href="{{ route('doctor.chambers.request.create') }}" class="ch-btn-new">
+                        <i class="fa-solid fa-plus"></i> নতুন চেম্বার রিকোয়েস্ট <span>৳{{ $requestFee }}</span>
+                    </a>
                 </div>
 
                 <div class="now-box {{ $working ? '' : 'off' }}">
@@ -225,7 +249,7 @@
         <details class="ch-rules mb-4">
             <summary><i class="fa-solid fa-circle-info"></i> কীভাবে কাজ করে <i class="fa-solid fa-chevron-down chev small"></i></summary>
             <ul>
-                <li>চেম্বার যোগ করা এবং তা <b>Active/Inactive</b> রাখার অনুমতি দেওয়া Super Admin-এর কাজ।</li>
+                <li>নতুন চেম্বারের জন্য <b>রিকোয়েস্ট</b> পাঠান (ফি ৳{{ $requestFee }})। Super Admin টেমপ্লেট সেট করে চেম্বার <b>Active</b> করবেন। বাতিল হলে ফি ফেরত পাবেন।</li>
                 <li>Super Admin যে চেম্বার Active রেখেছেন, সেটি আপনি নিজে <b>চালু বা বন্ধ</b> করতে পারবেন।</li>
                 <li>Super Admin Inactive করলে চেম্বারটি লক হয়ে যায়, আপনি চালু করতে পারবেন না।</li>
                 <li>একসাথে শুধু <b>একটি</b> চেম্বার চালু থাকে। অন্যটি চালু করলে আগেরটি বন্ধ হয়ে যায়।</li>
@@ -236,7 +260,10 @@
             <div class="ch-empty">
                 <i class="fa-solid fa-hospital-user"></i>
                 <h5 class="fw-bold mt-2">এখনো কোনো চেম্বার যোগ করা হয়নি</h5>
-                <p class="text-muted mb-0">Super Admin আপনার জন্য চেম্বার যোগ করলে এখানে দেখতে পাবেন।</p>
+                <p class="text-muted mb-3">নতুন চেম্বারের জন্য রিকোয়েস্ট পাঠান। Super Admin অনুমোদন করলে এখানে দেখতে পাবেন।</p>
+                <a href="{{ route('doctor.chambers.request.create') }}" class="btn btn-primary fw-bold" style="background:#4f46e5;border-color:#4f46e5;border-radius:12px;">
+                    <i class="fa-solid fa-plus me-1"></i> নতুন চেম্বার রিকোয়েস্ট
+                </a>
             </div>
         @else
 
@@ -251,6 +278,12 @@
                     <button type="button" class="ch-tab" data-filter="working"><i class="fa-solid fa-circle-check"></i> চালু <span class="c">{{ $workingCnt }}</span></button>
                     <button type="button" class="ch-tab" data-filter="off"><i class="fa-solid fa-power-off"></i> বন্ধ <span class="c">{{ $offCnt }}</span></button>
                     <button type="button" class="ch-tab" data-filter="locked"><i class="fa-solid fa-lock"></i> লক <span class="c">{{ $lockedCnt }}</span></button>
+                    @if($pendingCnt > 0)
+                        <button type="button" class="ch-tab" data-filter="pending"><i class="fa-solid fa-hourglass-half"></i> অপেক্ষমান <span class="c">{{ $pendingCnt }}</span></button>
+                    @endif
+                    @if($rejectedCnt > 0)
+                        <button type="button" class="ch-tab" data-filter="rejected"><i class="fa-solid fa-ban"></i> বাতিল <span class="c">{{ $rejectedCnt }}</span></button>
+                    @endif
                 </div>
             </div>
 
@@ -258,10 +291,13 @@
             <div class="row g-4" id="chGrid">
                 @foreach($chambers as $chamber)
                     @php
-                        $adminOn = (bool) $chamber->status;
+                        $reqStatus = $chamber->request_status ?? 'approved';
+                        $adminOn = $reqStatus === 'approved' && (bool) $chamber->status;
                         $docOn   = (bool) $chamber->doctor_active;
                         $isWork  = $adminOn && $docOn;
-                        $state   = $isWork ? 'working' : ($adminOn ? 'off' : 'locked');
+                        $state   = $reqStatus === 'waiting_request' ? 'pending'
+                                 : ($reqStatus === 'rejected' ? 'rejected'
+                                 : ($isWork ? 'working' : ($adminOn ? 'off' : 'locked')));
                         $days    = collect(preg_split('/\s*[,\/|·،]+\s*/u', (string) $chamber->visiting_days))->map('trim')->filter()->values();
                         $search  = mb_strtolower(trim($chamber->chamber_name . ' ' . $chamber->hospital_name . ' ' . $chamber->address . ' ' . $chamber->phone));
                     @endphp
@@ -275,7 +311,11 @@
                                     <h5 class="text-truncate">{{ $chamber->chamber_name }}</h5>
                                     <div class="sub text-truncate">{{ $chamber->hospital_name }}</div>
                                 </div>
-                                @if($isWork)
+                                @if($state === 'pending')
+                                    <span class="ch-flag pending"><i class="fa-solid fa-hourglass-half"></i>অপেক্ষমান</span>
+                                @elseif($state === 'rejected')
+                                    <span class="ch-flag rejected"><i class="fa-solid fa-ban"></i>বাতিল</span>
+                                @elseif($isWork)
                                     <span class="ch-flag working"><span class="live-dot"></span>চালু আছে</span>
                                 @elseif($adminOn)
                                     <span class="ch-flag off"><i class="fa-solid fa-power-off"></i>বন্ধ</span>
@@ -331,6 +371,15 @@
                             </div>
 
                             <div class="ch-foot">
+                                @if($state === 'pending')
+                                    <div class="ch-note pending"><i class="fa-solid fa-hourglass-half me-1"></i> Super Admin রিভিউ করছেন। টেমপ্লেট সেট হলে চেম্বার Active হবে।</div>
+                                    <div class="ch-row mt-2">
+                                        <span class="k">রিকোয়েস্ট ফি</span>
+                                        <span class="pill wait">৳{{ (int) $chamber->fee_charged }} কাটা হয়েছে</span>
+                                    </div>
+                                @elseif($state === 'rejected')
+                                    <div class="ch-note rejected"><i class="fa-solid fa-ban me-1"></i> রিকোয়েস্ট বাতিল হয়েছে@if($chamber->reject_reason): {{ $chamber->reject_reason }}@endif। ফি ফেরত দেওয়া হয়েছে।</div>
+                                @else
                                 <div class="ch-row">
                                     <span class="k"><i class="fa-solid fa-user-shield me-1 text-muted"></i> Super Admin</span>
                                     @if($adminOn)
@@ -359,6 +408,7 @@
                                 @unless($adminOn)
                                     <div class="ch-lockmsg"><i class="fa-solid fa-lock me-1"></i> Super Admin এই চেম্বার Inactive করে রেখেছেন। চালু করতে তাঁর সাথে যোগাযোগ করুন।</div>
                                 @endunless
+                                @endif
                             </div>
                         </div>
                     </div>

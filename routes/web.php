@@ -11,6 +11,8 @@ use App\Http\Controllers\Assistant\SerialController as AssistantSerialController
 use App\Http\Controllers\Doctor\ApprovalStatusController;
 use App\Http\Controllers\Doctor\AssistantController;
 use App\Http\Controllers\Doctor\ChamberController as DoctorChamberController;
+use App\Http\Controllers\Admin\ChamberRequestController as AdminChamberRequestController;
+use App\Http\Controllers\Doctor\ChamberRequestController as DoctorChamberRequestController;
 use App\Http\Controllers\Doctor\DashboardController as DoctorDashboardController;
 use App\Http\Controllers\Doctor\PrescriptionController;
 use App\Http\Controllers\Doctor\PatientController;
@@ -86,6 +88,17 @@ Route::middleware(['auth', 'role:super_admin'])
         Route::resource('doctors', DoctorController::class);
         Route::resource('templates', PrescriptionTemplateController::class);
         Route::resource('chambers', ChamberController::class);
+
+        // Chamber requests (Super Admin review)
+        Route::get('chamber-requests', [AdminChamberRequestController::class, 'index'])->name('chamber-requests.index');
+        Route::get('chamber-requests/{chamber}', [AdminChamberRequestController::class, 'show'])
+            ->whereNumber('chamber')->name('chamber-requests.show');
+        Route::post('chamber-requests/{chamber}/approve', [AdminChamberRequestController::class, 'approve'])
+            ->whereNumber('chamber')->name('chamber-requests.approve');
+        Route::post('chamber-requests/{chamber}/reject', [AdminChamberRequestController::class, 'reject'])
+            ->whereNumber('chamber')->name('chamber-requests.reject');
+        Route::patch('chamber-requests/{chamber}/toggle', [AdminChamberRequestController::class, 'toggle'])
+            ->whereNumber('chamber')->name('chamber-requests.toggle');
         Route::resource('medicines', MedicineController::class);
 
         // Wallets
@@ -134,6 +147,10 @@ Route::middleware(['auth', 'role:doctor', 'doctor.approved'])
         Route::patch('chambers/{chamber}/toggle', [DoctorChamberController::class, 'toggle'])
             ->whereNumber('chamber')
             ->name('chambers.toggle');
+
+        // Chamber request (doctor)
+        Route::get('chambers/request', [DoctorChamberRequestController::class, 'create'])->name('chambers.request.create');
+        Route::post('chambers/request', [DoctorChamberRequestController::class, 'store'])->name('chambers.request.store');
 
         // Patients (static route-gulo {patient} route-er age)
         Route::get('patients', [PatientController::class, 'index'])->name('patients.index');
