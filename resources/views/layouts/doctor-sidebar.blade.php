@@ -98,10 +98,9 @@
                     </div>
                 </div>
 
-                <a href="#" class="side-link disabled">
+                <a href="{{ route('doctor.favorites.index') }}" class="side-link {{ Request::is('doctor/favorites*') ? 'active' : '' }}">
                     <i class="fa-solid fa-star"></i>
                     <span>Favorite Medicines</span>
-                    <span class="soon-badge">Soon</span>
                 </a>
 
                 <a href="#" class="side-link disabled">

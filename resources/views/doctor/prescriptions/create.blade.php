@@ -285,12 +285,12 @@
                             </div>
                         </div>
 
-                        <div>
+                        <div class="relative">
                             <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Investigations / Tests Advice <span id="invReq" class="text-rose-500 hidden">*</span></label>
-                            <textarea name="investigations" id="investigations" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">{{ old('investigations', $parent->investigations ?? '') }}</textarea>
+                            <textarea name="investigations" id="investigations" rows="2" placeholder="টেস্টের নাম লিখুন — suggestion আসবে (যেমন: cbc, sugar, usg, ecg)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">{{ old('investigations', $parent->investigations ?? '') }}</textarea>
 
-                            <!-- Quick test chips (JS diye render hoy, QUICK_TESTS array te notun test jog korun) -->
-                            <div id="quickTests" class="flex flex-wrap gap-1.5 mt-2"></div>
+                            <!-- Test suggestions (likhle dropdown-e ashbe; TEST_CATALOG array te notun test jog korun) -->
+                            <div id="invSuggest" class="hidden absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-40 max-h-60 overflow-y-auto"></div>
                         </div>
 
                         <div id="findingsWrap" class="{{ $parent ? 'bg-amber-50 border border-amber-200 rounded-xl p-3' : '' }}">
@@ -707,8 +707,9 @@
                             <div class="px-4 py-2 hover:bg-indigo-50 cursor-pointer flex justify-between items-center gap-2" data-id="${escHtml(item.id)}" data-label="${escHtml(item.label)}" data-generic="${escHtml(item.generic_name || '')}">
                                 <div>
                                     <div class="font-semibold text-slate-700">${escHtml(item.label)}</div>
-                                    <div class="text-[11px] text-slate-400">${escHtml(item.generic_name || '')}</div>
+                                    <div class="text-[11px] text-slate-400">${escHtml(item.generic_name || '')}${item.company ? ' · ' + escHtml(item.company) : ''}</div>
                                 </div>
+                                ${item.is_favorite_company ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap" style="background:#d1fae5;color:#065f46"><i class="fa-solid fa-star"></i> আপনার ব্র্যান্ড</span>' : ''}
                                 ${item.is_sponsored ? '<span class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full whitespace-nowrap"><i class="fa-solid fa-star"></i> Sponsored</span>' : ''}
                             </div>`).join('');
                         searchResults.classList.remove('hidden');
@@ -731,62 +732,364 @@
         function fillDuration(v) { byId('med-duration').value = v; }
         function fillInstruction(v) { byId('med-instruction').value = v; }
 
-        /* ================= Investigation quick-test chips ================= */
-        // Notun test jog korte chaile ei list-e ekta line add korun.
-        // Chip-er label alada hole ['Full Name', 'Short Label'] likhun. Test-er naame comma (,) dibenna.
-        const QUICK_TESTS = [
-            // --- common (ager gulo) ---
-            'CBC', 'ESR', 'Dengue NS-1', 'ECG', 'Lipid Profile',
-            ['Serum Creatinine', 'Creatinine'], 'RBS', ['Widal Test', 'Widal'], 'Urine R/E', 'X-Ray Chest',
-            // --- blood / sugar ---
-            'FBS', '2 Hrs ABF', 'HbA1c', 'Hb%', 'Platelet Count', 'PBF', 'CRP', 'Blood Grouping & Rh',
-            'Prothrombin Time (PT/INR)', 'D-Dimer',
-            // --- liver / kidney / minerals ---
-            'SGPT (ALT)', 'Serum Bilirubin', 'LFT', 'RFT', 'Serum Electrolytes', 'Serum Uric Acid', 'Serum Calcium',
-            // --- hormone / vitamin ---
-            'TSH', 'Thyroid Profile', 'Vitamin D', 'S. Ferritin', 'PSA', 'Pregnancy Test (UPT)',
-            // --- infection ---
-            'Blood Culture', 'Urine C/S', 'Stool R/E', 'Typhidot', 'Dengue IgG/IgM', 'MP (Malaria Parasite)',
-            'HBsAg', 'Anti-HCV', 'Sputum for AFB', 'Mantoux Test',
-            // --- cardiac ---
-            'Troponin-I', 'CK-MB', 'Echocardiogram',
-            // --- imaging ---
-            'USG W/A', 'USG KUB', 'CT Scan Brain', 'MRI',
-        ];
-        const QUICK_VISIBLE = 14;
-        let quickExpanded = false;
+        /* ================= Investigation suggestions (likhle suggest hobe) ================= */
+// Notun test jog korte chaile ei list-e ekta line add korun.
+// Format: 'Test-er Naam|alias|alias'  (alias diye-o khujle pawa jabe, e.g. "sugar" likhle RBS/FBS ashbe).
+// Test-er naame comma (,) dibenna, karon comma diye test alada kora hoy.
+const TEST_CATALOG = [
+    // --- Blood: basic ---
+    'CBC|complete blood count|blood count|hb|hemoglobin|wbc|platelet',
+    'Hb%|hemoglobin|haemoglobin|anemia',
+    'ESR|erythrocyte sedimentation rate',
+    'Platelet Count|platelet|plt|dengue',
+    'TC DC|total count|differential count|wbc',
+    'PBF|peripheral blood film|blood film|smear',
+    'Reticulocyte Count|retic',
+    'Blood Grouping & Rh|blood group|rh factor',
+    'Bleeding Time & Clotting Time|bt ct',
+    'Prothrombin Time (PT/INR)|pt|inr|coagulation',
+    'aPTT|activated partial thromboplastin',
+    'D-Dimer|ddimer',
+    'Coombs Test|direct coombs|indirect coombs',
+    'Hb Electrophoresis|thalassemia|hemoglobin electrophoresis',
+    'Serum Ferritin|ferritin|s. ferritin|iron',
+    'Serum Iron|iron',
+    'TIBC|iron binding capacity',
+    'Serum Vitamin B12|b12|vitamin b12',
+    'Serum Folate|folic acid|folate',
+    // --- Sugar / diabetes ---
+    'RBS|random blood sugar|sugar|glucose',
+    'FBS|fasting blood sugar|sugar|glucose',
+    '2 Hrs ABF|2 hrs after breakfast|ppbs|pp sugar|sugar',
+    '2 Hrs After 75g Glucose (OGTT)|ogtt|glucose tolerance|sugar',
+    'HbA1c|hba1c|glycated hemoglobin|sugar|diabetes',
+    'Urine Sugar|urine glucose',
+    'Urine Ketone|ketone',
+    'Serum Insulin (Fasting)|insulin',
+    'C-Peptide|cpeptide',
+    'Urine Microalbumin|albumin creatinine ratio|acr|microalbuminuria',
+    // --- Lipid ---
+    'Lipid Profile|cholesterol|tg|ldl|hdl|triglyceride',
+    'Serum Cholesterol|cholesterol',
+    'Serum Triglyceride|triglyceride|tg',
+    'LDL-C|ldl|cholesterol',
+    'HDL-C|hdl|cholesterol',
+    'Lipoprotein (a)|lp(a)|lipoprotein a',
+    // --- Liver ---
+    'LFT|liver function test|liver profile',
+    'SGPT (ALT)|alt|sgpt|liver',
+    'SGOT (AST)|ast|sgot|liver',
+    'Serum Bilirubin (Total & Direct)|bilirubin|jaundice',
+    'Serum Alkaline Phosphatase|alp|alkaline phosphatase',
+    'GGT|gamma gt|ggt',
+    'Serum Albumin|albumin',
+    'Serum Total Protein|total protein|a/g ratio',
+    'Serum Amylase|amylase|pancreas',
+    'Serum Lipase|lipase|pancreas',
+    'AFP|alpha fetoprotein|alpha feto protein',
+    // --- Kidney / minerals ---
+    'RFT|renal function test|kidney function',
+    'Serum Creatinine|creatinine|kidney',
+    'Blood Urea|urea|bun',
+    'eGFR|gfr|kidney',
+    'Serum Electrolytes|na k cl|sodium|potassium|electrolyte',
+    'Serum Sodium|sodium|na',
+    'Serum Potassium|potassium|k',
+    'Serum Calcium|calcium|ca',
+    'Serum Phosphate|phosphate|phosphorus',
+    'Serum Magnesium|magnesium|mg',
+    'Serum Uric Acid|uric acid|gout',
+    'Serum Bicarbonate|bicarbonate|hco3',
+    'ABG|arterial blood gas|blood gas',
+    // --- Urine / stool ---
+    'Urine R/E|urine re|urine routine|urine routine examination',
+    'Urine C/S|urine culture|culture sensitivity|urine cs',
+    'Urine for Pus Cells|pus cell',
+    '24 Hrs Urinary Protein|24 hour urine protein|proteinuria',
+    '24 Hrs Urinary Creatinine Clearance|creatinine clearance',
+    'Urine Pregnancy Test (UPT)|upt|pregnancy test|pregnancy',
+    'Stool R/E|stool re|stool routine',
+    'Stool C/S|stool culture',
+    'Stool for Occult Blood|occult blood|fobt',
+    'Stool for Ova & Cyst|ova cyst|worm|parasite',
+    'Stool for Reducing Substances|reducing substance',
+    // --- Infection / fever ---
+    'Dengue NS-1|ns1|ns-1|dengue',
+    'Dengue IgG/IgM|dengue igg|dengue igm|dengue antibody',
+    'MP (Malaria Parasite)|mp|malaria|malaria parasite',
+    'Malaria Rapid Test (ICT)|malaria ict|malaria card',
+    'Widal Test|widal|typhoid',
+    'Typhidot (IgM/IgG)|typhidot|typhoid',
+    'Blood Culture & Sensitivity|blood culture|culture sensitivity|bc',
+    'CRP|c reactive protein|c-reactive protein|inflammation',
+    'Procalcitonin|pct',
+    'Chikungunya IgM|chikungunya',
+    'COVID-19 Rapid Antigen|covid|corona|rapid antigen',
+    'COVID-19 RT-PCR|covid pcr|corona pcr|rt pcr',
+    'Influenza A/B Rapid Test|influenza|flu',
+    'Brucella Antibody|brucella',
+    'Leptospira IgM|leptospira',
+    'Kala-azar (rK39) Test|kala azar|rk39|leishmania',
+    'HBsAg|hepatitis b|hbs ag',
+    'Anti-HCV|hepatitis c|hcv',
+    'Anti-HBs|hbs antibody',
+    'HBV DNA (Quantitative)|hbv dna|hepatitis b dna',
+    'HCV RNA (Quantitative)|hcv rna|hepatitis c rna',
+    'Anti-HAV IgM|hepatitis a',
+    'Anti-HEV IgM|hepatitis e',
+    'Anti-HIV (I & II)|hiv|aids',
+    'VDRL / TPHA|vdrl|tpha|syphilis',
+    'Mantoux Test (MT)|mantoux|tuberculin|tb test',
+    'Sputum for AFB|afb|sputum|tb',
+    'GeneXpert MTB/RIF|genexpert|xpert|tb',
+    'Sputum C/S|sputum culture',
+    'Throat Swab C/S|throat swab',
+    'Wound Swab C/S|wound swab|pus culture',
+    'H. pylori Stool Antigen|h pylori|pylori|stool antigen',
+    'H. pylori Breath Test|urea breath test|h pylori',
+    'ASO Titre|aso|anti streptolysin',
+    // --- Hormones / vitamins ---
+    'TSH|thyroid stimulating hormone|thyroid',
+    'Free T3|ft3|thyroid',
+    'Free T4|ft4|thyroid',
+    'Thyroid Profile (T3, T4, TSH)|thyroid profile|thyroid function',
+    'Anti-TPO|thyroid antibody|tpo',
+    'Serum Vitamin D (25-OH)|vitamin d|vit d',
+    'Serum PTH|parathyroid|pth',
+    'Serum Cortisol|cortisol',
+    'FSH|follicle stimulating hormone',
+    'LH|luteinizing hormone',
+    'Prolactin|prl',
+    'Serum Estradiol (E2)|estradiol|oestrogen',
+    'Serum Progesterone|progesterone',
+    'Serum Testosterone|testosterone',
+    'AMH|anti mullerian hormone',
+    'Beta-hCG (Quantitative)|beta hcg|hcg|pregnancy',
+    'PSA (Total)|psa|prostate',
+    'Semen Analysis|semen|sperm count',
+    // --- Autoimmune / rheumatology / tumor markers ---
+    'RA Factor|ra test|rheumatoid factor|rheumatoid',
+    'Anti-CCP|ccp|rheumatoid',
+    'ANA|antinuclear antibody',
+    'Anti-dsDNA|dsdna|lupus',
+    'C3 / C4|complement',
+    'HLA-B27|hla b27',
+    'CA-125|ca125|ovarian',
+    'CA 19-9|ca19-9|pancreas',
+    'CEA|carcinoembryonic antigen',
+    'Biopsy (Histopathology)|biopsy|histopathology|histology',
+    'FNAC|fine needle aspiration|fnac',
+    'Pap Smear|pap test|cervical smear',
+    // --- Cardiac ---
+    'ECG|electrocardiogram|ekg|heart',
+    'Echocardiogram|echo|2d echo|heart',
+    'Exercise ECG (TMT)|tmt|stress test|treadmill',
+    'Holter Monitoring (24 Hrs)|holter',
+    'Ambulatory BP Monitoring|abpm',
+    'Troponin-I|trop i|troponin|heart attack',
+    'Troponin-T|trop t|troponin',
+    'CK-MB|ckmb|cardiac enzyme',
+    'CPK|cpk|creatine phosphokinase',
+    'NT-proBNP|bnp|probnp|heart failure',
+    'LDH|lactate dehydrogenase',
+    'CT Coronary Angiogram|ct angiogram|coronary angiogram',
+    'Coronary Angiogram (CAG)|cag|angiogram',
+    'Carotid Doppler|carotid',
+    'Doppler Study of Lower Limb (Arterial)|arterial doppler|leg doppler',
+    'Doppler Study of Lower Limb (Venous)|venous doppler|dvt',
+    // --- X-ray ---
+    'X-Ray Chest (P/A View)|x-ray chest|xray chest|cxr|chest x ray',
+    'X-Ray Chest (Lateral View)|chest lateral',
+    'X-Ray Abdomen (Erect)|x ray abdomen|abdomen xray',
+    'X-Ray KUB|kub xray',
+    'X-Ray PNS (OM View)|pns|sinus|om view',
+    'X-Ray Cervical Spine (B/V)|cervical spine|c spine|neck xray',
+    'X-Ray Lumbosacral Spine (B/V)|ls spine|lumbar spine|back xray',
+    'X-Ray Thoracic Spine (B/V)|thoracic spine',
+    'X-Ray Skull (B/V)|skull',
+    'X-Ray Pelvis (A/P View)|pelvis|hip',
+    'X-Ray Knee Joint (B/V)|knee',
+    'X-Ray Shoulder Joint|shoulder',
+    'X-Ray Elbow Joint|elbow',
+    'X-Ray Wrist Joint|wrist',
+    'X-Ray Ankle Joint|ankle',
+    'X-Ray Hand|hand',
+    'X-Ray Foot|foot',
+    'Barium Swallow|barium|swallow',
+    'Barium Meal|barium|stomach',
+    'Barium Enema|barium|colon',
+    'IVU|intravenous urography|urogram',
+    'HSG|hysterosalpingography',
+    'Mammography|mammogram|breast',
+    'DEXA Scan|bone density|bmd|dexa|osteoporosis',
+    // --- Ultrasound ---
+    'USG of Whole Abdomen|usg w/a|usg wa|usg|ultrasound|whole abdomen',
+    'USG of Upper Abdomen|usg upper abdomen|usg|liver|gallbladder',
+    'USG of Lower Abdomen|usg lower abdomen|usg|pelvis',
+    'USG of KUB & Prostate|usg kub|kub|kidney|prostate',
+    'USG of Pelvis|usg pelvis|uterus|ovary',
+    'USG of Pregnancy Profile|usg pregnancy|obstetric usg|anomaly scan',
+    'USG of Neck|usg neck|thyroid usg',
+    'USG of Breast|usg breast',
+    'USG of Scrotum|usg scrotum|testis',
+    'USG of Thyroid|usg thyroid',
+    'USG of Chest (Pleural)|usg chest|pleural effusion',
+    'Fibroscan|liver stiffness|elastography',
+    'Color Doppler Study|doppler',
+    'Transvaginal Sonography (TVS)|tvs|transvaginal',
+    // --- CT / MRI ---
+    'CT Scan of Brain|ct brain|ct head|head ct',
+    'CT Scan of PNS|ct pns|ct sinus',
+    'CT Scan of Chest (HRCT)|hrct|ct chest',
+    'CT Scan of Whole Abdomen|ct abdomen|ct w/a',
+    'CT Scan of KUB|ct kub|stone',
+    'CT Scan of Neck|ct neck',
+    'CT Scan of Spine|ct spine',
+    'MRI of Brain|mri brain|brain mri',
+    'MRI of Cervical Spine|mri c spine|mri neck',
+    'MRI of Lumbosacral Spine|mri ls spine|mri lumbar|mri back',
+    'MRI of Knee Joint|mri knee',
+    'MRI of Shoulder Joint|mri shoulder',
+    'MRI of Pelvis|mri pelvis',
+    'MRI of Whole Abdomen|mri abdomen',
+    'MRCP|mr cholangiopancreatography',
+    'MR Angiography (Brain)|mra|mr angiogram',
+    'PET-CT Scan|pet ct|pet scan',
+    // --- Neuro / ENT / eye / others ---
+    'EEG|electroencephalogram|seizure|epilepsy',
+    'EMG & NCV|nerve conduction|nct|nerve study|emg',
+    'Audiometry (PTA)|audiometry|pta|hearing',
+    'Tympanometry|tympanogram',
+    'Nasal Endoscopy|dne|nasal endoscope',
+    'Pulmonary Function Test (Spirometry)|pft|spirometry|lung function|asthma',
+    'Peak Flow Meter Reading|peak flow',
+    'Upper GI Endoscopy|endoscopy|ugi|gastroscopy|oges',
+    'Colonoscopy|colon scope',
+    'Sigmoidoscopy',
+    'Bronchoscopy',
+    'Cystoscopy',
+    'Pleural Fluid Analysis|pleural fluid|pleural tap',
+    'Ascitic Fluid Analysis|ascitic fluid|ascitic tap',
+    'CSF Study|csf|lumbar puncture|lp',
+    'Synovial Fluid Analysis|joint fluid',
+    'Bone Marrow Study|bone marrow|bm study',
+    'Fundoscopy|fundus|eye',
+    'Slit Lamp Examination|slit lamp|eye',
+    'OCT (Optical Coherence Tomography)|oct|retina',
+    'Visual Field Test|visual field|perimetry',
+    'Intraocular Pressure (IOP)|iop|glaucoma|tonometry',
+    'Blood Sugar Profile (Day Long)|sugar profile|sugar series',
+    'Blood Film for Microfilaria|microfilaria|filaria',
+    'Fine Needle Aspiration Cytology (Thyroid)|thyroid fnac',
+    'BMI & Waist Measurement|bmi|waist',
+    'Oral Glucose Challenge Test (GDM)|gdm|gestational diabetes',
+].filter(Boolean).map(function (line) {
+    const parts = line.split('|');
+    return { name: parts[0], keys: parts.map(function (x) { return x.toLowerCase(); }) };
+});
 
-        function renderQuickTests() {
-            const wrap = byId('quickTests');
-            const list = quickExpanded ? QUICK_TESTS : QUICK_TESTS.slice(0, QUICK_VISIBLE);
+const invBox = byId('investigations');
+const invSuggest = byId('invSuggest');
+let invList = [];
+let invActive = 0;
+let invRange = null;
 
-            wrap.innerHTML = list.map(t => {
-                const value = Array.isArray(t) ? t[0] : t;
-                const label = Array.isArray(t) ? t[1] : t;
-                return `<span data-test="${escHtml(value)}" class="quick-test bg-teal-50 text-teal-700 border border-teal-100 px-2 py-0.5 rounded text-xs font-medium cursor-pointer hover:bg-teal-100">🔬 ${escHtml(label)}</span>`;
-            }).join('');
+// Cursor jei test-er ghore ache (comma / notun line diye alada) sheta ber kore
+function invToken() {
+    const v = invBox.value;
+    const pos = invBox.selectionStart || 0;
+    const s = pos === 0 ? 0 : Math.max(v.lastIndexOf(',', pos - 1), v.lastIndexOf('\n', pos - 1)) + 1;
+    const next = v.slice(pos).search(/[,\n]/);
+    const e = next === -1 ? v.length : pos + next;
+    return { s: s, e: e, q: v.slice(s, e).trim() };
+}
 
-            if (QUICK_TESTS.length > QUICK_VISIBLE) {
-                const hidden = QUICK_TESTS.length - QUICK_VISIBLE;
-                wrap.innerHTML += `<span class="quick-toggle px-2 py-0.5 rounded text-xs font-bold text-indigo-600 cursor-pointer hover:underline">${quickExpanded ? 'কম দেখুন ▲' : `আরও দেখুন (+${hidden}) ▼`}</span>`;
-            }
-        }
+function invMatches(q) {
+    const needle = q.toLowerCase();
+    const words = needle.split(/\s+/).filter(Boolean);
+    const t = invToken();
+    const taken = invBox.value.slice(0, t.s).concat(',', invBox.value.slice(t.e))
+        .split(/[,\n]/).map(function (x) { return x.trim().toLowerCase(); }).filter(Boolean);
 
-        byId('quickTests').addEventListener('click', function (e) {
-            const chip = e.target.closest('.quick-test');
-            if (chip) { addQuickTest(chip.dataset.test); return; }
-            if (e.target.closest('.quick-toggle')) { quickExpanded = !quickExpanded; renderQuickTests(); }
-        });
+    const out = [];
+    TEST_CATALOG.forEach(function (it, idx) {
+        if (taken.indexOf(it.name.toLowerCase()) !== -1) return;
+        const hay = it.keys.join(' ');
+        if (!words.every(function (w) { return hay.indexOf(w) !== -1; })) return;
 
-        function addQuickTest(name) {
-            const ta = byId('investigations');
-            const parts = ta.value.split(',').map(s => s.trim()).filter(Boolean);
-            if (!parts.includes(name)) parts.push(name);
-            ta.value = parts.join(', ');
-            dirty = true;
-        }
+        let score = 3;
+        if (it.name.toLowerCase().indexOf(needle) === 0) score = 0;
+        else if (it.keys.some(function (k) { return k.indexOf(needle) === 0; })) score = 1;
+        else if (it.keys.some(function (k) { return (' ' + k).indexOf(' ' + needle) !== -1; })) score = 2;
+        out.push({ it: it, score: score, idx: idx });
+    });
+    out.sort(function (a, b) { return a.score - b.score || a.idx - b.idx; });
+    return out.slice(0, 8).map(function (x) { return x.it; });
+}
 
-        renderQuickTests();
+function hideInvSuggest() { invSuggest.classList.add('hidden'); invList = []; }
+
+function renderInvSuggest() {
+    const t = invToken();
+    invRange = t;
+    if (t.q.length < 1) { hideInvSuggest(); return; }
+
+    invList = invMatches(t.q);
+    if (!invList.length) { hideInvSuggest(); return; }
+    if (invActive >= invList.length) invActive = 0;
+
+    invSuggest.innerHTML = invList.map(function (it, i) {
+        return '<div class="inv-sug px-3 py-1.5 cursor-pointer text-sm ' +
+            (i === invActive ? 'bg-teal-50 text-teal-800 font-semibold' : 'text-slate-700 hover:bg-teal-50') +
+            '" data-i="' + i + '">🔬 ' + escHtml(it.name) + '</div>';
+    }).join('');
+    invSuggest.classList.remove('hidden');
+}
+
+function pickInvSuggest(i) {
+    const it = invList[i];
+    if (!it) return;
+    const t = invToken();
+    const v = invBox.value;
+    let before = v.slice(0, t.s);
+    if (before.trim() && !/\s$/.test(before)) before += ' ';
+    const after = v.slice(t.e);
+    const tail = after.trim() === '' ? ', ' : '';
+
+    invBox.value = before + it.name + tail + after;
+    const caret = (before + it.name + tail).length;
+    invBox.setSelectionRange(caret, caret);
+    invBox.focus();
+    dirty = true;
+    invActive = 0;
+    hideInvSuggest();
+}
+
+// Save-er age shesh-er extra comma/space muche felbo
+function cleanInvText() {
+    invBox.value = invBox.value.replace(/[,\s]+$/, '');
+}
+
+invBox.addEventListener('input', function () { invActive = 0; renderInvSuggest(); });
+invBox.addEventListener('click', renderInvSuggest);
+invBox.addEventListener('keyup', function (e) {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Home' || e.key === 'End') renderInvSuggest();
+});
+invBox.addEventListener('keydown', function (e) {
+    if (invSuggest.classList.contains('hidden') || !invList.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); invActive = (invActive + 1) % invList.length; renderInvSuggest(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); invActive = (invActive - 1 + invList.length) % invList.length; renderInvSuggest(); }
+    else if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); pickInvSuggest(invActive); }
+    else if (e.key === 'Escape') { e.preventDefault(); hideInvSuggest(); }
+});
+invBox.addEventListener('blur', function () { setTimeout(hideInvSuggest, 150); cleanInvText(); });
+invSuggest.addEventListener('mousedown', function (e) {
+    const row = e.target.closest('.inv-sug');
+    if (!row) return;
+    e.preventDefault();   // textarea-r focus jate na jay
+    pickInvSuggest(parseInt(row.dataset.i, 10));
+});
+byId('prescriptionForm').addEventListener('submit', cleanInvText);
 
         /* ================= Patient search / select (Patient ID aware) ================= */
         // Ekoi mobile-e ekadhik rogi thakte pare, tai mobile diye shudhu ekjon dhora hoy na.
@@ -1778,4 +2081,8 @@
             }
         });
     </script>
+@endpush
+
+@push('scripts')
+@include('doctor.prescriptions._default-medicines')
 @endpush
