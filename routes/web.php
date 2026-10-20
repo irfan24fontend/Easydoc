@@ -267,3 +267,18 @@ Route::middleware(['auth', 'role:assistant'])
             ->whereNumber('serial')
             ->name('serials.status');
     });
+
+
+// Public disk files (doctor photo, chamber pad image) Laravel diye serve hoy.
+// Deploy e public_html/storage muche gelew image bhangbe na.
+Route::get('/storage/{path}', function (string $path) {
+    $base = realpath(storage_path('app/public'));
+    $file = $base ? realpath($base . DIRECTORY_SEPARATOR . $path) : false;
+
+    abort_unless(
+        $file && is_file($file) && str_starts_with($file, $base . DIRECTORY_SEPARATOR),
+        404
+    );
+
+    return response()->file($file, ['Cache-Control' => 'public, max-age=604800']);
+})->where('path', '.*')->name('public.storage');
