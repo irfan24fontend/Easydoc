@@ -282,3 +282,5 @@ Route::get('/storage/{path}', function (string $path) {
 
     return response()->file($file, ['Cache-Control' => 'public, max-age=604800']);
 })->where('path', '.*')->name('public.storage');
+
+require __DIR__.'/wallet_notifications.php';

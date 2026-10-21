@@ -26,6 +26,10 @@
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+
+        /* Tailwind (compiled into app.css) has a ".collapse { visibility: collapse }" utility.
+           It hides Bootstrap's dropdown/collapse menus even when they are open, so undo it. */
+        .collapse { visibility: visible !important; }
     </style>
 
     @stack('styles')
@@ -106,6 +110,10 @@
         update();
     })();
 </script>
+
+@if(\Illuminate\Support\Facades\Route::has('doctor.notifications.poll'))
+    @include('doctor.notifications._popup')
+@endif
 
 @stack('scripts')
 

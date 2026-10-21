@@ -11,6 +11,14 @@
     $isCreateRx = Request::routeIs('doctor.prescriptions.create');
     $profileOpen = Request::is('doctor/public-profile*');
     $hasPublicProfile = (bool) $doctor?->profile()->exists();
+    $walletOpen  = Request::is('doctor/wallet*');
+    try {
+        $unreadNotifs = $doctor
+            ? \App\Models\DoctorNotification::where('doctor_id', $doctor->id)->whereNull('read_at')->count()
+            : 0;
+    } catch (\Throwable $e) {
+        $unreadNotifs = 0;   // table not migrated yet
+    }
     $isListRx   = Request::routeIs('doctor.prescriptions.index')
                || Request::routeIs('doctor.prescriptions.show')
                || Request::routeIs('doctor.prescriptions.edit');
@@ -98,16 +106,63 @@
                     </div>
                 </div>
 
-                <a href="{{ route('doctor.favorites.index') }}" class="side-link {{ Request::is('doctor/favorites*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-star"></i>
-                    <span>Favorite Medicines</span>
-                </a>
+                @if(Route::has('doctor.favorites.index'))
+                    <a href="{{ route('doctor.favorites.index') }}" class="side-link {{ Request::is('doctor/favorites*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-star"></i>
+                        <span>Favorite Medicines</span>
+                    </a>
+                @else
+                    <a href="#" class="side-link disabled">
+                        <i class="fa-solid fa-star"></i>
+                        <span>Favorite Medicines</span>
+                        <span class="soon-badge">Soon</span>
+                    </a>
+                @endif
 
-                <a href="#" class="side-link disabled">
-                    <i class="fa-solid fa-wallet"></i>
-                    <span>Wallet & Recharge</span>
-                    <span class="soon-badge">Soon</span>
-                </a>
+                @if(Route::has('doctor.wallet.recharge'))
+                    {{-- Wallet (submenu: Recharge / Invoices / Log) --}}
+                    <a href="#"
+                       class="side-link has-sub {{ $walletOpen ? 'open-parent' : '' }}"
+                       data-submenu="walletMenu" role="button"
+                       aria-expanded="{{ $walletOpen ? 'true' : 'false' }}" aria-controls="walletMenu">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Wallet</span>
+                        <i class="fa-solid fa-chevron-down caret"></i>
+                    </a>
+                    <div class="submenu {{ $walletOpen ? 'open' : '' }}" id="walletMenu">
+                        <div class="sub-links">
+                            <a href="{{ route('doctor.wallet.recharge') }}" class="side-sublink {{ Request::is('doctor/wallet/recharge') ? 'active' : '' }}">
+                                <i class="fa-solid fa-circle-plus"></i>
+                                <span>Recharge</span>
+                            </a>
+                            <a href="{{ route('doctor.wallet.invoices') }}" class="side-sublink {{ Request::is('doctor/wallet/invoices*') ? 'active' : '' }}">
+                                <i class="fa-solid fa-file-invoice"></i>
+                                <span>Invoices</span>
+                            </a>
+                            <a href="{{ route('doctor.wallet.log') }}" class="side-sublink {{ Request::is('doctor/wallet/log') ? 'active' : '' }}">
+                                <i class="fa-solid fa-receipt"></i>
+                                <span>Log</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <a href="{{ route('doctor.notifications.index') }}" class="side-link {{ Request::is('doctor/notifications*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-bell"></i>
+                        <span>Notifications</span>
+                        <span class="count-badge js-notif-count" style="{{ $unreadNotifs > 0 ? '' : 'display:none' }}">{{ $unreadNotifs > 99 ? '99+' : $unreadNotifs }}</span>
+                    </a>
+
+                    <a href="{{ route('doctor.news.index') }}" class="side-link {{ Request::is('doctor/news*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-newspaper"></i>
+                        <span>News</span>
+                    </a>
+                @else
+                    <a href="#" class="side-link disabled">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Wallet & Recharge</span>
+                        <span class="soon-badge">Soon</span>
+                    </a>
+                @endif
             </nav>
         </div>
     </div>

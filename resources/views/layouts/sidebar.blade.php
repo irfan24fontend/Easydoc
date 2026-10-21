@@ -26,39 +26,10 @@
                     @endif
                 </a>
 
-                {{-- Chambers (submenu: All Chambers / Chamber Requests) --}}
-                @php
-                    $pendingChambers = \App\Models\Chamber::where('request_status', 'waiting_request')->count();
-                    $chamberOpen     = Request::is('admin/chambers*') || Request::is('admin/chamber-requests*');
-                @endphp
-                <a href="#" role="button"
-                   class="side-link has-sub {{ $chamberOpen ? 'open-parent' : '' }}"
-                   data-submenu="chamberSubmenu"
-                   aria-expanded="{{ $chamberOpen ? 'true' : 'false' }}" aria-controls="chamberSubmenu">
+                <a href="{{ route('admin.chambers.index') }}" class="side-link {{ Request::is('admin/chambers*') ? 'active' : '' }}">
                     <i class="fa-solid fa-hospital"></i>
                     <span>Chambers</span>
-                    @if($pendingChambers > 0)
-                        <span class="pending-badge" title="Review pending">{{ $pendingChambers }}</span>
-                    @endif
-                    <i class="fa-solid fa-chevron-down caret"></i>
                 </a>
-                <div class="side-submenu {{ $chamberOpen ? 'open' : '' }}" id="chamberSubmenu">
-                    <div class="sub-inner">
-                        <div class="sub-links">
-                            <a href="{{ route('admin.chambers.index') }}" class="side-sublink {{ Request::is('admin/chambers*') ? 'active' : '' }}">
-                                <i class="fa-solid fa-list"></i>
-                                <span>All Chambers</span>
-                            </a>
-                            <a href="{{ route('admin.chamber-requests.index') }}" class="side-sublink {{ Request::is('admin/chamber-requests*') ? 'active' : '' }}">
-                                <i class="fa-solid fa-inbox"></i>
-                                <span>Chamber Requests</span>
-                                @if($pendingChambers > 0)
-                                    <span class="pending-badge">{{ $pendingChambers }}</span>
-                                @endif
-                            </a>
-                        </div>
-                    </div>
-                </div>
 
                 <a href="{{ route('admin.templates.index') }}" class="side-link {{ Request::is('admin/templates*') ? 'active' : '' }}">
                     <i class="fa-solid fa-file-medical"></i>
@@ -67,28 +38,38 @@
 
                 {{-- Wallet Management (submenu: All Wallets / Invoices) --}}
                 @php
-                    $walletOpen = Request::is('admin/wallets*') || Request::is('admin/invoices*');
+                    $walletOpen = Request::is('admin/wallets*') || Request::is('admin/invoices*') || Request::is('admin/recharge-requests*');
+                    $pendingRecharges = \Illuminate\Support\Facades\Route::has('admin.recharge-requests.index')
+                        ? \App\Models\RechargeRequest::where('status', 'pending')->count()
+                        : 0;
                 @endphp
-                <a href="#" role="button"
+                <a href="#walletSubmenu"
                    class="side-link has-sub {{ $walletOpen ? 'open-parent' : '' }}"
-                   data-submenu="walletSubmenu"
+                   data-bs-toggle="collapse" role="button"
                    aria-expanded="{{ $walletOpen ? 'true' : 'false' }}" aria-controls="walletSubmenu">
                     <i class="fa-solid fa-wallet"></i>
                     <span>Wallet Management</span>
                     <i class="fa-solid fa-chevron-down caret"></i>
                 </a>
-                <div class="side-submenu {{ $walletOpen ? 'open' : '' }}" id="walletSubmenu">
-                    <div class="sub-inner">
-                        <div class="sub-links">
-                            <a href="{{ route('admin.wallets.index') }}" class="side-sublink {{ Request::is('admin/wallets*') ? 'active' : '' }}">
-                                <i class="fa-solid fa-user-doctor"></i>
-                                <span>All Wallets</span>
+                <div class="collapse {{ $walletOpen ? 'show' : '' }}" id="walletSubmenu">
+                    <div class="sub-links">
+                        <a href="{{ route('admin.wallets.index') }}" class="side-sublink {{ Request::is('admin/wallets*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-user-doctor"></i>
+                            <span>All Wallets</span>
+                        </a>
+                        @if(Route::has('admin.recharge-requests.index'))
+                            <a href="{{ route('admin.recharge-requests.index') }}" class="side-sublink {{ Request::is('admin/recharge-requests*') ? 'active' : '' }}">
+                                <i class="fa-solid fa-hand-holding-dollar"></i>
+                                <span>Recharge Requests</span>
+                                @if($pendingRecharges > 0)
+                                    <span style="margin-left:auto;font-size:11px;font-weight:800;background:#f59e0b;color:#0f172a;padding:1px 8px;border-radius:999px;">{{ $pendingRecharges }}</span>
+                                @endif
                             </a>
-                            <a href="{{ route('admin.invoices.index') }}" class="side-sublink {{ Request::is('admin/invoices*') ? 'active' : '' }}">
-                                <i class="fa-solid fa-file-invoice"></i>
-                                <span>Invoices</span>
-                            </a>
-                        </div>
+                        @endif
+                        <a href="{{ route('admin.invoices.index') }}" class="side-sublink {{ Request::is('admin/invoices*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-file-invoice"></i>
+                            <span>Invoices</span>
+                        </a>
                     </div>
                 </div>
 
@@ -96,6 +77,13 @@
                     <i class="fa-solid fa-pills"></i>
                     <span>Medicines</span>
                 </a>
+
+                @if(Route::has('admin.announcements.index'))
+                    <a href="{{ route('admin.announcements.index') }}" class="side-link {{ Request::is('admin/announcements*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-bullhorn"></i>
+                        <span>Notifications</span>
+                    </a>
+                @endif
 
                 <a href="#" class="side-link disabled">
                     <i class="fa-solid fa-user-injured"></i>
@@ -160,20 +148,11 @@
     .side-link.active { background: linear-gradient(135deg,#4f46e5,#4338ca); color: #fff; box-shadow: 0 4px 10px rgba(79,70,229,.25); }
     .side-link.disabled { opacity: 0.45; cursor: not-allowed; }
     .soon-badge { margin-left: auto; font-size: 9px; font-weight: 700; background: rgba(255,255,255,.1); padding: 2px 6px; border-radius: 999px; }
-    .pending-badge { margin-left: auto; font-size: 11px; font-weight: 800; background: #f59e0b; color: #0f172a; padding: 1px 8px; border-radius: 999px; }
-    .side-link .pending-badge + .caret { margin-left: 0; }
 
-    /* ---- Submenus (Bootstrap JS chara kaj kore) ---- */
-    .side-link.has-sub { cursor: pointer; user-select: none; }
+    /* ---- Wallet submenu ---- */
     .side-link.has-sub .caret { margin-left: auto; width: auto; font-size: 0.65rem; transition: transform .2s ease; }
-    .side-link.has-sub .pending-badge ~ .caret { margin-left: 8px; }
     .side-link.has-sub[aria-expanded="true"] .caret { transform: rotate(180deg); }
     .side-link.open-parent { background: rgba(255,255,255,.06); color: #fff; }
-
-    .side-submenu { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .22s ease; }
-    .side-submenu.open { grid-template-rows: 1fr; }
-    .side-submenu > .sub-inner { overflow: hidden; min-height: 0; }
-
     .sub-links { margin: 2px 0 6px 20px; padding-left: 12px; border-left: 1px solid rgba(255,255,255,.12); }
     .side-sublink {
         display: flex; align-items: center; gap: 10px; padding: 0.5rem 0.75rem; border-radius: 8px;
@@ -204,19 +183,4 @@
         .sidebar-container { transform: translateX(-100%); }
         .main-content { margin-left: 0; }
     }
-    @media (prefers-reduced-motion: reduce) { .side-submenu, .side-link.has-sub .caret { transition: none; } }
 </style>
-
-<script>
-    (function () {
-        document.querySelectorAll('.side-link[data-submenu]').forEach(function (toggle) {
-            toggle.addEventListener('click', function (e) {
-                e.preventDefault();
-                var menu = document.getElementById(toggle.getAttribute('data-submenu'));
-                if (!menu) { return; }
-                var open = menu.classList.toggle('open');
-                toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-            });
-        });
-    })();
-</script>
