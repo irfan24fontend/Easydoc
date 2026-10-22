@@ -28,9 +28,7 @@ use Illuminate\Support\Facades\Route;
 | Public Routes
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::view('/', 'welcome');
 
 // Shareable public doctor profile (no login needed)
 Route::get('/dr/{slug}', [PublicDoctorController::class, 'show'])

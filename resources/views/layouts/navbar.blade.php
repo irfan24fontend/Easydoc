@@ -1,7 +1,12 @@
 <nav class="topbar">
+    <div class="topbar-left">
+    <button type="button" class="topbar-toggle" data-sidebar-toggle aria-label="Open menu" aria-controls="adminSidebar" aria-expanded="false">
+        <i class="fa-solid fa-bars"></i>
+    </button>
     <div class="topbar-search">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" placeholder="Search doctors, chambers, templates...">
+    </div>
     </div>
 
     <div class="topbar-right">
@@ -65,4 +70,24 @@
     }
     .profile-name { font-size: 0.8rem; font-weight: 700; color: #0f172a; line-height: 1.1; }
     .profile-role { font-size: 0.7rem; color: #94a3b8; }
+
+    /* ---- responsive top bar ---- */
+    .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+    .topbar-toggle {
+        display: none; flex: none; width: 42px; height: 42px; border-radius: 10px;
+        border: 1px solid #e2e8f0; background: #fff; color: #334155; font-size: 1.05rem;
+        align-items: center; justify-content: center; cursor: pointer;
+    }
+    .topbar-toggle:hover { background: #f1f5f9; }
+    .topbar-toggle:focus-visible { outline: 3px solid #c7d2fe; outline-offset: 2px; }
+
+    @media (max-width: 991px) {
+        .topbar { padding: 0.65rem 1rem; }
+        .topbar-toggle { display: inline-flex; }
+    }
+    @media (max-width: 575px) {
+        .topbar-search { display: none; }
+        .topbar-right { gap: 6px; }
+        .profile-pill .fa-chevron-down { display: none; }
+    }
 </style>

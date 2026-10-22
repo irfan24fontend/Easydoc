@@ -19,6 +19,14 @@
         /* Tailwind (compiled into app.css) has a ".collapse { visibility: collapse }" utility.
            It hides Bootstrap's dropdown/collapse menus even when they are open, so undo it. */
         .collapse { visibility: visible !important; }
+
+        /* Phones: tighter page padding, and tables that are not already wrapped scroll sideways */
+        @media (max-width: 767px) {
+            .main-content > .container-fluid { padding: 1rem !important; }
+            .main-content table:not(.table-responsive table) {
+                display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+            }
+        }
     </style>
 
     @stack('styles')

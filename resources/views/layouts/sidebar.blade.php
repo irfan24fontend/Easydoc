@@ -1,4 +1,6 @@
-<div class="sidebar-container">
+<div class="sidebar-overlay" id="adminSidebarOverlay"></div>
+
+<div class="sidebar-container" id="adminSidebar">
     <div>
         <div class="sidebar-brand">
             <div class="brand-icon"><i class="fa-solid fa-stethoscope"></i></div>
@@ -179,8 +181,58 @@
 
     .main-content { margin-left: 260px; min-height: 100vh; background-color: #f8fafc; }
 
+    /* ---- mobile / tablet: the sidebar becomes a drawer opened by the top bar button ---- */
+    .sidebar-overlay {
+        position: fixed; inset: 0; background: rgba(15, 23, 42, .55);
+        z-index: 1025; opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility .2s ease;
+    }
     @media (max-width: 991px) {
-        .sidebar-container { transform: translateX(-100%); }
+        .sidebar-container {
+            width: min(280px, 86vw);
+            height: 100vh; height: 100dvh;
+            transform: translateX(-100%);
+            transition: transform .25s ease;
+            z-index: 1030;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        html.sb-open .sidebar-container { transform: none; box-shadow: 14px 0 40px rgba(0, 0, 0, .35); }
+        html.sb-open .sidebar-overlay { opacity: 1; visibility: visible; }
         .main-content { margin-left: 0; }
     }
+    @media (prefers-reduced-motion: reduce) {
+        .sidebar-container, .sidebar-overlay { transition: none; }
+    }
 </style>
+
+<script>
+    // Admin sidebar drawer (phones and tablets)
+    (function () {
+        var root = document.documentElement;
+        var mq = window.matchMedia('(max-width: 991px)');
+
+        function setOpen(open) {
+            root.classList.toggle('sb-open', open);
+            document.body.style.overflow = (open && mq.matches) ? 'hidden' : '';
+            document.querySelectorAll('[data-sidebar-toggle]').forEach(function (b) {
+                b.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+        }
+
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('[data-sidebar-toggle]')) { setOpen(!root.classList.contains('sb-open')); return; }
+            if (e.target.closest('#adminSidebarOverlay')) { setOpen(false); return; }
+
+            // After choosing a page on a small screen, close the drawer (submenu toggles stay open)
+            var a = e.target.closest('#adminSidebar a');
+            if (a && mq.matches && !a.hasAttribute('data-bs-toggle')) {
+                var href = a.getAttribute('href');
+                if (href && href !== '#') setOpen(false);
+            }
+        });
+
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+
+        var onChange = function () { setOpen(false); };
+        if (mq.addEventListener) mq.addEventListener('change', onChange); else if (mq.addListener) mq.addListener(onChange);
+    })();
+</script>
