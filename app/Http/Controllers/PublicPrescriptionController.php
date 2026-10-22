@@ -1,0 +1,124 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Doctor;
+use App\Models\Prescription;
+use Illuminate\Http\Request;
+
+class PublicPrescriptionController extends Controller
+{
+    /**
+     * Public (login charai) prescription page.
+     * Doctor\PrescriptionController::print() er logic hubohu - shudhu login/ownership check nai.
+     */
+    public function show(string $token)
+    {
+        $prescription = Prescription::where('share_token', $token)->firstOrFail();
+        $doctor = Doctor::with('user')->findOrFail($prescription->doctor_id);
+
+        $prescription->load(['patient', 'chamber.template', 'medicines']);
+
+        $chamber  = $prescription->chamber;
+        $template = $chamber?->template;
+
+        $headers = [
+            'X-Robots-Tag'    => 'noindex, nofollow, noarchive',
+            'Referrer-Policy' => 'no-referrer',
+        ];
+
+        if (! $template) {
+            return response()->view('doctor.prescriptions.print-fallback', [
+                'prescription' => $prescription,
+                'isPublic'     => true,
+            ], 200, $headers);
+        }
+
+        if ($prescription->medicines->isEmpty()) {
+            $medicineTable = '<div class="no-medicine-note" style="padding:14px 6px;font-size:12.5px;color:#64748b;">No medicine prescribed.</div>';
+        } else {
+            $rows = '';
+            foreach ($prescription->medicines as $i => $pm) {
+                $rows .= '<tr>'
+                    . '<td>' . ($i + 1) . '</td>'
+                    . '<td>' . e($pm->displayName()) . '</td>'
+                    . '<td>' . e($pm->doseLabel()) . '</td>'
+                    . '<td>' . e($pm->duration) . '</td>'
+                    . '<td>' . e($pm->instruction) . '</td>'
+                    . '</tr>';
+            }
+            $medicineTable = '<table class="medicine-table"><thead><tr><th>SL</th><th>Medicine</th><th>Dose</th><th>Duration</th><th>Instruction</th></tr></thead><tbody>' . $rows . '</tbody></table>';
+        }
+
+        $findings = trim((string) $prescription->investigation_findings);
+        $findingsBlock = $findings === ''
+            ? ''
+            : '<div class="rx-section"><div class="rx-label">Investigation Findings:</div><div class="rx-text">' . nl2br(e($findings)) . '</div></div>';
+
+        $logo = $doctor->photo
+            ? '<img src="' . asset('storage/' . $doctor->photo) . '" style="max-width:70px;">'
+            : '<div style="width:55px;height:55px;border-radius:50%;border:3px solid #4f46e5;display:flex;align-items:center;justify-content:center;font-weight:700;">+</div>';
+
+        $p = $prescription->patient;
+
+        $replacements = [
+            'doctor_name'      => $doctor->user->name ?? '',
+            'doctor_degree'    => $doctor->qualification ?? '',
+            'doctor_bmdc'      => $doctor->bmdc_number ?? '',
+            'chamber_name'     => $chamber->chamber_name ?? '',
+            'hospital_name'    => $chamber->hospital_name ?? '',
+            'hospital_address' => $chamber->address ?? '',
+            'hospital_phone'   => $chamber->phone ?? '',
+            'date'             => $prescription->created_at->format('d M Y'),
+            'patient_name'     => $p->name ?? '',
+            'patient_id'       => $p->patient_code ?? '',
+            'patient_code'     => $p->patient_code ?? '',
+            'patient_age'      => $p->age ?? '',
+            'patient_gender'   => $p->gender ?? '',
+            'patient_weight'   => ($p && $p->weight) ? $p->weight . ' kg' : '',
+            'blood_group'      => $p->blood_group ?? '',
+            'patient_address'  => $p->address ?? '',
+            'bp'               => $prescription->bp ?? '',
+            'pulse'            => $prescription->pulse ?? '',
+            'temperature'      => $prescription->temperature ?? '',
+            'diagnosis'            => nl2br(e($prescription->diagnosis)),
+            'clinical_complaints'  => nl2br(e($prescription->clinical_complaints)),
+            'risk_factors'         => nl2br(e($prescription->risk_factors)),
+            'investigations'       => nl2br(e($prescription->investigations)),
+            'investigation_findings'       => nl2br(e($prescription->investigation_findings)),
+            'investigation_findings_block' => $findingsBlock,
+            'advice'           => nl2br(e($prescription->advice)),
+            'medicine_table'   => $medicineTable,
+            'logo'             => $logo,
+        ];
+
+        $html = $template->html;
+        foreach ($replacements as $key => $value) {
+            $html = str_replace('{{' . $key . '}}', $value, $html);
+        }
+
+        return response()->view('doctor.prescriptions.print', [
+            'prescription' => $prescription,
+            'html'         => $html,
+            'css'          => $template->css,
+            'paperSize'    => $template->paper_size,
+            'isPublic'     => true,
+        ], 200, $headers);
+    }
+
+    public function revoke(Request $request, $id)
+    {
+        $p = Prescription::findOrFail($id);
+
+        $user = $request->user();
+        $allowed = [$user->id];
+        if (method_exists($user, 'doctor') && $user->doctor) {
+            $allowed[] = $user->doctor->id;
+        }
+        abort_unless(in_array($p->doctor_id ?? null, $allowed, true) || ($user->role ?? '') === 'admin', 403);
+
+        $p->forceFill(['share_token' => null, 'shared_at' => null])->save();
+
+        return back()->with('success', 'Share link bondho kora hoyeche.');
+    }
+}

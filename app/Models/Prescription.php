@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use \App\Models\Concerns\HasShareLink;
 use Illuminate\Database\Eloquent\Model;
 
 class Prescription extends Model
