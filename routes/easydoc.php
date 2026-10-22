@@ -13,3 +13,8 @@ Route::get('/p/{token}', [PublicPrescriptionController::class, 'show'])
 Route::post('/easydoc/share/{id}/revoke', [PublicPrescriptionController::class, 'revoke'])
     ->middleware('auth')
     ->name('prescription.share.revoke');
+
+// Remote image proxy (JPG/PDF download e CORS problem na hoy)
+Route::get('/easydoc/img', [PublicPrescriptionController::class, 'image'])
+    ->middleware('throttle:120,1')
+    ->name('prescription.img');

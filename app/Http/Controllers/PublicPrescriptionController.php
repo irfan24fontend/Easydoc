@@ -61,6 +61,17 @@ class PublicPrescriptionController extends Controller
 
         $p = $prescription->patient;
 
+        $fuRaw = $prescription->follow_up_date ?? $prescription->followup_date
+            ?? $prescription->next_visit_date ?? $prescription->next_visit ?? null;
+        $fuText = '';
+        if (! empty($fuRaw)) {
+            try { $fuText = \Illuminate\Support\Carbon::parse($fuRaw)->format('d M Y'); }
+            catch (\Throwable $e) { $fuText = (string) $fuRaw; }
+        }
+        $followupBlock = $fuText === ''
+            ? ''
+            : '<div class="rx-followup">Follow-up: ' . e($fuText) . ' <small>(abar dekha korun)</small></div>';
+
         $replacements = [
             'doctor_name'      => $doctor->user->name ?? '',
             'doctor_degree'    => $doctor->qualification ?? '',
@@ -90,6 +101,8 @@ class PublicPrescriptionController extends Controller
             'advice'           => nl2br(e($prescription->advice)),
             'medicine_table'   => $medicineTable,
             'logo'             => $logo,
+            'followup_block'   => $followupBlock,
+            'followup_date'    => $fuText,
         ];
 
         $html = $template->html;
@@ -104,6 +117,34 @@ class PublicPrescriptionController extends Controller
             'paperSize'    => $template->paper_size,
             'isPublic'     => true,
         ], 200, $headers);
+    }
+
+    /** Remote image (jemon logo/watermark) same-origin e dey - download er somoy CORS error ray na */
+    public function image(Request $request)
+    {
+        $url = (string) $request->query('u', '');
+        $parts = parse_url($url);
+        abort_unless($parts && ($parts['scheme'] ?? '') === 'https' && ! empty($parts['host']), 404);
+
+        $ip = gethostbyname($parts['host']);
+        abort_unless(
+            filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE),
+            404
+        );
+
+        try {
+            $res = \Illuminate\Support\Facades\Http::timeout(8)->withoutRedirecting()->get($url);
+        } catch (\Throwable $e) {
+            abort(404);
+        }
+
+        $type = (string) $res->header('Content-Type');
+        abort_unless($res->successful() && str_starts_with($type, 'image/') && strlen($res->body()) < 6 * 1024 * 1024, 404);
+
+        return response($res->body(), 200, [
+            'Content-Type'  => $type,
+            'Cache-Control' => 'public, max-age=86400',
+        ]);
     }
 
     public function revoke(Request $request, $id)

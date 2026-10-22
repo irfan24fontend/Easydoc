@@ -45,39 +45,74 @@
     while(n && (['SCRIPT','STYLE'].indexOf(n.tagName)>-1 || n.offsetHeight<150)) n=n.nextElementSibling;
     return n || document.querySelector('main,.container') || document.body;
   }
-  var AW=2480, AH=3508; // A4 @ 300 DPI
-  var AW=2480, AH=3508; // A4 @300dpi
+  var PROXY=@json(route('prescription.img'));
+  var GIF='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
   function wait(ms){return new Promise(function(r){setTimeout(r,ms)})}
+
+  // Remote image gulo ke proxy diye same-origin korbe (capture er por ager obosthay ferot)
+  function proxify(el){
+    var saved=[];
+    el.querySelectorAll('img').forEach(function(img){
+      var src=img.getAttribute('src')||'';
+      try{
+        var u=new URL(src,location.href);
+        if(u.origin!==location.origin && u.protocol==='https:'){
+          saved.push([img,src,img.getAttribute('srcset')]);
+          img.removeAttribute('srcset');
+          img.setAttribute('src',PROXY+'?u='+encodeURIComponent(u.href));
+        }
+      }catch(e){}
+    });
+    return function(){saved.forEach(function(x){x[0].setAttribute('src',x[1]); if(x[2]) x[0].setAttribute('srcset',x[2]);})};
+  }
+  function imgsReady(el){
+    return Promise.all(Array.prototype.map.call(el.querySelectorAll('img'),function(i){
+      return i.complete?Promise.resolve():new Promise(function(r){i.onload=i.onerror=r});
+    }));
+  }
+
   function snap(){
     var el=target(), bar=document.getElementById('edx-bar'), st=el.getAttribute('style');
     bar.style.display='none';
-    // Phone e dekhleo A4 (794x1123px) layout e render
     el.style.width='794px'; el.style.maxWidth='794px'; el.style.minHeight='1123px'; el.style.margin='0';
-    var restore=function(){ if(st===null) el.removeAttribute('style'); else el.setAttribute('style',st); bar.style.display=''; };
-    var opt=function(ratio){return {pixelRatio:ratio,backgroundColor:'#ffffff',cacheBust:true,width:794,height:Math.max(el.scrollHeight,1123),style:{margin:'0'}}};
+    var undo=proxify(el);
+    var restore=function(){ undo(); if(st===null) el.removeAttribute('style'); else el.setAttribute('style',st); bar.style.display=''; };
+    var base=function(ratio,skipFonts){return {pixelRatio:ratio,backgroundColor:'#ffffff',cacheBust:false,imagePlaceholder:GIF,skipFonts:!!skipFonts,width:794,height:Math.max(el.scrollHeight,1123),style:{margin:'0'}}};
+    var attempts=[[AW/794,false],[2,false],[1.5,true],[1,true]];
+    var lastErr;
     var fonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
-    return fonts.then(function(){return wait(150)})
-      .then(function(){return htmlToImage.toCanvas(el,opt(1))})            // warm-up (font/image load)
-      .then(function(){return wait(150)})
-      .then(function(){return htmlToImage.toCanvas(el,opt(AW/794))})
-      .catch(function(){return htmlToImage.toCanvas(el,opt(2))})            // phone e memory kom hole
+
+    function tryAt(i){
+      if(i>=attempts.length) return Promise.reject(lastErr||new Error('render failed'));
+      return htmlToImage.toCanvas(el,base(attempts[i][0],attempts[i][1])).catch(function(e){lastErr=e;return wait(200).then(function(){return tryAt(i+1)})});
+    }
+    return fonts.then(function(){return imgsReady(el)}).then(function(){return wait(200)})
+      .then(function(){return htmlToImage.toCanvas(el,base(1,true)).catch(function(){})})  // warm-up
+      .then(function(){return tryAt(0)})
       .then(function(c){restore();return c},function(e){restore();throw e});
   }
-  function a4(c){ // ek page A4 canvas, content fit kore (white background)
-    var out=document.createElement('canvas'); out.width=AW; out.height=AH;
-    var g=out.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,AW,AH);
-    var r=Math.min(AW/c.width, AH/c.height), w=c.width*r, h=c.height*r;
-    g.drawImage(c,(AW-w)/2,0,w,h); return out;
+
+  function a4(c){ // ek page A4 canvas (canvas er nijer resolution e)
+    var out=document.createElement('canvas'); out.width=c.width; out.height=Math.round(c.width*297/210);
+    var g=out.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,out.width,out.height);
+    var r=Math.min(out.width/c.width, out.height/c.height), w=c.width*r, h=c.height*r;
+    g.drawImage(c,(out.width-w)/2,0,w,h); return out;
   }
+  function msg(e){ return (e&&e.message)||(e&&e.type)||String(e); }
+
   document.querySelectorAll('[data-dl]').forEach(function(b){b.onclick=function(){
-    var type=b.getAttribute('data-dl'), old=b.textContent; b.textContent='...';
+    var type=b.getAttribute('data-dl'), old=b.textContent; b.textContent='...'; b.disabled=true;
     snap().then(function(c){
-      if(type==='jpg'){var a=document.createElement('a');a.download=FILE+'-A4.jpg';a.href=a4(c).toDataURL('image/jpeg',.95);document.body.appendChild(a);a.click();a.remove();return}
-      var pdf=new window.jspdf.jsPDF('p','mm','a4'),pw=210,ph=297,h=c.height*pw/c.width,img=c.toDataURL('image/jpeg',.95),y=0;
+      if(type==='jpg'){
+        var out=a4(c), url=out.toDataURL('image/jpeg',.92);
+        var a=document.createElement('a'); a.download=FILE+'-A4.jpg'; a.href=url; document.body.appendChild(a); a.click(); a.remove(); return;
+      }
+      var pdf=new window.jspdf.jsPDF('p','mm','a4'),pw=210,ph=297,h=c.height*pw/c.width,img=c.toDataURL('image/jpeg',.92),y=0;
       pdf.addImage(img,'JPEG',0,y,pw,h);var left=h-ph;
       while(left>0.5){y-=ph;pdf.addPage();pdf.addImage(img,'JPEG',0,y,pw,h);left-=ph}
       pdf.save(FILE+'.pdf');
-    }).catch(function(){alert('Download hoyni, abar chesta korun.')}).then(function(){b.textContent=old});
+    }).catch(function(e){ alert('Download hoyni, abar chesta korun.\n('+msg(e)+')'); })
+      .then(function(){b.textContent=old;b.disabled=false;});
   }});
 })();
 </script>
