@@ -46,6 +46,7 @@
     while(n && (['SCRIPT','STYLE'].indexOf(n.tagName)>-1 || n.offsetHeight<150)) n=n.nextElementSibling;
     return n || document.querySelector('main,.container') || document.body;
   }
+  var AW=2480; // A4 @300dpi width
   var PROXY=@json(route('prescription.img'));
   var GIF='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
   function wait(ms){return new Promise(function(r){setTimeout(r,ms)})}
