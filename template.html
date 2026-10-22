@@ -1,0 +1,125 @@
+<div class="rx-page">
+
+    <!-- WATERMARK -->
+    <img src="https://i.postimg.cc/zX5dBVNK/Chat-GPT-Image-Sep-16-2026-12-28-35-AM.png"
+         class="rx-watermark" alt="">
+
+    <!-- HEADER -->
+    <div class="rx-header">
+        <div class="rx-header-left">
+            <img src="https://i.postimg.cc/zX5dBVNK/Chat-GPT-Image-Sep-16-2026-12-28-35-AM.png"
+                 class="rx-logo-img" alt="Life Care Diagnostic Center">
+        </div>
+
+        <div class="rx-header-right">
+            <h2>ডাঃ সাইদুর রহমান</h2>
+            <p>এমবিবিএস (সিইউ), বিসিএস (স্বাস্থ্য)</p>
+            <p>এফসিপিএস (কার্ডিওলজি), এফপি</p>
+            <p>পিজিটি (মেডিসিন), সি.সি.ডি (বারডেম)</p>
+            <p class="rx-hospital-name">কুমিল্লা মেডিকেল কলেজ হাসপাতাল</p>
+            <p class="rx-bmdc">বি.এম.ডি.সি নং- ১২৫৯৮৮</p>
+        </div>
+    </div>
+
+    <!-- PATIENT BAR -->
+    <div class="rx-patient-bar">
+        <div>
+            <strong>Name:</strong> {{patient_name}} &nbsp;&nbsp;
+            <strong>Age:</strong> {{patient_age}} &nbsp;&nbsp;
+            <strong>Gender:</strong> {{patient_gender}}
+        </div>
+        <div>
+            <strong>Weight:</strong> {{patient_weight}} &nbsp;&nbsp;
+            <strong>Blood Group:</strong> {{blood_group}} &nbsp;&nbsp;
+            <strong>Date:</strong> {{date}}
+        </div>
+    </div>
+
+    <!-- BODY (A4 er baki jayga nijei nebe, medicine barle ei part boro hobe) -->
+    <div class="rx-body">
+
+        <!-- LEFT COLUMN -->
+        <div class="rx-left">
+            <div class="rx-section">
+                <div class="rx-label">C/C</div>
+                <div class="rx-text">{{clinical_complaints}}</div>
+            </div>
+
+            <div class="rx-section">
+                <div class="rx-label">Dx,</div>
+                <div class="rx-text rx-diagnosis">{{diagnosis}}</div>
+            </div>
+
+            <div class="rx-section">
+                <div class="rx-label">O/E</div>
+                <div class="rx-vitals">
+                    <div>BP: {{bp}} mmHg</div>
+                    <div>Pulse: {{pulse}} bpm</div>
+                    <div>Temp: {{temperature}}</div>
+                </div>
+            </div>
+
+            <div class="rx-section">
+                <div class="rx-label">Advice:</div>
+                <div class="rx-checklist">{{investigations}}</div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="rx-right">
+            <div class="rx-rx-top">
+                <div class="rx-rx-symbol">℞</div>
+                <div class="rx-pid"><span>Patient ID</span> {{patient_id}}</div>
+            </div>
+
+            {{medicine_table}}
+
+            <div class="rx-upodesh">
+                <div class="rx-label">উপদেশ:</div>
+                <div class="rx-text">{{advice}}</div>
+            </div>
+
+            {{followup_block}}
+        </div>
+    </div>
+
+    <!-- FOOTER (always A4 page er niche) -->
+    <div class="rx-footer">
+        <div class="rx-footer-main">
+            <div class="rx-footer-left">
+                <div class="rx-contact">
+                    <span class="rx-ico">
+                        <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+                    </span>
+                    <span>Newmarket, Bus Stand, Debidwar, Cumilla.</span>
+                </div>
+                <div class="rx-contact">
+                    <span class="rx-ico">
+                        <svg viewBox="0 0 24 24"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.6a1 1 0 0 1-.25 1z"/></svg>
+                    </span>
+                    <span>01327-383948, 01568-103323</span>
+                </div>
+                <div class="rx-contact">
+                    <span class="rx-ico">
+                        <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5z"/></svg>
+                    </span>
+                    <span>lifecareofficials11@gmail.com</span>
+                </div>
+            </div>
+
+            <div class="rx-footer-right">
+                <div class="rx-signature-line"></div>
+                <p class="rx-sign-name">Dr. Saidur Rahman</p>
+                <p class="rx-sign-degree">MBBS, BCS (Health)</p>
+                <p class="rx-sign-degree">MCPS-Cardiology (Final Part)</p>
+                <p class="rx-sign-degree">RMO, Langadu Upazila Health Complex, Rangamati</p>
+                <p class="rx-sign-bmdc">BMDC: A125988</p>
+            </div>
+        </div>
+
+        <div class="rx-visit-bar">
+            রোগী দেখার সময়: প্রতি বৃহস্পতি ও শুক্রবার সকাল ১০টা থেকে বিকাল ৫টা পর্যন্ত
+        </div>
+    </div>
+
+</div>

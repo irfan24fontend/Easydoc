@@ -1,0 +1,148 @@
+/* ===== A4 page: footer always at bottom, body grows with medicines ===== */
+@page { size: A4; margin: 0; }
+
+.rx-page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Noto Sans Bengali', 'SolaimanLipi', sans-serif;
+    color: #1e293b;
+    width: 100%;
+    max-width: 210mm;
+    min-height: 297mm;          /* full A4 height */
+    margin: 0 auto;
+    padding: 14mm 12mm 10mm;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: #fff;
+}
+
+@media print {
+    .rx-page { width: 210mm; max-width: none; min-height: 296.5mm; margin: 0; }
+}
+
+/* Watermark */
+.rx-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    max-width: 520px;
+    height: auto;
+    opacity: 0.07;
+    filter: grayscale(100%);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.rx-header, .rx-patient-bar, .rx-body, .rx-footer { position: relative; z-index: 1; }
+
+/* Header */
+.rx-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #1e3a8a;
+    padding-bottom: 10px;
+    margin-bottom: 6px;
+    gap: 12px;
+}
+.rx-header-left { display: flex; align-items: center; flex-shrink: 0; max-width: 55%; }
+.rx-logo-img { width: auto !important; max-width: 230px !important; height: auto !important; max-height: 70px; object-fit: contain !important; display: block; }
+.rx-header-right { text-align: right; min-width: 0; flex-shrink: 1; }
+.rx-header-right h2 { margin: 0 0 2px; font-size: 20px; color: #1e3a8a; font-weight: 800; }
+.rx-header-right p { margin: 1px 0; font-size: 11.5px; color: #334155; }
+.rx-hospital-name { color: #1e3a8a !important; font-weight: 700; }
+.rx-bmdc { color: #b91c1c !important; font-weight: 700; }
+
+/* Patient bar */
+.rx-patient-bar {
+    background: #f0fdf4;
+    border-top: 1px solid #86efac;
+    border-bottom: 1px solid #86efac;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    margin-bottom: 14px;
+    font-weight: 600;
+}
+
+/* Body: baki shob jayga nebe -> footer niche chole jabe */
+.rx-body { display: flex; gap: 22px; flex: 1 1 auto; align-items: stretch; }
+.rx-left { width: 34%; border-right: 1px dashed #cbd5e1; padding-right: 18px; }
+.rx-right { width: 66%; }
+
+.rx-section { margin-bottom: 16px; }
+.rx-label { font-weight: 800; text-decoration: underline; margin-bottom: 4px; font-size: 13px; color: #0f172a; }
+.rx-text { font-size: 12.5px; line-height: 1.6; color: #1e293b; }
+.rx-diagnosis { font-weight: 700; }
+.rx-vitals { font-size: 12px; line-height: 1.9; }
+.rx-checklist { font-size: 12px; line-height: 1.9; white-space: pre-line; }
+
+/* Rx symbol + Patient ID */
+.rx-rx-symbol { font-size: 30px; font-weight: 700; color: #1e3a8a; font-style: italic; margin-bottom: 4px; }
+.rx-rx-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 4px; }
+.rx-rx-top .rx-rx-symbol { margin-bottom: 0; }
+.rx-pid {
+    background: #eff6ff; border: 1px solid #1e3a8a; color: #1e3a8a;
+    font-size: 12px; font-weight: 800; letter-spacing: 0.3px;
+    padding: 3px 10px; border-radius: 4px; white-space: nowrap;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.rx-pid span { font-size: 10px; font-weight: 600; text-transform: uppercase; color: #64748b; margin-right: 4px; }
+
+/* Medicine table */
+.medicine-table { width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 12.5px; }
+.medicine-table th { text-align: left; font-size: 10.5px; text-transform: uppercase; color: #64748b; border-bottom: 2px solid #1e3a8a; padding: 4px 6px; }
+.medicine-table td { padding: 7px 6px; border-bottom: 1px dotted #cbd5e1; vertical-align: top; }
+.medicine-table tr td:first-child { color: #16a34a; font-weight: 700; }
+.medicine-table tr td:nth-child(2) { font-weight: 700; }
+.medicine-table tr { page-break-inside: avoid; }
+
+.rx-upodesh { margin-top: 8px; }
+
+/* Follow-up */
+.rx-followup {
+    margin-top: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff7ed;
+    border: 1px solid #fb923c;
+    color: #9a3412;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.rx-followup small { font-weight: 600; color: #c2410c; }
+
+/* Footer: margin-top:auto => page er sobar niche */
+.rx-footer { margin-top: auto; border-top: 3px solid #1e3a8a; padding-top: 12px; page-break-inside: avoid; }
+.rx-body + .rx-footer { margin-top: auto; }
+.rx-footer-main { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px 24px; }
+.rx-footer-left { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.rx-contact { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #334155; line-height: 1.3; }
+.rx-ico { width: 22px; height: 22px; border-radius: 50%; background: #1e3a8a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.rx-ico svg { width: 12px; height: 12px; fill: #fff; }
+
+.rx-footer-right { text-align: right; min-width: 200px; max-width: 300px; }
+.rx-signature-line { width: 170px; border-bottom: 1.5px solid #1e293b; margin: 0 0 6px auto; height: 34px; }
+.rx-sign-name { font-size: 14px; font-weight: 800; color: #1e3a8a; margin: 0 0 2px; }
+.rx-sign-degree { font-size: 10px; color: #475569; margin: 1px 0; line-height: 1.4; }
+.rx-sign-bmdc { font-size: 10.5px; font-weight: 700; color: #b91c1c; margin: 3px 0 0; }
+
+.rx-visit-bar {
+    margin-top: 14px; background: #1e3a8a; color: #fff; text-align: center;
+    font-size: 11.5px; font-weight: 600; padding: 7px 12px; border-radius: 4px;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}

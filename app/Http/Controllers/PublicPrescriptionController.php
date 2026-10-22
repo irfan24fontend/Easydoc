@@ -147,7 +147,34 @@ class PublicPrescriptionController extends Controller
         ]);
     }
 
+    /** Doctor "Share" click korle link toiri (na thakle) kore JSON e dey */
+    public function share(Request $request, $id)
+    {
+        $p = $this->ownedPrescription($request, $id);
+
+        if (! $p->share_token) {
+            do {
+                $t = \Illuminate\Support\Str::random(40);
+            } while (Prescription::where('share_token', $t)->exists());
+            $p->forceFill(['share_token' => $t, 'shared_at' => now()])->save();
+        }
+
+        return response()->json(['url' => route('prescription.public', $p->share_token)]);
+    }
+
     public function revoke(Request $request, $id)
+    {
+        $p = $this->ownedPrescription($request, $id);
+        $p->forceFill(['share_token' => null, 'shared_at' => null])->save();
+
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true]);
+        }
+
+        return back()->with('success', 'Share link bondho kora hoyeche.');
+    }
+
+    private function ownedPrescription(Request $request, $id): Prescription
     {
         $p = Prescription::findOrFail($id);
 
@@ -158,8 +185,6 @@ class PublicPrescriptionController extends Controller
         }
         abort_unless(in_array($p->doctor_id ?? null, $allowed, true) || ($user->role ?? '') === 'admin', 403);
 
-        $p->forceFill(['share_token' => null, 'shared_at' => null])->save();
-
-        return back()->with('success', 'Share link bondho kora hoyeche.');
+        return $p;
     }
 }

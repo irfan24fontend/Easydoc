@@ -1,35 +1,23 @@
-EASYDOC UPDATE - INSTALL (shudhu 1 ta line edit lagbe)
+EASYDOC FULL UPDATE (print page + public link + JPG/PDF + mobile)
 
-1) Ei zip ta Laravel project er main folder e (jekhane artisan, composer.json ache) Extract/Replace korun.
-   (Kono existing file overwrite hobe na - shob notun file.)
+0) BACKUP: resources/views/doctor/prescriptions/print.blade.php ke age copy kore rakhun (e.g. print.blade.php.bak)
 
-2) bootstrap/providers.php file khulun, array er bhitore ekta line add korun:
+1) Zip ta Laravel main folder e extract (Replace/Overwrite):
+     cd D:\easydoc
+     Expand-Archive -Path ".\easydoc-final.zip" -DestinationPath . -Force
 
-       App\Providers\EasyDocShareServiceProvider::class,
+2) bootstrap/providers.php e (jodi na thake):
+     App\Providers\EasyDocShareServiceProvider::class,
 
-   Example:
-       return [
-           App\Providers\AppServiceProvider::class,
-           App\Providers\EasyDocShareServiceProvider::class,
-       ];
+3) php artisan migrate        (share_token column; ager bar kora thakle skip hoy)
+   php artisan optimize:clear
+   php artisan route:list --name=prescription
+   (dekhben: prescription.public, prescription.img, prescription.share.create, prescription.share.revoke)
 
-3) Terminal (local):
-       php artisan migrate
-       php artisan optimize:clear
-       php artisan route:list --name=prescription
+4) Admin > Template e: template.html ar template.css ei zip er notun version diye replace korun.
+   (template.css e phone media-query nai - paper A4 fixed, phone e auto-fit zoom hoy)
 
-4) GitHub push + cPanel "Deploy HEAD Commit". cPanel e Terminal na thakle phpMyAdmin e:
-       ALTER TABLE prescriptions ADD COLUMN share_token VARCHAR(64) NULL;
-       ALTER TABLE prescriptions ADD COLUMN shared_at TIMESTAMP NULL;
-       CREATE UNIQUE INDEX prescriptions_share_token_unique ON prescriptions(share_token);
+5) Follow-up date: followup-snippet.php er code Doctor\PrescriptionController::print() e
+   '$replacements = [' er age boshan, ar array te 'followup_block' / 'followup_date' line add korun.
 
-Ki hobe:
- - Shob page e stethoscope preloader
- - Doctor er print page e (URL/route name e "print" thakle) nicher bar: Copy link, WhatsApp, SMS, Share, JPG, PDF, Link bondho
- - /p/{token} public page: rugi login charai prescription dekhbe + JPG/PDF download
- - Doctor area (doctor.* route / /doctor/* URL) te phone e drawer sidebar + boro input + sticky save
-
-Jodi ekta kaj na kore:
- - Public page e error: PublicPrescriptionController.php er VIEWS list e apnar print blade er nam din.
- - Sidebar drawer na ashle doctor layout e age:
-     <script>window.EDOC_SIDEBAR='.sidebar-class';window.EDOC_MAIN='.main-class';</script>
+6) git add . ; git commit -m "final print page" ; git push origin main  -> cPanel Deploy HEAD Commit
