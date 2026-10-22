@@ -39,6 +39,64 @@
         @media (max-width: 767px) {
             .prescription-builder { min-width: 0; }
         }
+
+        /* ============ MOBILE STEP SYSTEM ============ */
+        .rx-track { display: flex; align-items: flex-start; }
+        .rx-dot { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: 0; padding: 0; position: relative; font-size: 10px; font-weight: 700; color: #94a3b8; line-height: 1.1; }
+        .rx-dot::before { content: ''; position: absolute; top: 13px; left: -50%; width: 100%; height: 2px; background: #e2e8f0; z-index: 0; }
+        .rx-dot:first-child::before { display: none; }
+        .rx-dot.done::before, .rx-dot.active::before { background: #6366f1; }
+        .rx-dot-c { position: relative; z-index: 1; width: 28px; height: 28px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: #fff; border: 2px solid #cbd5e1; font-size: 12px; }
+        .rx-dot.active { color: #4338ca; }
+        .rx-dot.active .rx-dot-c { background: #4f46e5; border-color: #4f46e5; color: #fff; box-shadow: 0 0 0 4px #e0e7ff; }
+        .rx-dot.done { color: #059669; }
+        .rx-dot.done .rx-dot-c { background: #10b981; border-color: #10b981; color: #fff; }
+        .rx-badge { position: absolute; top: -5px; left: calc(50% + 8px); z-index: 2; background: #f43f5e; color: #fff; font-size: 9px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px; display: flex; align-items: center; justify-content: center; }
+        .rx-nav { position: sticky; bottom: 0; z-index: 30; display: flex; align-items: center; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); background: rgba(255,255,255,.97); border-top: 1px solid #e2e8f0; box-shadow: 0 -6px 18px rgba(15,23,42,.08); border-radius: 16px 16px 0 0; }
+        .rx-nav-info { flex: 1; text-align: center; font-size: 11px; font-weight: 700; color: #64748b; line-height: 1.25; }
+        .rx-nav-btn { border: 0; border-radius: 12px; padding: 11px 16px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .rx-nav-back { background: #f1f5f9; color: #475569; }
+        .rx-nav-back:disabled { opacity: .4; }
+        .rx-nav-next { background: #4f46e5; color: #fff; box-shadow: 0 4px 10px rgba(79,70,229,.3); }
+        .rx-nav-next.rx-save { background: #059669; box-shadow: 0 4px 10px rgba(5,150,105,.3); }
+        @keyframes rxIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+        @media (max-width: 1023px) {
+            .rx-step { display: none !important; }
+            .rx-step.is-active { display: block !important; animation: rxIn .18s ease; }
+            .rx-step.hidden { display: none !important; }
+            #medicineCard { min-height: 0 !important; }
+        }
+        @media (min-width: 1024px) {
+            #stepper, #stepNav { display: none !important; }
+            #advCard > .rx-submit-row { margin-top: auto !important; }
+        }
+
+        /* ============ FIELD SUGGESTIONS (Dose / Duration / Instruction) ============ */
+        .fld-sug { position: absolute; left: 0; top: 100%; margin-top: 4px; min-width: 100%; width: max-content; max-width: min(340px, 86vw); background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 12px 28px rgba(15,23,42,.18); z-index: 60; overflow-y: auto; display: none; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+        .fld-sug.up { top: auto; bottom: 100%; margin: 0 0 4px; }
+        .fld-opt { padding: 8px 12px; font-size: 13px; color: #334155; cursor: pointer; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 1px solid #f1f5f9; }
+        .fld-opt:last-child { border-bottom: 0; }
+        .fld-opt small { font-size: 10px; color: #94a3b8; white-space: nowrap; }
+        .fld-opt.on, .fld-opt:hover { background: #eef2ff; color: #3730a3; }
+        @media (pointer: coarse) { .fld-opt { padding: 11px 12px; } }
+
+        /* ============ MEDICINE TABLE -> CARDS (mobile) ============ */
+        @media (max-width: 767px) {
+            #rxTable { min-width: 0 !important; display: block; width: 100%; }
+            #rxTable thead { display: none; }
+            #rxTable tbody { display: block; }
+            #rxTable tbody tr { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; padding: 10px 2px; }
+            #rxTable tbody tr#empty-row { display: block; }
+            #rxTable tbody td { display: block; padding: 0 !important; }
+            #rxTable tbody td:nth-child(1) { grid-column: 1; }
+            #rxTable tbody td:nth-child(5) { grid-column: 2; grid-row: 1; }
+            #rxTable tbody td:nth-child(2), #rxTable tbody td:nth-child(3), #rxTable tbody td:nth-child(4) { grid-column: 1 / -1; font-size: 12px; }
+            #rxTable tbody td[data-label]::before { content: attr(data-label) ': '; font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .03em; }
+            #rxTable tbody td[data-label]:empty { display: none; }
+        }
+
+        #rxToast { position: fixed; left: 50%; bottom: 88px; transform: translateX(-50%) translateY(10px); background: #0f172a; color: #fff; font-size: 12px; font-weight: 600; padding: 8px 14px; border-radius: 999px; z-index: 9998; opacity: 0; pointer-events: none; transition: all .2s; max-width: 90vw; text-align: center; }
+        #rxToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 @endpush
 
@@ -155,12 +213,17 @@
                     </div>
                 </div>
 
-                <!-- LEFT: Patient + Vitals + Investigations -->
-                <div class="col-span-12 lg:col-span-4 space-y-6 min-w-0">
+                <!-- ===== MOBILE STEP BAR (শুধু মোবাইল/ট্যাবলেটে দেখাবে) ===== -->
+                <div id="stepper" class="col-span-12 lg:hidden bg-white rounded-2xl border border-slate-100 shadow-sm px-2 pt-3 pb-2">
+                    <div id="stepperTrack" class="rx-track"></div>
+                </div>
+
+                <!-- LEFT: Patient + Vitals + Advice/Save -->
+                <div class="col-span-12 lg:col-span-5 xl:col-span-4 flex flex-col gap-6 min-w-0">
 
                     <!-- Serial queue (shudhu $serials thakle) -->
                     @if(!$parent && count($queue))
-                    <div id="queueCard" class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div id="queueCard" data-step="1" class="rx-step is-active bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                         <div class="px-5 py-3 bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-slate-100 flex items-center justify-between gap-2">
                             <h3 class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-list-ol text-indigo-600 mr-2"></i> আজকের সিরিয়াল</h3>
                             <span id="queueCount" class="text-[11px] font-bold bg-indigo-600 text-white px-2.5 py-0.5 rounded-full">0</span>
@@ -170,7 +233,7 @@
                     @endif
 
                     <!-- Patient Info -->
-                    <div id="stepPatient" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+                    <div id="stepPatient" data-step="1" class="rx-step is-active bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-circle-user text-indigo-600 mr-2 text-lg"></i> Patient Information</h3>
                             <span id="patientStatus" class="text-[10px] font-bold px-2 py-0.5 rounded-full hidden"></span>
@@ -238,7 +301,7 @@
                     </div>
 
                     <!-- Clinical Vitals -->
-                    <div id="stepClinical" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-4">
+                    <div id="stepClinical" data-step="2" class="rx-step bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-4">
                         <h3 class="font-bold text-slate-900 flex items-center mb-2"><i class="fa-solid fa-heart-pulse text-rose-500 mr-2 text-lg"></i> Clinical Vitals</h3>
                         <div class="grid grid-cols-3 gap-2">
                             <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
@@ -268,9 +331,48 @@
                             <textarea name="risk_factors" id="riskInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('risk_factors', $parent->risk_factors ?? '') }}</textarea>
                         </div>
                     </div>
+                    <!-- Advice + Follow-up + Submit (দুই মোডেই দেখা যাবে) -->
+                    <div id="advCard" data-step="5" class="rx-step lg:flex-1 flex flex-col bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 space-y-3">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 block mb-1">Advice</label>
+                            <textarea name="advice" id="adviceInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('advice') }}</textarea>
+
+                            <!-- Quick Advice presets (JS diye render hoy, ADVICE_PRESETS array te notun advice jog korun) -->
+                            <div class="mt-3">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase block mb-1.5"><i class="fa-solid fa-bolt text-amber-400 mr-1"></i> Quick Advice</span>
+                                <div id="adviceTabs" class="flex flex-wrap gap-1.5 mb-2"></div>
+                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3">
+                                    <div id="adviceChips" class="flex flex-wrap gap-1.5"></div>
+                                    <button type="button" id="adviceAddAll" class="mt-2 text-[11px] font-bold text-indigo-600 hover:underline">+ এই গ্রুপের সবগুলো যোগ করুন</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rx-submit-row grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div>
+                                <label class="text-xs font-semibold text-slate-500 block mb-1" id="followupLabel">Follow-up Date</label>
+                                <input type="date" name="followup_date" id="followupDate" value="{{ old('followup_date') }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="flex items-end md:col-span-2">
+                                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm shadow-md flex items-center justify-center transition-colors">
+                                    <i class="fa-solid fa-print mr-2"></i> <span id="submitLabel">Save & Print Prescription</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT -->
+                <div class="col-span-12 lg:col-span-7 xl:col-span-8 flex flex-col gap-6 min-w-0">
+
+                    <!-- Investigation-only note -->
+                    <div id="investigationNote" data-step="3" class="rx-step hidden bg-teal-50 border border-teal-200 rounded-2xl p-6">
+                        <h3 class="font-bold text-teal-900 flex items-center mb-2"><i class="fa-solid fa-flask mr-2"></i> Investigation Advice মোড</h3>
+                        <p class="text-sm text-teal-800">এই ভিজিটে কোনো ঔষধ লেখা হচ্ছে না। বাম দিকে রোগীর তথ্য ও পরীক্ষাগুলো লিখে সেভ করুন, রোগীর জন্য একটা Investigation Slip প্রিন্ট হবে।</p>
+                        <p class="text-sm text-teal-800 mt-2">রোগী রিপোর্ট নিয়ে ফিরলে মোবাইল নাম্বার দিয়ে খুঁজুন। সিস্টেম এই ভিজিটটা দেখাবে, <b>Continue with Reports</b> চাপলে সব তথ্য আগে থেকেই ভরা থাকবে।</p>
+                    </div>
 
                     <!-- Diagnosis & Investigations -->
-                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-4">
+                    <div id="dxCard" data-step="3" class="rx-step bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-4">
                         <h3 class="font-bold text-slate-900 flex items-center mb-1"><i class="fa-solid fa-stethoscope text-teal-600 mr-2 text-lg"></i> Diagnosis & Tests</h3>
 
                         <div>
@@ -298,20 +400,9 @@
                             <textarea name="investigation_findings" id="investigationFindings" rows="3" placeholder="e.g., CBC: Hb 11.2, WBC 14000, Platelet 90000. NS-1: Positive" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500">{{ old('investigation_findings') }}</textarea>
                         </div>
                     </div>
-                </div>
-
-                <!-- RIGHT -->
-                <div class="col-span-12 lg:col-span-8 space-y-6 min-w-0">
-
-                    <!-- Investigation-only note -->
-                    <div id="investigationNote" class="hidden bg-teal-50 border border-teal-200 rounded-2xl p-6">
-                        <h3 class="font-bold text-teal-900 flex items-center mb-2"><i class="fa-solid fa-flask mr-2"></i> Investigation Advice মোড</h3>
-                        <p class="text-sm text-teal-800">এই ভিজিটে কোনো ঔষধ লেখা হচ্ছে না। বাম দিকে রোগীর তথ্য ও পরীক্ষাগুলো লিখে সেভ করুন, রোগীর জন্য একটা Investigation Slip প্রিন্ট হবে।</p>
-                        <p class="text-sm text-teal-800 mt-2">রোগী রিপোর্ট নিয়ে ফিরলে মোবাইল নাম্বার দিয়ে খুঁজুন। সিস্টেম এই ভিজিটটা দেখাবে, <b>Continue with Reports</b> চাপলে সব তথ্য আগে থেকেই ভরা থাকবে।</p>
-                    </div>
 
                     <!-- Medicine card -->
-                    <div id="medicineCard" class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 flex flex-col min-h-[560px]">
+                    <div id="medicineCard" data-step="4" class="rx-step lg:flex-1 bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 flex flex-col lg:min-h-[420px]">
                         <div class="flex justify-between items-center pb-4 border-b border-slate-100 mb-4 flex-wrap gap-2">
                             <h3 class="font-bold text-lg text-slate-900 flex items-center"><span class="text-indigo-600 font-serif italic text-2xl mr-2">Rx</span> Medicine Prescription</h3>
                             <div class="flex items-center gap-2 flex-wrap">
@@ -343,8 +434,8 @@
                         <div id="conflictBox" class="hidden mb-4"></div>
 
                         <!-- Add Medicine Row -->
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 mb-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                            <div class="md:col-span-4 relative">
+                        <div class="grid grid-cols-2 md:grid-cols-12 gap-3 mb-3 bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-100">
+                            <div class="col-span-2 md:col-span-4 relative">
                                 <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Search Medicine</label>
                                 <div class="relative">
                                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
@@ -353,7 +444,7 @@
                                 </div>
                                 <div id="search-results" class="hidden absolute left-0 right-0 md:right-4 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-52 overflow-y-auto text-sm"></div>
                             </div>
-                            <div class="md:col-span-2">
+                            <div class="col-span-1 md:col-span-2 relative">
                                 <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Type</label>
                                 <select id="med-type" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     <option value="Tablet">Tablet</option>
@@ -366,70 +457,27 @@
                                     <option value="Other">Other</option>
                                 </select>
                             </div>
-                            <div class="md:col-span-2">
+                            <div class="col-span-1 md:col-span-2 relative">
                                 <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1" id="med-dose-label">Dose (M+A+N)</label>
                                 <input type="text" id="med-dose" placeholder="e.g., 1+0+1" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="text" id="med-dose-text" placeholder="২ চামচ" class="hidden w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
-                            <div class="md:col-span-2">
+                            <div class="col-span-1 md:col-span-2 relative">
                                 <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Duration</label>
                                 <input type="text" id="med-duration" placeholder="৭ দিন" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
-                            <div class="md:col-span-2 flex items-end">
+                            <div class="col-span-2 md:col-span-2 flex items-end order-last md:order-none">
                                 <button type="button" onclick="addMedicineRow()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-sm shadow-sm">
                                     <i class="fa-solid fa-plus mr-1"></i> Add
                                 </button>
                             </div>
-                            <div class="md:col-span-12">
+                            <div class="col-span-2 md:col-span-12 relative">
                                 <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Instruction (optional)</label>
                                 <input type="text" id="med-instruction" placeholder="খাবার পরে" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
                         </div>
 
-                        <!-- Quick chips -->
-                        <div class="flex flex-wrap gap-x-5 gap-y-3 mb-4 text-xs">
-                            <div>
-                                <span class="text-slate-400 font-semibold mr-1 block mb-1">Dose:</span>
-                                <div class="flex flex-wrap gap-1">
-                                    <span onclick="fillDose('1+0+0')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১+০+০</span>
-                                    <span onclick="fillDose('0+1+0')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">০+১+০</span>
-                                    <span onclick="fillDose('0+0+1')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">০+০+১</span>
-                                    <span onclick="fillDose('1+0+1')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১+০+১</span>
-                                    <span onclick="fillDose('1+1+0')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১+১+০</span>
-                                    <span onclick="fillDose('0+1+1')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">০+১+১</span>
-                                    <span onclick="fillDose('1+1+1')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১+১+১</span>
-                                    <span onclick="fillDose('2+0+2')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">২+০+২</span>
-                                    <span onclick="fillDose('1+2+1')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১+২+১</span>
-                                    <span onclick="fillDose('2+2+2')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">২+২+২</span>
-                                    <span onclick="fillDose('0.5+0+0.5')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">০.৫+০+০.৫</span>
-                                </div>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 font-semibold mr-1 block mb-1">Duration:</span>
-                                <div class="flex flex-wrap gap-1">
-                                    <span onclick="fillDuration('৩ দিন')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">৩ দিন</span>
-                                    <span onclick="fillDuration('৫ দিন')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">৫ দিন</span>
-                                    <span onclick="fillDuration('৭ দিন')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">৭ দিন</span>
-                                    <span onclick="fillDuration('১০ দিন')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১০ দিন</span>
-                                    <span onclick="fillDuration('১৪ দিন')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১৪ দিন</span>
-                                    <span onclick="fillDuration('২১ দিন')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">২১ দিন</span>
-                                    <span onclick="fillDuration('১ মাস')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">১ মাস</span>
-                                    <span onclick="fillDuration('৩ মাস')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">৩ মাস</span>
-                                    <span onclick="fillDuration('চলবে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">চলবে</span>
-                                    <span onclick="fillDuration('প্রয়োজনে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">প্রয়োজনে</span>
-                                </div>
-                            </div>
-                            <div>
-                                <span class="text-slate-400 font-semibold mr-1 block mb-1">Instr:</span>
-                                <div class="flex flex-wrap gap-1">
-                                    <span onclick="fillInstruction('খাবার পরে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">খাবার পরে</span>
-                                    <span onclick="fillInstruction('খাবার আগে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">খাবার আগে</span>
-                                    <span onclick="fillInstruction('সকালে খালি পেটে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">সকালে খালি পেটে</span>
-                                    <span onclick="fillInstruction('রাতে ঘুমানোর আগে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">রাতে ঘুমানোর আগে</span>
-                                    <span onclick="fillInstruction('প্রয়োজনে')" class="bg-white border border-slate-200 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-50">প্রয়োজনে</span>
-                                </div>
-                            </div>
-                        </div>
+                        <p class="text-[11px] text-slate-400 -mt-1 mb-3"><i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i> Dose / Duration / Instruction ঘরে ট্যাপ করলেই সব অপশন দেখাবে, লিখলে ফিল্টার হবে (বাংলা বা ইংরেজি সংখ্যা দুটোই চলবে)। Instruction-এ একাধিক অপশন যোগ করা যায়।</p>
 
                         <!-- Favorites -->
                         <div class="mb-4" id="favWrap" style="display:none;">
@@ -439,7 +487,7 @@
 
                         <!-- Table -->
                         <div class="flex-grow overflow-x-auto">
-                            <table class="w-full text-left border-collapse min-w-[520px]">
+                            <table id="rxTable" class="w-full text-left border-collapse min-w-[520px]">
                                 <thead>
                                     <tr class="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
                                         <th class="py-2">Medicine</th>
@@ -457,35 +505,13 @@
                             </table>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Advice + Follow-up + Submit (দুই মোডেই দেখা যাবে) -->
-                    <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 space-y-3">
-                        <div>
-                            <label class="text-xs font-semibold text-slate-500 block mb-1">Advice</label>
-                            <textarea name="advice" id="adviceInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('advice') }}</textarea>
-
-                            <!-- Quick Advice presets (JS diye render hoy, ADVICE_PRESETS array te notun advice jog korun) -->
-                            <div class="mt-3">
-                                <span class="text-[11px] font-bold text-slate-400 uppercase block mb-1.5"><i class="fa-solid fa-bolt text-amber-400 mr-1"></i> Quick Advice</span>
-                                <div id="adviceTabs" class="flex flex-wrap gap-1.5 mb-2"></div>
-                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3">
-                                    <div id="adviceChips" class="flex flex-wrap gap-1.5"></div>
-                                    <button type="button" id="adviceAddAll" class="mt-2 text-[11px] font-bold text-indigo-600 hover:underline">+ এই গ্রুপের সবগুলো যোগ করুন</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div>
-                                <label class="text-xs font-semibold text-slate-500 block mb-1" id="followupLabel">Follow-up Date</label>
-                                <input type="date" name="followup_date" id="followupDate" value="{{ old('followup_date') }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div class="flex items-end md:col-span-2">
-                                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm shadow-md flex items-center justify-center transition-colors">
-                                    <i class="fa-solid fa-print mr-2"></i> <span id="submitLabel">Save & Print Prescription</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <!-- ===== MOBILE STEP NAV ===== -->
+                <div id="stepNav" class="rx-nav col-span-12 lg:hidden">
+                    <button type="button" id="stepBack" class="rx-nav-btn rx-nav-back"><i class="fa-solid fa-arrow-left"></i> পিছনে</button>
+                    <span id="stepInfo" class="rx-nav-info"></span>
+                    <button type="button" id="stepNext" class="rx-nav-btn rx-nav-next"></button>
                 </div>
             </main>
         </form>
@@ -661,6 +687,9 @@
             btnInv.classList.remove(...ACTIVE_CLS, ...INACTIVE_CLS);
             btnFull.classList.add(...(inv ? INACTIVE_CLS : ACTIVE_CLS));
             btnInv.classList.add(...(inv ? ACTIVE_CLS : INACTIVE_CLS));
+
+            byId('dxCard').classList.toggle('lg:flex-1', inv);
+            onStepModeChange();
         }
 
         async function switchMode(mode) {
@@ -1024,15 +1053,15 @@ function invMatches(q) {
         out.push({ it: it, score: score, idx: idx });
     });
     out.sort(function (a, b) { return a.score - b.score || a.idx - b.idx; });
-    return out.slice(0, 8).map(function (x) { return x.it; });
+    return out.slice(0, needle ? 12 : 40).map(function (x) { return x.it; });
 }
 
 function hideInvSuggest() { invSuggest.classList.add('hidden'); invList = []; }
 
-function renderInvSuggest() {
+function renderInvSuggest(showAll) {
     const t = invToken();
     invRange = t;
-    if (t.q.length < 1) { hideInvSuggest(); return; }
+    if (t.q.length < 1 && !showAll) { hideInvSuggest(); return; }
 
     invList = invMatches(t.q);
     if (!invList.length) { hideInvSuggest(); return; }
@@ -1072,6 +1101,7 @@ function cleanInvText() {
 
 invBox.addEventListener('input', function () { invActive = 0; renderInvSuggest(); });
 invBox.addEventListener('click', renderInvSuggest);
+invBox.addEventListener('focus', function () { renderInvSuggest(true); });
 invBox.addEventListener('keyup', function (e) {
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Home' || e.key === 'End') renderInvSuggest();
 });
@@ -1370,6 +1400,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
             renderQueue();
             dirty = true;
 
+            goStep(2, { noScroll: true });
             byId('stepClinical').scrollIntoView({ behavior: 'smooth', block: 'start' });
             byId('symptomsInput').focus({ preventScroll: true });
         }
@@ -1484,18 +1515,18 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                     <input type="hidden" name="medicines[${index}][medicine_name]" value="${escHtml(e.name)}">
                     <input type="hidden" name="medicines[${index}][medicine_type]" value="${escHtml(e.type)}">
                 </td>
-                <td class="py-3 text-slate-600">
+                <td data-label="Dose" class="py-3 text-slate-600">
                     <span class="bg-slate-100 px-2 py-0.5 rounded text-xs whitespace-nowrap">${escHtml(e.doseText || e.dose)}</span>
                     <input type="hidden" name="medicines[${index}][dose_morning]" value="${nums[0]}">
                     <input type="hidden" name="medicines[${index}][dose_noon]" value="${nums[1]}">
                     <input type="hidden" name="medicines[${index}][dose_night]" value="${nums[2]}">
                     <input type="hidden" name="medicines[${index}][dose_text]" value="${escHtml(e.doseText || '')}">
                 </td>
-                <td class="py-3 text-slate-600">
+                <td data-label="Duration" class="py-3 text-slate-600">
                     ${escHtml(e.duration)}
                     <input type="hidden" name="medicines[${index}][duration]" value="${escHtml(e.duration)}">
                 </td>
-                <td class="py-3 text-slate-600">
+                <td data-label="Instruction" class="py-3 text-slate-600">
                     ${escHtml(e.instruction)}
                     <input type="hidden" name="medicines[${index}][instruction]" value="${escHtml(e.instruction)}">
                 </td>
@@ -1521,7 +1552,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                 medSearch.focus(); return;
             }
             if (!dose && !doseText) {
-                await appDialog({ type: 'warning', title: 'ডোজ দিন', message: '"' + name + '" এর ডোজ লিখুন বা নিচের কুইক বাটন থেকে বাছুন।' });
+                await appDialog({ type: 'warning', title: 'ডোজ দিন', message: '"' + name + '" এর ডোজ লিখুন, অথবা Dose ঘরে ট্যাপ করে তালিকা থেকে বাছুন।' });
                 (isSyrup ? medDoseText : medDose).focus(); return;
             }
             if (!id) {
@@ -1553,6 +1584,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
 
             appendMedicineRow({ id, name, type, dose, doseText, duration, instruction, generic: pendingGeneric });
             dirty = true;
+            rxToast('✓ ঔষধ যোগ হয়েছে (মোট ' + medRowCount() + 'টি)');
 
             medSearch.value = ''; medId.value = ''; pendingGeneric = '';
             medType.value = 'Tablet';
@@ -1762,6 +1794,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
             const symptoms = val('symptomsInput');
             if (!diagnosis) {
                 await appDialog({ type: 'info', title: 'আগে Diagnosis লিখুন', message: 'AI ঔষধ পরামর্শের জন্য Diagnosis লিখুন (বা "Suggest Diagnosis (AI)" ব্যবহার করুন)।' });
+                goStep(3, { noScroll: true });
                 byId('diagnosisInput').focus(); return;
             }
 
@@ -1849,6 +1882,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
 
             if (!val('patientMobile') || !val('patientName')) {
                 await appDialog({ type: 'warning', title: 'রোগীর তথ্য অসম্পূর্ণ', message: 'রোগীর নাম ও মোবাইল নম্বর দিতে হবে।' });
+                goStep(1, { noScroll: true });
                 (val('patientMobile') ? byId('patientName') : patientMobileInput).focus();
                 byId('stepPatient').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return false;
@@ -1857,6 +1891,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
             // Ei number-e ager rogi ache kintu doctor sothik rogi/notun rogi bachai kore ni
             if (patientDecisionPending && !patientIdInput.value) {
                 await appDialog({ type: 'warning', title: 'রোগী নির্বাচন করুন', message: 'এই নম্বরে আগে থেকেই রোগী আছে। তালিকা থেকে সঠিক রোগী নির্বাচন করুন, অথবা "নতুন রোগী হিসেবে যোগ করুন" বাছুন।' });
+                goStep(1, { noScroll: true });
                 patientMatches.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return false;
             }
@@ -1864,10 +1899,11 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
             if (inv) {
                 if (!val('investigations')) {
                     await appDialog({ type: 'warning', title: 'Investigation লিখুন', message: 'Investigation Advice দিতে হলে অন্তত একটি পরীক্ষা লিখুন।' });
-                    byId('investigations').focus(); return false;
+                    goStep(3, { noScroll: true }); byId('investigations').focus(); return false;
                 }
             } else if (medRowCount() === 0) {
                 await appDialog({ type: 'warning', title: 'কোনো ঔষধ যোগ করা হয়নি', message: 'Full Prescription-এ অন্তত একটি ঔষধ যোগ করতে হবে।' });
+                goStep(4, { noScroll: true });
                 byId('medicineCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return false;
             }
@@ -1892,6 +1928,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                         confirmText: 'এখন Check করি', extraText: 'এভাবেই Save করুন',
                     });
                     if (r === 'confirm') {
+                        goStep(4, { noScroll: true });
                         byId('conflictBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
                         checkConflicts();
                         return false;
@@ -1908,7 +1945,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                             items: serious.map(w => w.pair + ' — ' + w.effect),
                             confirmText: 'তবুও Save করুন', cancelText: 'ঔষধ দেখি',
                         });
-                        if (r !== 'confirm') { byId('conflictBox').scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; }
+                        if (r !== 'confirm') { goStep(4, { noScroll: true }); byId('conflictBox').scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; }
                     }
                 }
             }
@@ -2067,10 +2104,304 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
             if (dirty && !submitting) { e.preventDefault(); e.returnValue = ''; }
         });
 
+
+        /* ================= Toast ================= */
+        function rxToast(msg) {
+            let t = byId('rxToast');
+            if (!t) { t = document.createElement('div'); t.id = 'rxToast'; document.body.appendChild(t); }
+            t.textContent = msg; t.classList.add('show');
+            clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('show'); }, 1800);
+        }
+
+        /* ================= Mobile step system (lg-er niche) ================= */
+        // Desktop-e sob ek page-e dekha jay; mobile/tablet-e ek ek step kore.
+        // Notun step lagle RX_STEPS-e jog korun ebong card-e data-step="N" attribute দিন।
+        const RX_STEPS = [
+            { n: 1, t: 'রোগী',      full: 'রোগীর তথ্য' },
+            { n: 2, t: 'Vitals',    full: 'Vitals ও সমস্যা' },
+            { n: 3, t: 'Dx/Test',   full: 'Diagnosis ও Test' },
+            { n: 4, t: 'ঔষধ',       full: 'ঔষধ (Rx)' },
+            { n: 5, t: 'Save',      full: 'Advice ও Save' },
+        ];
+        let curStep = 1;
+        const stepperTrack = byId('stepperTrack');
+        const stepBack = byId('stepBack');
+        const stepNextBtn = byId('stepNext');
+        const stepInfo = byId('stepInfo');
+
+        function stepsNow() { return RX_STEPS.filter(function (s) { return !(s.n === 4 && currentMode() === 'investigation_only'); }); }
+        function isStepView() { return window.matchMedia('(max-width: 1023px)').matches; }
+
+        function renderStepper() {
+            const list = stepsNow();
+            if (!list.some(function (s) { return s.n === curStep; })) curStep = list[list.length - 1].n;
+            const idx = list.findIndex(function (s) { return s.n === curStep; });
+            const meds = medRowCount();
+
+            stepperTrack.innerHTML = list.map(function (s, i) {
+                const st = i < idx ? 'done' : (i === idx ? 'active' : '');
+                const badge = (s.n === 4 && meds > 0) ? '<span class="rx-badge">' + meds + '</span>' : '';
+                return '<button type="button" class="rx-dot ' + st + '" data-go="' + s.n + '">' +
+                    '<span class="rx-dot-c">' + (i < idx ? '<i class="fa-solid fa-check"></i>' : (i + 1)) + '</span>' +
+                    '<span>' + s.t + '</span>' + badge + '</button>';
+            }).join('');
+
+            document.querySelectorAll('.rx-step').forEach(function (el) {
+                el.classList.toggle('is-active', Number(el.dataset.step) === curStep);
+            });
+
+            stepInfo.textContent = 'ধাপ ' + (idx + 1) + '/' + list.length + ' · ' + list[idx].full;
+            stepBack.disabled = idx === 0;
+            const last = idx === list.length - 1;
+            stepNextBtn.classList.toggle('rx-save', last);
+            stepNextBtn.innerHTML = last
+                ? '<i class="fa-solid fa-floppy-disk"></i> Save'
+                : 'পরবর্তী <i class="fa-solid fa-arrow-right"></i>';
+        }
+
+        function goStep(n, o) {
+            o = o || {};
+            curStep = n;
+            renderStepper();
+            if (!o.noScroll && isStepView()) byId('stepper').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function onStepModeChange() {
+            if (currentMode() === 'investigation_only' && curStep === 4) curStep = 5;
+            renderStepper();
+        }
+
+        async function stepNext() {
+            const list = stepsNow();
+            const idx = list.findIndex(function (s) { return s.n === curStep; });
+            if (idx === list.length - 1) { byId('submitBtn').click(); return; }
+
+            if (curStep === 1) {
+                if (patientSearchInFlight) { await patientSearchInFlight; }
+                if (!val('patientMobile') || !val('patientName')) {
+                    await appDialog({ type: 'warning', title: 'রোগীর তথ্য অসম্পূর্ণ', message: 'রোগীর নাম ও মোবাইল নম্বর দিতে হবে।' });
+                    (val('patientMobile') ? byId('patientName') : patientMobileInput).focus();
+                    return;
+                }
+                if (patientDecisionPending && !patientIdInput.value) {
+                    await appDialog({ type: 'warning', title: 'রোগী নির্বাচন করুন', message: 'এই নম্বরে আগে থেকেই রোগী আছে। তালিকা থেকে সঠিক রোগী নির্বাচন করুন, অথবা "নতুন রোগী হিসেবে যোগ করুন" বাছুন।' });
+                    patientMatches.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+            }
+            goStep(list[idx + 1].n);
+        }
+
+        stepNextBtn.addEventListener('click', stepNext);
+        stepBack.addEventListener('click', function () {
+            const list = stepsNow();
+            const idx = list.findIndex(function (s) { return s.n === curStep; });
+            if (idx > 0) goStep(list[idx - 1].n);
+        });
+        stepperTrack.addEventListener('click', function (e) {
+            const b = e.target.closest('[data-go]'); if (!b) return;
+            goStep(Number(b.dataset.go));
+        });
+        new MutationObserver(renderStepper).observe(prescriptionList, { childList: true });
+        window.addEventListener('resize', function () { if (!isStepView()) renderStepper(); });
+
+        /* ================= Dose / Duration / Instruction suggestions ================= */
+        // Notun option lagle nicher list-e line jog korun. Format: 'Text|alias|alias'
+        const BN_DIGITS = '০১২৩৪৫৬৭৮৯';
+        const toBn = (s) => String(s).replace(/[0-9]/g, function (d) { return BN_DIGITS[d]; });
+        const toEn = (s) => String(s).replace(/[০-৯]/g, function (d) { return String(BN_DIGITS.indexOf(d)); });
+        const sugNorm = (s) => toEn(s).toLowerCase().replace(/\s+/g, ' ').trim();
+
+        function sugFromLines(lines) {
+            const seen = {};
+            const out = [];
+            lines.forEach(function (ln) {
+                const p = ln.split('|');
+                const k = sugNorm(p[0]);
+                if (!k || seen[k]) return;
+                seen[k] = 1;
+                out.push({ v: p[0], label: p[0], hint: '', key: sugNorm(p.join(' ')) });
+            });
+            return out;
+        }
+
+        // ---- Dose (M+A+N): shob possible combination (0, 0.5, 1, 1.5, 2) ----
+        const DOSE_OPTS = (function () {
+            const common = ['1+0+0', '0+1+0', '0+0+1', '1+0+1', '1+1+0', '0+1+1', '1+1+1', '2+0+2', '1+2+1', '2+2+2', '0.5+0+0.5', '0.5+0.5+0.5', '2+0+0', '0+0+2', '0.5+0+0', '0+0+0.5', '1+0+2', '2+0+1', '2+1+2', '2+1+1', '1+1+2', '2+2+0', '0+2+2', '0+2+0'];
+            const vals = [0, 0.5, 1, 1.5, 2];
+            const all = common.slice();
+            vals.forEach(function (a) { vals.forEach(function (b) { vals.forEach(function (c) {
+                const s = a + '+' + b + '+' + c;
+                if (s !== '0+0+0') all.push(s);
+            }); }); });
+            const slot = ['সকাল', 'দুপুর', 'রাত'];
+            const seen = {};
+            const out = [];
+            all.forEach(function (s) {
+                if (seen[s]) return; seen[s] = 1;
+                const nums = s.split('+').map(Number);
+                const hint = nums.map(function (n, i) { return n > 0 ? slot[i] + (n !== 1 ? ' ' + toBn(n) : '') : null; }).filter(Boolean).join(' · ');
+                out.push({ v: s, label: toBn(s), hint: hint, key: sugNorm(s + ' ' + toBn(s) + ' ' + hint) });
+            });
+            return out;
+        })();
+
+        // ---- Syrup dose (text) ----
+        const SYRUP_OPTS = (function () {
+            const amounts = ['½ চামচ|half spoon', '১ চামচ|1 spoon|tsp', '১½ চামচ', '২ চামচ|2 spoon|tsp', '৩ চামচ', '২.৫ মিলি|ml', '৫ মিলি|5 ml|ml', '৭.৫ মিলি|ml', '১০ মিলি|ml', '১৫ মিলি|ml', '২০ মিলি|ml'].map(function (x) { return x.split('|')[0]; });
+            const freqs = ['দিনে ১ বার', 'দিনে ২ বার', 'দিনে ৩ বার', 'দিনে ৪ বার', 'রাতে ১ বার', 'সকালে ১ বার'];
+            const lines = amounts.slice();
+            ['প্রতি ৪ ঘণ্টা পর', 'প্রতি ৬ ঘণ্টা পর', 'প্রতি ৮ ঘণ্টা পর', 'প্রতি ১২ ঘণ্টা পর', 'প্রয়োজনে ৫ মিলি', 'প্রয়োজনে ১ চামচ', 'প্রয়োজনে ২ চামচ'].forEach(function (x) { lines.push(x); });
+            amounts.forEach(function (a) { freqs.forEach(function (f) { lines.push(a + ' করে ' + f); }); });
+            return sugFromLines(lines.map(function (l) { return l + '|' + (l.indexOf('চামচ') !== -1 ? 'spoon tsp' : (l.indexOf('মিলি') !== -1 ? 'ml' : '')); }));
+        })();
+
+        // ---- Duration ----
+        const DUR_OPTS = (function () {
+            const lines = ['৩ দিন|3 day', '৫ দিন|5 day', '৭ দিন|7 day', '১০ দিন|10 day', '১৪ দিন|14 day', '১ মাস|1 month', 'চলবে|continue', 'প্রয়োজনে|prn|sos'];
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 20, 21, 28, 30, 45, 60].forEach(function (n) { lines.push(toBn(n) + ' দিন|' + n + ' day|' + n + 'd'); });
+            [1, 2, 3, 4].forEach(function (n) { lines.push(toBn(n) + ' সপ্তাহ|' + n + ' week|' + n + 'w'); });
+            [1, 2, 3, 4, 5, 6, 9].forEach(function (n) { lines.push(toBn(n) + ' মাস|' + n + ' month|' + n + 'm'); });
+            lines.push('১ বছর|1 year', 'আজীবন|lifelong', 'একবার মাত্র|stat|once', 'শেষ না হওয়া পর্যন্ত|until finished', 'রিপোর্ট দেখা পর্যন্ত|till report', 'জ্বর থাকলে|fever', 'ব্যথা থাকলে|pain', 'উপসর্গ না কমা পর্যন্ত|till relief');
+            return sugFromLines(lines);
+        })();
+
+        // ---- Instruction (type onujayi age ashbe, baki-gulo likhle pawa jabe) ----
+        const INSTR_BASE = ['খাবার পরে|after meal|ac', 'খাবার আগে|before meal|pc', 'খাবারের মাঝে', 'খালি পেটে|empty stomach', 'সকালে খালি পেটে', 'সকালে|morning', 'দুপুরে|noon', 'বিকালে|evening', 'রাতে|night', 'রাতে ঘুমানোর আগে|bedtime|hs', 'ঘুমানোর আগে', 'প্রয়োজনে|prn|sos', 'প্রয়োজন হলে', 'জ্বর হলে|fever', 'ব্যথা হলে|pain', 'বমি হলে|vomiting', 'পাতলা পায়খানা হলে|diarrhea', 'চুলকানি হলে|itching', 'কাশি হলে|cough', 'শ্বাসকষ্ট হলে|breathing', 'প্রতি ৪ ঘণ্টা পর পর', 'প্রতি ৬ ঘণ্টা পর পর', 'প্রতি ৮ ঘণ্টা পর পর', 'প্রতি ১২ ঘণ্টা পর পর', 'প্রতি ২৪ ঘণ্টায় একবার', 'নিয়মিত খাবেন', 'প্রতিদিন একই সময়ে', 'ভরা পেটে', 'খাবারের ৩০ মিনিট আগে', 'খাবারের ১ ঘণ্টা পর', 'পানির সাথে খাবেন', 'প্রচুর পানি পান করবেন', 'দুধের সাথে নয়', 'চা/কফির সাথে নয়', 'অ্যান্টাসিডের ২ ঘণ্টা পর', 'অন্য ওষুধের ১ ঘণ্টা পর', 'কোর্স শেষ করবেন', 'ডাক্তারের পরামর্শ অনুযায়ী'];
+        const INSTR_BY_TYPE = {
+            Tablet:    ['চিবিয়ে খাবেন', 'গিলে খাবেন', 'গুঁড়ো করে পানিতে গুলিয়ে খাবেন', 'জিহ্বার নিচে রাখবেন', 'চুষে খাবেন'],
+            Capsule:   ['না ভেঙে গিলে খাবেন', 'পূর্ণ গ্লাস পানি দিয়ে খাবেন', 'শোয়া অবস্থায় খাবেন না'],
+            Syrup:     ['ঝাঁকিয়ে খাবেন', 'মেপে খাবেন', 'ঠান্ডা জায়গায় রাখবেন', 'খোলার ৭ দিনের মধ্যে ব্যবহার করবেন', 'ফ্রিজে রাখবেন'],
+            Injection: ['মাংসপেশিতে (IM)', 'শিরায় (IV)', 'চামড়ার নিচে (SC)', 'ধীরে ধীরে পুশ করবেন', 'স্যালাইনের সাথে দিবেন', 'একবার মাত্র (Stat)', 'Test dose করে দিবেন'],
+            Drop:      ['চোখে ১ ফোঁটা করে', 'চোখে ২ ফোঁটা করে', 'কানে ২ ফোঁটা করে', 'কানে ৩ ফোঁটা করে', 'নাকে ২ ফোঁটা করে', 'প্রতি নাকে ২ ফোঁটা করে', 'মুখে ১ মিলি দিবেন', 'ফোঁটা দেওয়ার পর ১ মিনিট চোখ বন্ধ রাখবেন'],
+            Cream:     ['আক্রান্ত স্থানে লাগাবেন', 'পাতলা করে লাগাবেন', 'দিনে ২ বার লাগাবেন', 'দিনে ৩ বার লাগাবেন', 'রাতে ঘুমানোর আগে লাগাবেন', 'লাগিয়ে হালকা মালিশ করবেন', 'পরিষ্কার করে শুকিয়ে লাগাবেন', 'গোসলের পর লাগাবেন', 'ক্ষতস্থানে লাগাবেন', 'চোখে লাগাবেন না', 'সূর্যের আলো এড়িয়ে চলবেন'],
+            Inhaler:   ['১ পাফ করে', '২ পাফ করে', 'শ্বাসকষ্ট হলে ২ পাফ', 'স্পেসার দিয়ে ব্যবহার করবেন', 'ব্যবহারের পর কুলকুচি করবেন', 'প্রতিদিন সকাল-রাত নিয়মিত'],
+            Other:     [],
+        };
+        const instrCache = {};
+        function instrOptsFor(type) {
+            if (instrCache[type]) return instrCache[type];
+            const lines = (INSTR_BY_TYPE[type] || []).concat(INSTR_BASE);
+            Object.keys(INSTR_BY_TYPE).forEach(function (t) { if (t !== type) lines.push.apply(lines, INSTR_BY_TYPE[t]); });
+            return (instrCache[type] = sugFromLines(lines));
+        }
+
+        // ---- Generic dropdown (investigation-er moto) ----
+        function attachSuggest(input, getOpts, o) {
+            o = o || {};
+            const host = input.parentNode;
+            if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+            const box = document.createElement('div');
+            box.className = 'fld-sug';
+            host.appendChild(box);
+            let list = [], active = -1;
+            const isOpen = function () { return box.style.display === 'block'; };
+
+            function tok() {
+                const v = input.value;
+                if (!o.multi) return { s: 0, e: v.length, q: v.trim() };
+                const pos = input.selectionStart == null ? v.length : input.selectionStart;
+                const s = pos === 0 ? 0 : v.lastIndexOf(',', pos - 1) + 1;
+                const nx = v.indexOf(',', pos);
+                const e = nx === -1 ? v.length : nx;
+                return { s: s, e: e, q: v.slice(s, e).trim() };
+            }
+            function close() { box.style.display = 'none'; list = []; active = -1; }
+            function place() {
+                const r = input.getBoundingClientRect();
+                const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                const below = vh - r.bottom - 12, above = r.top - 12;
+                const flip = below < 170 && above > below;
+                box.classList.toggle('up', flip);
+                box.style.maxHeight = Math.max(120, Math.min(260, flip ? above : below)) + 'px';
+            }
+            function paint() {
+                box.querySelectorAll('.fld-opt').forEach(function (el, i) { el.classList.toggle('on', i === active); });
+                const el = box.children[active];
+                if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
+            }
+            function render(fromFocus) {
+                const t = tok();
+                let q = sugNorm(t.q);
+                const all = getOpts();
+                if (fromFocus && !o.multi && all.some(function (x) { return sugNorm(x.v) === q; })) q = '';
+                const taken = o.multi
+                    ? input.value.slice(0, t.s).concat(',', input.value.slice(t.e)).split(',').map(sugNorm).filter(Boolean)
+                    : [];
+                const res = [];
+                all.forEach(function (x, i) {
+                    if (taken.indexOf(sugNorm(x.v)) !== -1) return;
+                    let r = 0;
+                    if (q) {
+                        if (x.key.indexOf(q) !== -1) {
+                            r = (x.key.indexOf(q) === 0) ? 0 : (x.key.indexOf(' ' + q) !== -1 ? 1 : 2);
+                        } else if (q.split(' ').every(function (w) { return x.key.indexOf(w) !== -1; })) {
+                            r = 3;
+                        } else return;
+                    }
+                    res.push({ x: x, r: r, i: i });
+                });
+                res.sort(function (a, b) { return a.r - b.r || a.i - b.i; });
+                list = res.slice(0, 80).map(function (z) { return z.x; });
+                if (!list.length) { close(); return; }
+                const exact = q && sugNorm(list[0].v) === q;
+                active = (q && !exact) ? 0 : -1;
+                box.innerHTML = list.map(function (x, i) {
+                    return '<div class="fld-opt' + (i === active ? ' on' : '') + '" data-i="' + i + '"><span>' + escHtml(x.label || x.v) + '</span>' +
+                        (x.hint ? '<small>' + escHtml(x.hint) + '</small>' : '') + '</div>';
+                }).join('');
+                box.style.display = 'block';
+                place();
+            }
+            function pick(i) {
+                const x = list[i]; if (!x) return;
+                if (o.multi) {
+                    const t = tok();
+                    const parts = input.value.split(',').map(function (s) { return s.trim(); });
+                    const idx = input.value.slice(0, t.s).split(',').length - 1;
+                    parts[idx] = x.v;
+                    input.value = parts.filter(Boolean).join(', ');
+                } else {
+                    input.value = x.v;
+                }
+                dirty = true;
+                close();
+                const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+                if (!o.multi && o.next && fine) { const n = byId(o.next); if (n) n.focus(); }
+            }
+
+            input.addEventListener('focus', function () { render(true); });
+            input.addEventListener('click', function () { render(true); });
+            input.addEventListener('input', function () { render(false); });
+            input.addEventListener('keydown', function (e) {
+                if (!isOpen() || !list.length) {
+                    if (e.key === 'ArrowDown') { e.preventDefault(); render(true); }
+                    return;
+                }
+                if (e.key === 'ArrowDown') { e.preventDefault(); active = (active + 1) % list.length; paint(); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); active = (active - 1 + list.length) % list.length; paint(); }
+                else if ((e.key === 'Enter' || e.key === 'Tab') && active >= 0) { e.preventDefault(); e.stopPropagation(); pick(active); }
+                else if (e.key === 'Escape') { e.preventDefault(); close(); }
+            });
+            input.addEventListener('blur', function () { setTimeout(close, 120); });
+            box.addEventListener('mousedown', function (e) { e.preventDefault(); });   // input-er focus jate na jay
+            box.addEventListener('click', function (e) {
+                const row = e.target.closest('.fld-opt');
+                if (row) pick(parseInt(row.dataset.i, 10));
+            });
+            document.addEventListener('pointerdown', function (e) { if (!host.contains(e.target)) close(); });
+        }
+
+        attachSuggest(medDose, function () { return DOSE_OPTS; }, { next: 'med-duration' });
+        attachSuggest(medDoseText, function () { return SYRUP_OPTS; }, { next: 'med-duration' });
+        attachSuggest(byId('med-duration'), function () { return DUR_OPTS; }, { next: 'med-instruction' });
+        attachSuggest(byId('med-instruction'), function () { return instrOptsFor(medType.value); }, { multi: true });
+
         /* ================= Init ================= */
         syncDoseField();
         checkEmpty();
         setMode(byId('typeInput').value || 'full');
+        renderStepper();
         dirty = false;
 
         // Page khulei important popup (banner-er bodole)
