@@ -16,6 +16,7 @@
       </form>
     @endunless
   </div>
+  <div id="edx-status" style="font:12px system-ui,sans-serif;color:#64748b;text-align:center;margin-top:6px;min-height:0"></div>
 </div>
 <style>
 #edx-bar{position:fixed;left:0;right:0;bottom:0;z-index:9000;background:#fff;border-top:1px solid #e2e8f0;box-shadow:0 -4px 18px rgba(0,0,0,.12);padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));font-family:system-ui,sans-serif}
@@ -72,24 +73,30 @@
   }
 
   function snap(){
-    var el=target(), bar=document.getElementById('edx-bar'), st=el.getAttribute('style');
-    bar.style.display='none';
-    el.style.width='794px'; el.style.maxWidth='794px'; el.style.minHeight='1123px'; el.style.margin='0';
-    var undo=proxify(el);
-    var restore=function(){ undo(); if(st===null) el.removeAttribute('style'); else el.setAttribute('style',st); bar.style.display=''; };
-    var base=function(ratio,skipFonts){return {pixelRatio:ratio,backgroundColor:'#ffffff',cacheBust:false,imagePlaceholder:GIF,skipFonts:!!skipFonts,width:794,height:Math.max(el.scrollHeight,1123),style:{margin:'0'}}};
+    // Asol page e hat dei na: offscreen clone e render kori (page jump/scroll hobe na)
+    var el=target(), sy=window.scrollY, sx=window.scrollX;
+    var host=document.createElement('div');
+    host.setAttribute('aria-hidden','true');
+    host.style.cssText='position:fixed;left:-10000px;top:0;width:794px;pointer-events:none;overflow:visible;';
+    var clone=el.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.style.cssText+=';width:794px;max-width:794px;min-height:1123px;margin:0;';
+    host.appendChild(clone); document.body.appendChild(host);
+    proxify(clone);
+    var done=function(){ if(host.parentNode) host.parentNode.removeChild(host); window.scrollTo(sx,sy); };
+    var base=function(ratio,skipFonts){return {pixelRatio:ratio,backgroundColor:'#ffffff',cacheBust:false,imagePlaceholder:GIF,skipFonts:!!skipFonts,width:794,height:Math.max(clone.scrollHeight,1123),style:{margin:'0'}}};
     var attempts=[[AW/794,false],[2,false],[1.5,true],[1,true]];
     var lastErr;
     var fonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
 
     function tryAt(i){
       if(i>=attempts.length) return Promise.reject(lastErr||new Error('render failed'));
-      return htmlToImage.toCanvas(el,base(attempts[i][0],attempts[i][1])).catch(function(e){lastErr=e;return wait(200).then(function(){return tryAt(i+1)})});
+      return htmlToImage.toCanvas(clone,base(attempts[i][0],attempts[i][1])).catch(function(e){lastErr=e;return wait(200).then(function(){return tryAt(i+1)})});
     }
-    return fonts.then(function(){return imgsReady(el)}).then(function(){return wait(200)})
-      .then(function(){return htmlToImage.toCanvas(el,base(1,true)).catch(function(){})})  // warm-up
+    return fonts.then(function(){return imgsReady(clone)}).then(function(){return wait(250)})
+      .then(function(){return htmlToImage.toCanvas(clone,base(1,true)).catch(function(){})})  // warm-up
       .then(function(){return tryAt(0)})
-      .then(function(c){restore();return c},function(e){restore();throw e});
+      .then(function(c){done();return c},function(e){done();throw e});
   }
 
   function a4(c){ // ek page A4 canvas (canvas er nijer resolution e)
@@ -100,19 +107,38 @@
   }
   function msg(e){ return (e&&e.message)||(e&&e.type)||String(e); }
 
-  document.querySelectorAll('[data-dl]').forEach(function(b){b.onclick=function(){
-    var type=b.getAttribute('data-dl'), old=b.textContent; b.textContent='...'; b.disabled=true;
-    snap().then(function(c){
+  function status(t,err){var e=document.getElementById('edx-status'); if(e){e.textContent=t||''; e.style.color=err?'#b91c1c':'#64748b';}}
+  window.addEventListener('error',function(ev){ if(document.getElementById('edx-status').textContent.indexOf('...')>-1) status('Error: '+(ev.message||'script error'),true); });
+
+  document.querySelectorAll('[data-dl]').forEach(function(b){b.addEventListener('click',function(ev){
+    ev.preventDefault(); ev.stopPropagation();
+    var type=b.getAttribute('data-dl'), old=b.textContent;
+    b.textContent='...'; b.disabled=true; status('Preparing...');
+    var finish=function(){b.textContent=old;b.disabled=false;};
+    Promise.resolve().then(function(){
+      if(typeof htmlToImage==='undefined') throw new Error('html-to-image load hoyni (internet/CDN check korun)');
+      if(type==='pdf' && !(window.jspdf&&window.jspdf.jsPDF)) throw new Error('jsPDF load hoyni (internet/CDN check korun)');
+      status('Rendering image...');
+      return snap();
+    }).then(function(c){
+      status('Saving...');
       if(type==='jpg'){
-        var out=a4(c), url=out.toDataURL('image/jpeg',.92);
-        var a=document.createElement('a'); a.download=FILE+'-A4.jpg'; a.href=url; document.body.appendChild(a); a.click(); a.remove(); return;
+        return new Promise(function(res,rej){
+          a4(c).toBlob(function(blob){
+            if(!blob) return rej(new Error('Image toiri hoyni (phone memory kom hote pare)'));
+            var u=URL.createObjectURL(blob), a=document.createElement('a');
+            a.download=FILE+'-A4.jpg'; a.href=u; a.style.display='none';
+            document.body.appendChild(a); a.click();
+            setTimeout(function(){a.remove();URL.revokeObjectURL(u)},4000); res();
+          },'image/jpeg',.92);
+        });
       }
       var pdf=new window.jspdf.jsPDF('p','mm','a4'),pw=210,ph=297,h=c.height*pw/c.width,img=c.toDataURL('image/jpeg',.92),y=0;
       pdf.addImage(img,'JPEG',0,y,pw,h);var left=h-ph;
       while(left>0.5){y-=ph;pdf.addPage();pdf.addImage(img,'JPEG',0,y,pw,h);left-=ph}
       pdf.save(FILE+'.pdf');
-    }).catch(function(e){ alert('Download hoyni, abar chesta korun.\n('+msg(e)+')'); })
-      .then(function(){b.textContent=old;b.disabled=false;});
-  }});
+    }).then(function(){status('Done \u2713'); setTimeout(function(){status('')},2500); finish();},
+            function(e){status('Error: '+msg(e),true); finish();});
+  });});
 })();
 </script>
