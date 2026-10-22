@@ -26,7 +26,7 @@
 @media(max-width:520px){.edx-row .edx-b{flex:1 1 28%;text-align:center}}
 @media print{#edx-bar{display:none!important}}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (function(){
@@ -47,11 +47,21 @@
   }
   var AW=2480, AH=3508; // A4 @ 300 DPI
   var AW=2480, AH=3508; // A4 @300dpi
+  function wait(ms){return new Promise(function(r){setTimeout(r,ms)})}
   function snap(){
-    var el=target(), bar=document.getElementById('edx-bar'); bar.style.display='none';
-    var w=el.offsetWidth||794, sc=AW/w;
-    return html2canvas(el,{scale:sc,useCORS:true,backgroundColor:'#ffffff'})
-      .then(function(c){bar.style.display='';return c},function(e){bar.style.display='';throw e});
+    var el=target(), bar=document.getElementById('edx-bar'), st=el.getAttribute('style');
+    bar.style.display='none';
+    // Phone e dekhleo A4 (794x1123px) layout e render
+    el.style.width='794px'; el.style.maxWidth='794px'; el.style.minHeight='1123px'; el.style.margin='0';
+    var restore=function(){ if(st===null) el.removeAttribute('style'); else el.setAttribute('style',st); bar.style.display=''; };
+    var opt=function(ratio){return {pixelRatio:ratio,backgroundColor:'#ffffff',cacheBust:true,width:794,height:Math.max(el.scrollHeight,1123),style:{margin:'0'}}};
+    var fonts=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
+    return fonts.then(function(){return wait(150)})
+      .then(function(){return htmlToImage.toCanvas(el,opt(1))})            // warm-up (font/image load)
+      .then(function(){return wait(150)})
+      .then(function(){return htmlToImage.toCanvas(el,opt(AW/794))})
+      .catch(function(){return htmlToImage.toCanvas(el,opt(2))})            // phone e memory kom hole
+      .then(function(c){restore();return c},function(e){restore();throw e});
   }
   function a4(c){ // ek page A4 canvas, content fit kore (white background)
     var out=document.createElement('canvas'); out.width=AW; out.height=AH;
