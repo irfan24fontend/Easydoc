@@ -36,6 +36,10 @@ return [
     */
 
     'mailers' => [
+        'brevo-api' => [
+            'transport' => 'brevo-api',
+        ],
+
 
         'smtp' => [
             'transport' => 'smtp',
