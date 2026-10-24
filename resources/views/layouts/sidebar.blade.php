@@ -28,17 +28,44 @@
                     @endif
                 </a>
 
-                <a href="{{ route('admin.chambers.index') }}" class="side-link {{ Request::is('admin/chambers*') ? 'active' : '' }}">
+                {{-- Chambers (submenu: All Chambers / Chamber Requests) --}}
+                @php
+                    $chamberOpen     = Request::is('admin/chambers*') || Request::is('admin/chamber-requests*');
+                    $pendingChambers = \App\Models\Chamber::where('request_status', 'waiting_request')->count();
+                @endphp
+                <a href="#chamberSubmenu"
+                   class="side-link has-sub {{ $chamberOpen ? 'open-parent' : '' }}"
+                   data-bs-toggle="collapse" role="button"
+                   aria-expanded="{{ $chamberOpen ? 'true' : 'false' }}" aria-controls="chamberSubmenu">
                     <i class="fa-solid fa-hospital"></i>
                     <span>Chambers</span>
+                    @if($pendingChambers > 0)
+                        <span style="margin-left:auto;font-size:11px;font-weight:800;background:#f59e0b;color:#0f172a;padding:1px 8px;border-radius:999px;">{{ $pendingChambers }}</span>
+                    @endif
+                    <i class="fa-solid fa-chevron-down caret"></i>
                 </a>
+                <div class="collapse {{ $chamberOpen ? 'show' : '' }}" id="chamberSubmenu">
+                    <div class="sub-links">
+                        <a href="{{ route('admin.chambers.index') }}" class="side-sublink {{ Request::is('admin/chambers*') && ! Request::is('admin/chamber-requests*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-list"></i>
+                            <span>All Chambers</span>
+                        </a>
+                        <a href="{{ route('admin.chamber-requests.index') }}" class="side-sublink {{ Request::is('admin/chamber-requests*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-inbox"></i>
+                            <span>Chamber Requests</span>
+                            @if($pendingChambers > 0)
+                                <span style="margin-left:auto;font-size:11px;font-weight:800;background:#f59e0b;color:#0f172a;padding:1px 8px;border-radius:999px;">{{ $pendingChambers }}</span>
+                            @endif
+                        </a>
+                    </div>
+                </div>
 
                 <a href="{{ route('admin.templates.index') }}" class="side-link {{ Request::is('admin/templates*') ? 'active' : '' }}">
                     <i class="fa-solid fa-file-medical"></i>
                     <span>Prescription Templates</span>
                 </a>
 
-                {{-- Wallet Management (submenu: All Wallets / Invoices) --}}
+                {{-- Wallet Management (submenu: All Wallets / Recharge Requests / Invoices) --}}
                 @php
                     $walletOpen = Request::is('admin/wallets*') || Request::is('admin/invoices*') || Request::is('admin/recharge-requests*');
                     $pendingRecharges = \Illuminate\Support\Facades\Route::has('admin.recharge-requests.index')
@@ -51,6 +78,9 @@
                    aria-expanded="{{ $walletOpen ? 'true' : 'false' }}" aria-controls="walletSubmenu">
                     <i class="fa-solid fa-wallet"></i>
                     <span>Wallet Management</span>
+                    @if($pendingRecharges > 0)
+                        <span style="margin-left:auto;font-size:11px;font-weight:800;background:#f59e0b;color:#0f172a;padding:1px 8px;border-radius:999px;">{{ $pendingRecharges }}</span>
+                    @endif
                     <i class="fa-solid fa-chevron-down caret"></i>
                 </a>
                 <div class="collapse {{ $walletOpen ? 'show' : '' }}" id="walletSubmenu">
@@ -151,8 +181,9 @@
     .side-link.disabled { opacity: 0.45; cursor: not-allowed; }
     .soon-badge { margin-left: auto; font-size: 9px; font-weight: 700; background: rgba(255,255,255,.1); padding: 2px 6px; border-radius: 999px; }
 
-    /* ---- Wallet submenu ---- */
+    /* ---- Submenus ---- */
     .side-link.has-sub .caret { margin-left: auto; width: auto; font-size: 0.65rem; transition: transform .2s ease; }
+    .side-link.has-sub .caret:last-child { margin-left: 8px; }
     .side-link.has-sub[aria-expanded="true"] .caret { transform: rotate(180deg); }
     .side-link.open-parent { background: rgba(255,255,255,.06); color: #fff; }
     .sub-links { margin: 2px 0 6px 20px; padding-left: 12px; border-left: 1px solid rgba(255,255,255,.12); }
