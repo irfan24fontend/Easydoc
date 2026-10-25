@@ -292,6 +292,7 @@ class PrescriptionController extends Controller
                 'id' => $dm->medicine->id,
                 'label' => $dm->medicine->brand_name . ($dm->medicine->strength ? ' (' . $dm->medicine->strength . ')' : ''),
                 'generic_name' => $dm->medicine->generic_name,
+                'dosage_form' => $dm->medicine->dosage_form,
             ])
             ->values();
 

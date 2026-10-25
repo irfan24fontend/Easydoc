@@ -89,7 +89,7 @@
             #rxTable tbody tr#empty-row { display: block; }
             #rxTable tbody td { display: block; padding: 0 !important; }
             #rxTable tbody td:nth-child(1) { grid-column: 1; }
-            #rxTable tbody td:nth-child(5) { grid-column: 2; grid-row: 1; }
+            #rxTable tbody td:nth-child(5) { grid-column: 1 / -1; text-align: right; }
             #rxTable tbody td:nth-child(2), #rxTable tbody td:nth-child(3), #rxTable tbody td:nth-child(4) { grid-column: 1 / -1; font-size: 12px; }
             #rxTable tbody td[data-label]::before { content: attr(data-label) ': '; font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .03em; }
             #rxTable tbody td[data-label]:empty { display: none; }
@@ -97,6 +97,113 @@
 
         #rxToast { position: fixed; left: 50%; bottom: 88px; transform: translateX(-50%) translateY(10px); background: #0f172a; color: #fff; font-size: 12px; font-weight: 600; padding: 8px 14px; border-radius: 999px; z-index: 9998; opacity: 0; pointer-events: none; transition: all .2s; max-width: 90vw; text-align: center; }
         #rxToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ============ MODERN SKIN ============ */
+        .rx-hero { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #0ea5e9 100%); border-radius: 22px; padding: 18px 22px; box-shadow: 0 12px 32px rgba(79,70,229,.28); margin-bottom: 12px !important; }
+        .rx-hero h1 { color: #fff !important; }
+        .rx-hero p { color: rgba(255,255,255,.85) !important; }
+        .rx-hero .btn { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.4); color: #fff; border-radius: 12px; }
+        .rx-hero .btn:hover { background: rgba(255,255,255,.3); color: #fff; }
+        .rx-summary { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; align-items: center; }
+        .rx-chip { display: inline-flex; gap: 6px; align-items: center; background: #fff; border: 1px solid #e2e8f0; border-radius: 999px; padding: 6px 12px; font-size: 12px; color: #475569; box-shadow: 0 1px 2px rgba(15,23,42,.04); }
+        .rx-chip i { color: #6366f1; } .rx-chip b { color: #0f172a; }
+        .rx-chip.bad { background: #fff1f2; border-color: #fecdd3; } .rx-chip.bad i, .rx-chip.bad b { color: #e11d48; }
+        .rx-hint { margin-left: auto; font-size: 11px; color: #94a3b8; }
+        @media (max-width: 1023px) { .rx-hint { display: none; } }
+        .prescription-builder .rounded-2xl.bg-white { border-radius: 20px; border-color: #eef2f7; box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 10px 26px rgba(15,23,42,.05); }
+        .prescription-builder input:not([type=checkbox]):not([type=hidden]):not(.border-0), .prescription-builder select, .prescription-builder textarea { border-radius: 12px; transition: border-color .15s, box-shadow .15s; }
+        .prescription-builder input:not(.border-0):focus, .prescription-builder select:focus, .prescription-builder textarea:focus { border-color: #818cf8 !important; box-shadow: 0 0 0 4px rgba(99,102,241,.14) !important; outline: none !important; }
+        #submitBtn { background: linear-gradient(135deg, #4f46e5, #7c3aed) !important; border-radius: 14px !important; box-shadow: 0 8px 20px rgba(79,70,229,.3) !important; }
+        .rx-smart { display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #eef2ff, #f5f3ff); border: 1px dashed #a5b4fc; border-radius: 14px; padding: 8px 10px; margin-bottom: 12px; }
+        .rx-smart i { color: #6366f1; }
+        .rx-smart input { flex: 1; min-width: 0; background: transparent; border: 0 !important; box-shadow: none !important; font-size: 13px; padding: 6px 4px; outline: none; }
+        .rx-smart button { background: #4f46e5; color: #fff; border: 0; border-radius: 10px; padding: 7px 14px; font-size: 12px; font-weight: 700; }
+        .rx-ib { border: 0; background: #f1f5f9; border-radius: 8px; width: 28px; height: 28px; color: #64748b; margin-left: 4px; }
+        .rx-ib:hover { background: #e0e7ff; color: #4338ca; } .rx-ib.del { color: #e11d48; } .rx-ib.del:hover { background: #ffe4e6; }
+        .rx-v-high { border-color: #fda4af !important; background: #fff1f2 !important; } .rx-v-low { border-color: #fcd34d !important; background: #fffbeb !important; } .rx-v-ok { border-color: #86efac !important; background: #f0fdf4 !important; }
+        .rx-v-high > span::after { content: ' ▲ উচ্চ'; color: #e11d48; } .rx-v-low > span::after { content: ' ▼ কম'; color: #d97706; } .rx-v-ok > span::after { content: ' ✓'; color: #059669; } .rx-v-fever > span::after { content: ' 🔥 জ্বর'; color: #e11d48; }
+        .rx-fu { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; align-items: center; }
+        .rx-fu button { border: 1px solid #e2e8f0; background: #fff; border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 600; color: #475569; }
+        .rx-fu button:hover { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+        .rx-fu span { font-size: 11px; color: #059669; font-weight: 600; width: 100%; }
+        .rx-draft { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 14px; padding: 10px 14px; font-size: 13px; margin-bottom: 12px; }
+        .rx-draft button { border: 0; border-radius: 10px; padding: 5px 12px; font-size: 12px; font-weight: 700; }
+        .rx-draft .ok { background: #f59e0b; color: #fff; } .rx-draft .no { background: #fef3c7; color: #92400e; }
+
+        /* ================= WEB 3.0 THEME (aurora glass + neon, light / dark) ================= */
+        @keyframes rxFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .prescription-builder { position: relative; isolation: isolate; --p1: #7c3aed; --p2: #06b6d4; --p3: #ec4899; --glass: rgba(255,255,255,.62); --glass-b: rgba(255,255,255,.75); --field: rgba(255,255,255,.72); --fline: rgba(124,58,237,.16); }
+        .prescription-builder::before { content: ''; position: absolute; inset: -18px -12px; z-index: -1; border-radius: 34px; background: radial-gradient(620px 320px at 6% 0%, rgba(124,58,237,.20), transparent 62%), radial-gradient(520px 320px at 96% 8%, rgba(6,182,212,.20), transparent 62%), radial-gradient(560px 420px at 50% 100%, rgba(236,72,153,.13), transparent 62%); }
+        .rx-hero { background: linear-gradient(120deg, #4c1d95, #7c3aed, #2563eb, #06b6d4); background-size: 220% 220%; animation: rxFlow 14s ease infinite; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,.25); box-shadow: 0 18px 50px rgba(124,58,237,.35), inset 0 1px 0 rgba(255,255,255,.35); }
+        .rx-hero::after { content: ''; position: absolute; width: 260px; height: 260px; right: -60px; top: -120px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.35), transparent 65%); pointer-events: none; }
+        .rx-hero h1 { letter-spacing: -.01em; text-shadow: 0 2px 18px rgba(0,0,0,.25); }
+        .rx-theme-btn { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.4); color: #fff; border-radius: 12px; padding: 5px 11px; font-size: 14px; margin-right: 8px; backdrop-filter: blur(8px); }
+        .rx-theme-btn:hover { background: rgba(255,255,255,.3); }
+        .prescription-builder .rounded-2xl.bg-white { background: var(--glass) !important; -webkit-backdrop-filter: blur(18px) saturate(165%); backdrop-filter: blur(18px) saturate(165%); border: 1px solid var(--glass-b) !important; border-radius: 26px; box-shadow: 0 10px 40px rgba(76,29,149,.10), inset 0 1px 0 rgba(255,255,255,.85); transition: box-shadow .25s, transform .25s; }
+        .prescription-builder .rounded-2xl.bg-white:hover { box-shadow: 0 14px 48px rgba(124,58,237,.16), inset 0 1px 0 rgba(255,255,255,.9); }
+        #appDialog .rounded-2xl { background: #fff !important; }
+        .prescription-builder h3 { letter-spacing: -.01em; }
+        .prescription-builder h3 > i, .prescription-builder h3 > span.font-serif { background: linear-gradient(135deg, var(--p1), var(--p2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent !important; }
+        .prescription-builder input:not([type=checkbox]):not([type=hidden]):not(.border-0), .prescription-builder select, .prescription-builder textarea { background: var(--field) !important; border: 1px solid var(--fline) !important; }
+        .prescription-builder input:not(.border-0):focus, .prescription-builder select:focus, .prescription-builder textarea:focus { border-color: var(--p1) !important; box-shadow: 0 0 0 4px rgba(124,58,237,.14), 0 0 28px rgba(6,182,212,.28) !important; }
+        .prescription-builder .bg-slate-50 { background: rgba(248,250,252,.55) !important; border-color: var(--fline) !important; }
+        .prescription-builder .bg-indigo-600 { background-image: linear-gradient(135deg, #6d28d9, #4f46e5 55%, #0891b2); box-shadow: 0 6px 22px rgba(99,102,241,.38); border-color: transparent !important; }
+        .prescription-builder .bg-indigo-600:hover { filter: brightness(1.08); transform: translateY(-1px); }
+        #btnFull, #btnInv { border-radius: 999px !important; padding: 9px 18px !important; backdrop-filter: blur(10px); }
+        #btnFull:not(.bg-indigo-600), #btnInv:not(.bg-indigo-600) { background: var(--glass) !important; border-color: var(--fline) !important; }
+        .rx-chip { background: var(--glass); border-color: var(--glass-b); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 4px 16px rgba(76,29,149,.07); }
+        .rx-chip i { background: linear-gradient(135deg, var(--p1), var(--p2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .rx-chip.bad i { -webkit-text-fill-color: #e11d48; }
+        .rx-dot.active .rx-dot-c { background: linear-gradient(135deg, var(--p1), var(--p2)); border-color: transparent; box-shadow: 0 0 0 4px rgba(124,58,237,.18), 0 0 22px rgba(6,182,212,.5); }
+        .rx-nav { background: rgba(255,255,255,.78); -webkit-backdrop-filter: blur(18px) saturate(170%); backdrop-filter: blur(18px) saturate(170%); }
+        .rx-nav-next { background: linear-gradient(135deg, #6d28d9, #4f46e5 55%, #0891b2); box-shadow: 0 8px 22px rgba(99,102,241,.4); }
+        .rx-nav-next.rx-save { background: linear-gradient(135deg, #059669, #06b6d4); }
+        .fld-sug { background: rgba(255,255,255,.94); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-color: var(--fline); box-shadow: 0 18px 44px rgba(76,29,149,.22); }
+        .fld-opt.on, .fld-opt:hover { background: linear-gradient(90deg, rgba(124,58,237,.12), rgba(6,182,212,.10)); }
+        .rx-smart { background: linear-gradient(135deg, rgba(124,58,237,.10), rgba(6,182,212,.10)); border: 1px solid var(--fline); box-shadow: 0 0 0 1px rgba(255,255,255,.6) inset; }
+        .rx-smart button { background: linear-gradient(135deg, #6d28d9, #0891b2); box-shadow: 0 6px 18px rgba(99,102,241,.35); }
+        #prescription-list tr:hover { background: rgba(124,58,237,.05); }
+        #advCard textarea, #advCard input[type=date] { min-height: 44px; }
+        .prescription-builder ::-webkit-scrollbar { width: 8px; height: 8px; }
+        .prescription-builder ::-webkit-scrollbar-thumb { background: linear-gradient(var(--p1), var(--p2)); border-radius: 8px; }
+        #rxToast { background: linear-gradient(135deg, #1e1b4b, #4c1d95); box-shadow: 0 10px 30px rgba(76,29,149,.4); }
+
+        /* ---------- Dark neon mode ---------- */
+        .prescription-builder.rx-dark { --glass: rgba(15,23,42,.62); --glass-b: rgba(148,163,184,.16); --field: rgba(30,41,59,.72); --fline: rgba(148,163,184,.22); color: #e2e8f0; }
+        .rx-dark::before { background: #050816; background-image: radial-gradient(620px 320px at 6% 0%, rgba(124,58,237,.38), transparent 62%), radial-gradient(520px 320px at 96% 8%, rgba(6,182,212,.30), transparent 62%), radial-gradient(560px 420px at 50% 100%, rgba(236,72,153,.22), transparent 62%); }
+        .rx-dark .rounded-2xl.bg-white { box-shadow: 0 10px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06); }
+        .rx-dark .text-slate-900, .rx-dark .text-slate-800, .rx-dark .text-slate-700, .rx-dark .text-dark, .rx-dark .fw-bold { color: #f1f5f9 !important; }
+        .rx-dark .text-slate-600, .rx-dark .text-slate-500, .rx-dark .text-secondary { color: #cbd5e1 !important; }
+        .rx-dark .text-slate-400 { color: #94a3b8 !important; }
+        .rx-dark input, .rx-dark select, .rx-dark textarea { color: #f1f5f9 !important; }
+        .rx-dark ::placeholder { color: #64748b !important; }
+        .rx-dark select option { background: #0f172a; color: #f1f5f9; }
+        .rx-dark .bg-slate-50, .rx-dark .bg-slate-100 { background: rgba(30,41,59,.55) !important; border-color: rgba(148,163,184,.18) !important; }
+        .rx-dark .border-slate-100, .rx-dark .border-slate-200, .rx-dark .divide-slate-50 > * { border-color: rgba(148,163,184,.16) !important; }
+        .rx-dark .bg-white:not(.rounded-2xl) { background: rgba(30,41,59,.7) !important; }
+        .rx-dark .bg-indigo-50 { background: rgba(99,102,241,.16) !important; border-color: rgba(129,140,248,.3) !important; }
+        .rx-dark .bg-emerald-50 { background: rgba(16,185,129,.14) !important; border-color: rgba(52,211,153,.3) !important; }
+        .rx-dark .bg-teal-50 { background: rgba(20,184,166,.14) !important; border-color: rgba(45,212,191,.3) !important; }
+        .rx-dark .bg-purple-50 { background: rgba(168,85,247,.14) !important; border-color: rgba(192,132,252,.3) !important; }
+        .rx-dark .bg-amber-50 { background: rgba(245,158,11,.14) !important; border-color: rgba(251,191,36,.3) !important; }
+        .rx-dark .bg-rose-50 { background: rgba(244,63,94,.14) !important; border-color: rgba(251,113,133,.3) !important; }
+        .rx-dark [class*="text-indigo-"], .rx-dark [class*="text-emerald-"], .rx-dark [class*="text-teal-"], .rx-dark [class*="text-purple-"], .rx-dark [class*="text-amber-"], .rx-dark [class*="text-rose-"] { filter: brightness(1.45); }
+        .rx-dark .rx-chip, .rx-dark .rx-fu button, .rx-dark .rx-ib { color: #cbd5e1; }
+        .rx-dark .rx-chip b { color: #f8fafc; }
+        .rx-dark .rx-chip.bad { background: rgba(244,63,94,.16); }
+        .rx-dark .rx-fu button { background: rgba(30,41,59,.7); border-color: rgba(148,163,184,.25); }
+        .rx-dark .rx-ib { background: rgba(51,65,85,.7); }
+        .rx-dark .rx-dot-c { background: #0f172a; border-color: #334155; color: #94a3b8; }
+        .rx-dark .rx-dot.done .rx-dot-c { background: #10b981; border-color: #10b981; color: #fff; }
+        .rx-dark .rx-nav { background: rgba(10,14,32,.82); border-color: rgba(148,163,184,.2); }
+        .rx-dark .rx-nav-back { background: rgba(51,65,85,.7); color: #e2e8f0; }
+        .rx-dark .rx-nav-info { color: #94a3b8; }
+        .rx-dark .fld-sug { background: rgba(15,23,42,.96); border-color: rgba(148,163,184,.25); }
+        .rx-dark .fld-opt { color: #e2e8f0; border-color: rgba(148,163,184,.12); }
+        .rx-dark .rx-smart input { color: #f1f5f9 !important; }
+        .rx-dark .rx-v-high, .rx-dark .rx-v-low, .rx-dark .rx-v-ok { background: rgba(30,41,59,.7) !important; }
+        .rx-dark #prescription-list tr:hover { background: rgba(124,58,237,.12); }
+        .rx-dark .rx-draft { background: rgba(245,158,11,.14); border-color: rgba(251,191,36,.35); color: #fde68a; }
     </style>
 @endpush
 
@@ -155,7 +262,7 @@
 @endphp
 
 <div class="prescription-builder w-full">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div class="rx-hero d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <h1 class="h4 fw-bold text-dark mb-1">Create Prescription</h1>
             <p class="text-secondary small mb-0">রোগীর তথ্য, Clinical Vitals, Diagnosis ও Medicine দিয়ে প্রেসক্রিপশন তৈরি করুন।</p>
@@ -163,6 +270,14 @@
         <a href="{{ route('doctor.prescriptions.index') }}" class="btn btn-outline-primary btn-sm fw-semibold">
             <i class="fa-solid fa-list-ul me-1"></i> Prescription List
         </a>
+    </div>
+
+    <div class="rx-summary" id="rxSummary">
+        <span class="rx-chip"><i class="fa-solid fa-user"></i> <b id="sumPatient">রোগী নির্বাচন হয়নি</b></span>
+        <span class="rx-chip"><i class="fa-solid fa-pills"></i> ঔষধ <b id="sumMeds">0</b></span>
+        <span class="rx-chip"><i class="fa-solid fa-receipt"></i> চার্জ <b id="sumCharge"></b></span>
+        <span class="rx-chip" id="sumBalWrap"><i class="fa-solid fa-wallet"></i> ব্যালেন্স <b id="sumBal"></b></span>
+        <span class="rx-hint"><b>Ctrl+S</b> সেভ · <b>Alt+P</b> রোগী · <b>Alt+X</b> Diagnosis · <b>Alt+T</b> Test · <b>Alt+M</b> ঔষধ</span>
     </div>
 
     <form action="{{ route('doctor.prescriptions.store') }}" method="POST" id="prescriptionForm" autocomplete="off" novalidate>
@@ -331,48 +446,8 @@
                             <textarea name="risk_factors" id="riskInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('risk_factors', $parent->risk_factors ?? '') }}</textarea>
                         </div>
                     </div>
-                    <!-- Advice + Follow-up + Submit (দুই মোডেই দেখা যাবে) -->
-                    <div id="advCard" data-step="5" class="rx-step lg:flex-1 flex flex-col bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 space-y-3">
-                        <div>
-                            <label class="text-xs font-semibold text-slate-500 block mb-1">Advice</label>
-                            <textarea name="advice" id="adviceInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('advice') }}</textarea>
-
-                            <!-- Quick Advice presets (JS diye render hoy, ADVICE_PRESETS array te notun advice jog korun) -->
-                            <div class="mt-3">
-                                <span class="text-[11px] font-bold text-slate-400 uppercase block mb-1.5"><i class="fa-solid fa-bolt text-amber-400 mr-1"></i> Quick Advice</span>
-                                <div id="adviceTabs" class="flex flex-wrap gap-1.5 mb-2"></div>
-                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3">
-                                    <div id="adviceChips" class="flex flex-wrap gap-1.5"></div>
-                                    <button type="button" id="adviceAddAll" class="mt-2 text-[11px] font-bold text-indigo-600 hover:underline">+ এই গ্রুপের সবগুলো যোগ করুন</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="rx-submit-row grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div>
-                                <label class="text-xs font-semibold text-slate-500 block mb-1" id="followupLabel">Follow-up Date</label>
-                                <input type="date" name="followup_date" id="followupDate" value="{{ old('followup_date') }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div class="flex items-end md:col-span-2">
-                                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm shadow-md flex items-center justify-center transition-colors">
-                                    <i class="fa-solid fa-print mr-2"></i> <span id="submitLabel">Save & Print Prescription</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RIGHT -->
-                <div class="col-span-12 lg:col-span-7 xl:col-span-8 flex flex-col gap-6 min-w-0">
-
-                    <!-- Investigation-only note -->
-                    <div id="investigationNote" data-step="3" class="rx-step hidden bg-teal-50 border border-teal-200 rounded-2xl p-6">
-                        <h3 class="font-bold text-teal-900 flex items-center mb-2"><i class="fa-solid fa-flask mr-2"></i> Investigation Advice মোড</h3>
-                        <p class="text-sm text-teal-800">এই ভিজিটে কোনো ঔষধ লেখা হচ্ছে না। বাম দিকে রোগীর তথ্য ও পরীক্ষাগুলো লিখে সেভ করুন, রোগীর জন্য একটা Investigation Slip প্রিন্ট হবে।</p>
-                        <p class="text-sm text-teal-800 mt-2">রোগী রিপোর্ট নিয়ে ফিরলে মোবাইল নাম্বার দিয়ে খুঁজুন। সিস্টেম এই ভিজিটটা দেখাবে, <b>Continue with Reports</b> চাপলে সব তথ্য আগে থেকেই ভরা থাকবে।</p>
-                    </div>
-
                     <!-- Diagnosis & Investigations -->
-                    <div id="dxCard" data-step="3" class="rx-step bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-4">
+                    <div id="dxCard" data-step="3" class="rx-step lg:flex-1 bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-4">
                         <h3 class="font-bold text-slate-900 flex items-center mb-1"><i class="fa-solid fa-stethoscope text-teal-600 mr-2 text-lg"></i> Diagnosis & Tests</h3>
 
                         <div>
@@ -400,9 +475,20 @@
                             <textarea name="investigation_findings" id="investigationFindings" rows="3" placeholder="e.g., CBC: Hb 11.2, WBC 14000, Platelet 90000. NS-1: Positive" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500">{{ old('investigation_findings') }}</textarea>
                         </div>
                     </div>
+                </div>
+
+                <!-- RIGHT -->
+                <div class="col-span-12 lg:col-span-7 xl:col-span-8 flex flex-col gap-6 min-w-0">
+
+                    <!-- Investigation-only note -->
+                    <div id="investigationNote" data-step="3" class="rx-step hidden bg-teal-50 border border-teal-200 rounded-2xl p-6">
+                        <h3 class="font-bold text-teal-900 flex items-center mb-2"><i class="fa-solid fa-flask mr-2"></i> Investigation Advice মোড</h3>
+                        <p class="text-sm text-teal-800">এই ভিজিটে কোনো ঔষধ লেখা হচ্ছে না। বাম দিকে রোগীর তথ্য ও পরীক্ষাগুলো লিখে সেভ করুন, রোগীর জন্য একটা Investigation Slip প্রিন্ট হবে।</p>
+                        <p class="text-sm text-teal-800 mt-2">রোগী রিপোর্ট নিয়ে ফিরলে মোবাইল নাম্বার দিয়ে খুঁজুন। সিস্টেম এই ভিজিটটা দেখাবে, <b>Continue with Reports</b> চাপলে সব তথ্য আগে থেকেই ভরা থাকবে।</p>
+                    </div>
 
                     <!-- Medicine card -->
-                    <div id="medicineCard" data-step="4" class="rx-step lg:flex-1 bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 flex flex-col lg:min-h-[420px]">
+                    <div id="medicineCard" data-step="4" class="rx-step bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 flex flex-col lg:min-h-[420px]">
                         <div class="flex justify-between items-center pb-4 border-b border-slate-100 mb-4 flex-wrap gap-2">
                             <h3 class="font-bold text-lg text-slate-900 flex items-center"><span class="text-indigo-600 font-serif italic text-2xl mr-2">Rx</span> Medicine Prescription</h3>
                             <div class="flex items-center gap-2 flex-wrap">
@@ -432,6 +518,13 @@
 
                         <!-- AI Conflict Check result -->
                         <div id="conflictBox" class="hidden mb-4"></div>
+
+                        <!-- Smart Add: এক লাইনে ঔষধ + ডোজ + সময় -->
+                        <div class="rx-smart">
+                            <i class="fa-solid fa-bolt"></i>
+                            <input type="text" id="smartAdd" autocomplete="off" placeholder="Smart Add — যেমন: napa 1+0+1 5d after   (Enter চাপলেই যোগ হবে)">
+                            <button type="button" id="smartAddBtn">Add</button>
+                        </div>
 
                         <!-- Add Medicine Row -->
                         <div class="grid grid-cols-2 md:grid-cols-12 gap-3 mb-3 bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-100">
@@ -503,6 +596,36 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    <!-- Advice + Follow-up + Submit (দুই মোডেই দেখা যাবে) -->
+                    <div id="advCard" data-step="5" class="rx-step lg:flex-1 flex flex-col bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 space-y-3">
+                        <h3 class="font-bold text-lg text-slate-900 flex items-center"><i class="fa-solid fa-notes-medical text-indigo-600 mr-2"></i> Advice &amp; Follow-up</h3>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 block mb-1">Advice</label>
+                            <textarea name="advice" id="adviceInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('advice') }}</textarea>
+
+                            <!-- Quick Advice presets (JS diye render hoy, ADVICE_PRESETS array te notun advice jog korun) -->
+                            <div class="mt-3">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase block mb-1.5"><i class="fa-solid fa-bolt text-amber-400 mr-1"></i> Quick Advice</span>
+                                <div id="adviceTabs" class="flex flex-wrap gap-1.5 mb-2"></div>
+                                <div class="bg-slate-50 border border-slate-100 rounded-xl p-3">
+                                    <div id="adviceChips" class="flex flex-wrap gap-1.5"></div>
+                                    <button type="button" id="adviceAddAll" class="mt-2 text-[11px] font-bold text-indigo-600 hover:underline">+ এই গ্রুপের সবগুলো যোগ করুন</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rx-submit-row grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div>
+                                <label class="text-xs font-semibold text-slate-500 block mb-1" id="followupLabel">Follow-up Date</label>
+                                <input type="date" name="followup_date" id="followupDate" value="{{ old('followup_date') }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="flex items-end md:col-span-2">
+                                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm shadow-md flex items-center justify-center transition-colors">
+                                    <i class="fa-solid fa-print mr-2"></i> <span id="submitLabel">Save & Print Prescription</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -688,7 +811,7 @@
             btnFull.classList.add(...(inv ? INACTIVE_CLS : ACTIVE_CLS));
             btnInv.classList.add(...(inv ? ACTIVE_CLS : INACTIVE_CLS));
 
-            byId('dxCard').classList.toggle('lg:flex-1', inv);
+            byId('dxCard').classList.add('lg:flex-1');
             onStepModeChange();
         }
 
@@ -706,11 +829,21 @@
         }
 
         /* ================= Medicine search + autocomplete ================= */
+        // Tablet/Capsule chhara baki type-e dose likhito (text) hoy: ২ চামচ, ২ ফোঁটা, ২ পাফ ...
+        const TEXT_DOSE_TYPES = ['Syrup', 'Injection', 'Drop', 'Cream', 'Inhaler', 'Other'];
+        const DOSE_PH = { Syrup: '২ চামচ', Injection: '১ অ্যাম্পুল', Drop: '২ ফোঁটা', Cream: 'পাতলা করে', Inhaler: '২ পাফ', Other: '১ টি' };
+        const isTextType = (t) => TEXT_DOSE_TYPES.indexOf(t) !== -1;
+        function applyMedType(t) {
+            if (!t) return;
+            setSelect(medType, t);
+            syncDoseField();
+        }
         function syncDoseField() {
-            const isSyrup = medType.value === 'Syrup';
+            const isSyrup = isTextType(medType.value);
             medDose.classList.toggle('hidden', isSyrup);
             medDoseText.classList.toggle('hidden', !isSyrup);
-            medDoseLabel.textContent = isSyrup ? 'Dose (e.g., ২ চামচ)' : 'Dose (M+A+N)';
+            medDoseLabel.textContent = isSyrup ? 'Dose (e.g., ' + (DOSE_PH[medType.value] || '১ টি') + ')' : 'Dose (M+A+N)';
+            if (isSyrup) medDoseText.placeholder = DOSE_PH[medType.value] || '১ টি';
         }
         medType.addEventListener('change', syncDoseField);
 
@@ -733,7 +866,7 @@
                         const list = Array.isArray(data) ? data : (data.data || []);
                         if (!list.length) { searchResults.classList.add('hidden'); return; }
                         searchResults.innerHTML = list.map(item => `
-                            <div class="px-4 py-2 hover:bg-indigo-50 cursor-pointer flex justify-between items-center gap-2" data-id="${escHtml(item.id)}" data-label="${escHtml(item.label)}" data-generic="${escHtml(item.generic_name || '')}">
+                            <div class="px-4 py-2 hover:bg-indigo-50 cursor-pointer flex justify-between items-center gap-2" data-id="${escHtml(item.id)}" data-label="${escHtml(item.label)}" data-generic="${escHtml(item.generic_name || '')}" data-type="${escHtml(item.dosage_form || '')}">
                                 <div>
                                     <div class="font-semibold text-slate-700">${escHtml(item.label)}</div>
                                     <div class="text-[11px] text-slate-400">${escHtml(item.generic_name || '')}${item.company ? ' · ' + escHtml(item.company) : ''}</div>
@@ -748,8 +881,9 @@
                                 medSearch.value = this.dataset.label;
                                 medId.value = this.dataset.id;
                                 pendingGeneric = (this.dataset.generic || '').toLowerCase();
+                                applyMedType(this.dataset.type);
                                 searchResults.classList.add('hidden');
-                                (medType.value === 'Syrup' ? medDoseText : medDose).focus();
+                                (isTextType(medType.value) ? medDoseText : medDose).focus();
                             });
                         });
                     })
@@ -757,7 +891,7 @@
             }, 250);
         });
 
-        function fillDose(v) { (medType.value === 'Syrup' ? medDoseText : medDose).value = v; }
+        function fillDose(v) { (isTextType(medType.value) ? medDoseText : medDose).value = v; }
         function fillDuration(v) { byId('med-duration').value = v; }
         function fillInstruction(v) { byId('med-instruction').value = v; }
 
@@ -1420,14 +1554,15 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                 if (!Array.isArray(data) || !data.length) return;
                 byId('favWrap').style.display = 'block';
                 byId('favChips').innerHTML = data.map(m => `
-                    <span data-id="${escHtml(m.id)}" data-label="${escHtml(m.label)}" data-generic="${escHtml(m.generic_name || '')}" class="fav-chip bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer hover:bg-indigo-100">💊 ${escHtml(m.label)}</span>
+                    <span data-id="${escHtml(m.id)}" data-label="${escHtml(m.label)}" data-generic="${escHtml(m.generic_name || '')}" data-type="${escHtml(m.dosage_form || '')}" class="fav-chip bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer hover:bg-indigo-100">💊 ${escHtml(m.label)}</span>
                 `).join('');
                 document.querySelectorAll('.fav-chip').forEach(chip => {
                     chip.addEventListener('click', function () {
                         medSearch.value = this.dataset.label;
                         medId.value = this.dataset.id;
                         pendingGeneric = (this.dataset.generic || '').toLowerCase();
-                        (medType.value === 'Syrup' ? medDoseText : medDose).focus();
+                        applyMedType(this.dataset.type);
+                        (isTextType(medType.value) ? medDoseText : medDose).focus();
                     });
                 });
             })
@@ -1473,7 +1608,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                                 pendingGeneric = (this.dataset.generic || '').toLowerCase();
                                 setSelect(medType, this.dataset.type);
                                 syncDoseField();
-                                if (medType.value === 'Syrup') medDoseText.value = this.dataset.dose;
+                                if (isTextType(medType.value)) medDoseText.value = this.dataset.dose;
                                 else medDose.value = this.dataset.dose;
                                 byId('med-duration').value = this.dataset.duration;
                                 byId('med-instruction').value = this.dataset.instruction;
@@ -1530,20 +1665,23 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                     ${escHtml(e.instruction)}
                     <input type="hidden" name="medicines[${index}][instruction]" value="${escHtml(e.instruction)}">
                 </td>
-                <td class="py-3 text-right">
-                    <button type="button" onclick="this.closest('tr').remove(); checkEmpty(); dirty = true;" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                <td class="py-3 text-right whitespace-nowrap">
+                    <button type="button" data-act="up" class="rx-ib" title="উপরে"><i class="fa-solid fa-chevron-up"></i></button><button type="button" data-act="down" class="rx-ib" title="নিচে"><i class="fa-solid fa-chevron-down"></i></button><button type="button" data-act="edit" class="rx-ib" title="এডিট"><i class="fa-solid fa-pen"></i></button><button type="button" data-act="del" class="rx-ib del" title="মুছুন"><i class="fa-solid fa-trash-can"></i></button>
                 </td>
             `;
             prescriptionList.appendChild(tr);
         }
 
         async function addMedicineRow() {
+            normDose(); normDur();
             const name = medSearch.value.trim();
             const id = medId.value;
             const type = medType.value;
-            const isSyrup = type === 'Syrup';
-            const dose = isSyrup ? '' : medDose.value.trim();
-            const doseText = isSyrup ? medDoseText.value.trim() : '';
+            const isSyrup = isTextType(type);
+            let dose = isSyrup ? '' : medDose.value.trim();
+            let doseText = isSyrup ? medDoseText.value.trim() : '';
+            // text ghore 1+0+1 likhle sheta M+A+N hishebe nibo
+            if (doseText && /^[0-9০-৯.]+(\+[0-9০-৯.]+){1,2}$/.test(doseText)) { dose = doseText; doseText = ''; }
             const duration = byId('med-duration').value.trim();
             const instruction = byId('med-instruction').value.trim();
 
@@ -1843,7 +1981,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                         medId.value = this.dataset.id;
                         pendingGeneric = (this.dataset.generic || '').toLowerCase();
                         syncDoseField();
-                        (medType.value === 'Syrup' ? medDoseText : medDose).value = this.dataset.dose;
+                        (isTextType(medType.value) ? medDoseText : medDose).value = this.dataset.dose;
                         byId('med-duration').value = this.dataset.duration;
                         byId('med-instruction').value = this.dataset.instruction;
                         addMedicineRow();
@@ -1972,6 +2110,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
 
             submitting = true;
             dirty = false;
+            clearDraft();
             byId('submitLabel').textContent = 'Saving...';
             rxForm.submit();   // form.submit() 'submit' event fire kore na, tai loop hobe na
         });
@@ -2133,6 +2272,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
         function isStepView() { return window.matchMedia('(max-width: 1023px)').matches; }
 
         function renderStepper() {
+            if (typeof flagVitals === 'function') flagVitals();
             const list = stepsNow();
             if (!list.some(function (s) { return s.n === curStep; })) curStep = list[list.length - 1].n;
             const idx = list.findIndex(function (s) { return s.n === curStep; });
@@ -2167,6 +2307,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
         }
 
         function onStepModeChange() {
+            if (typeof refreshSummary === 'function') refreshSummary();
             if (currentMode() === 'investigation_only' && curStep === 4) curStep = 5;
             renderStepper();
         }
@@ -2246,15 +2387,54 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
             return out;
         })();
 
-        // ---- Syrup dose (text) ----
-        const SYRUP_OPTS = (function () {
-            const amounts = ['½ চামচ|half spoon', '১ চামচ|1 spoon|tsp', '১½ চামচ', '২ চামচ|2 spoon|tsp', '৩ চামচ', '২.৫ মিলি|ml', '৫ মিলি|5 ml|ml', '৭.৫ মিলি|ml', '১০ মিলি|ml', '১৫ মিলি|ml', '২০ মিলি|ml'].map(function (x) { return x.split('|')[0]; });
-            const freqs = ['দিনে ১ বার', 'দিনে ২ বার', 'দিনে ৩ বার', 'দিনে ৪ বার', 'রাতে ১ বার', 'সকালে ১ বার'];
-            const lines = amounts.slice();
-            ['প্রতি ৪ ঘণ্টা পর', 'প্রতি ৬ ঘণ্টা পর', 'প্রতি ৮ ঘণ্টা পর', 'প্রতি ১২ ঘণ্টা পর', 'প্রয়োজনে ৫ মিলি', 'প্রয়োজনে ১ চামচ', 'প্রয়োজনে ২ চামচ'].forEach(function (x) { lines.push(x); });
+        // ---- Text dose: type onujayi (Syrup / Injection / Drop / Cream / Inhaler / Other) ----
+        const DOSE_ALIAS = { 'চামচ': 'spoon tsp', 'মিলি': 'ml', 'ফোঁটা': 'drop', 'পাফ': 'puff', 'ইউনিট': 'unit iu', 'অ্যাম্পুল': 'amp ampoule', 'ভায়াল': 'vial', 'মিগ্রা': 'mg', 'গ্রাম': 'gm gram', 'বার': 'time', 'ঘণ্টা': 'hour hr', 'সাপোজিটরি': 'suppository supp', 'প্যাচ': 'patch', 'স্যাশে': 'sachet' };
+        function textDoseLines(amounts, freqs, extra) {
+            const lines = amounts.slice().concat(extra || []);
             amounts.forEach(function (a) { freqs.forEach(function (f) { lines.push(a + ' করে ' + f); }); });
-            return sugFromLines(lines.map(function (l) { return l + '|' + (l.indexOf('চামচ') !== -1 ? 'spoon tsp' : (l.indexOf('মিলি') !== -1 ? 'ml' : '')); }));
-        })();
+            return lines.map(function (l) {
+                const al = Object.keys(DOSE_ALIAS).filter(function (k) { return l.indexOf(k) !== -1; }).map(function (k) { return DOSE_ALIAS[k]; }).join(' ');
+                return l + '|' + al;
+            });
+        }
+        const F_DAY = ['দিনে ১ বার', 'দিনে ২ বার', 'দিনে ৩ বার', 'দিনে ৪ বার', 'রাতে ১ বার', 'সকালে ১ বার'];
+        const F_HR = ['প্রতি ৪ ঘণ্টা পর', 'প্রতি ৬ ঘণ্টা পর', 'প্রতি ৮ ঘণ্টা পর', 'প্রতি ১২ ঘণ্টা পর', 'প্রতি ২৪ ঘণ্টায়'];
+        const TEXT_DOSE_LINES = {
+            Syrup: function () {
+                return textDoseLines(['½ চামচ', '১ চামচ', '১½ চামচ', '২ চামচ', '৩ চামচ', '২.৫ মিলি', '৫ মিলি', '৭.৫ মিলি', '১০ মিলি', '১৫ মিলি', '২০ মিলি'],
+                    F_DAY.concat(F_HR), ['প্রয়োজনে ৫ মিলি', 'প্রয়োজনে ১ চামচ', 'প্রয়োজনে ২ চামচ']);
+            },
+            Drop: function () {
+                const l = textDoseLines(['১ ফোঁটা', '২ ফোঁটা', '৩ ফোঁটা', '৪ ফোঁটা', '০.৫ মিলি', '১ মিলি', '২ মিলি'], F_DAY.concat(['প্রতি ২ ঘণ্টা পর', 'প্রতি ৪ ঘণ্টা পর', 'প্রতি ৬ ঘণ্টা পর', 'প্রতি ৮ ঘণ্টা পর']));
+                ['চোখে', 'কানে', 'নাকে'].forEach(function (s) {
+                    ['১ ফোঁটা', '২ ফোঁটা', '৩ ফোঁটা'].forEach(function (a) {
+                        ['দিনে ২ বার', 'দিনে ৩ বার', 'দিনে ৪ বার', 'রাতে ১ বার'].forEach(function (f) { l.push(s + ' ' + a + ' করে ' + f + '|drop'); });
+                    });
+                });
+                return l;
+            },
+            Cream: function () {
+                return textDoseLines(['পাতলা করে', 'আক্রান্ত স্থানে', 'মটরদানা পরিমাণ', '১ ফিঙ্গারটিপ ইউনিট', 'ক্ষতস্থানে', 'পুরো আক্রান্ত স্থানে'],
+                    F_DAY.concat(['প্রতি ৮ ঘণ্টা পর', 'প্রতি ১২ ঘণ্টা পর', 'সপ্তাহে ২ বার']), ['প্রয়োজনে', 'গোসলের পর']);
+            },
+            Inhaler: function () {
+                return textDoseLines(['১ পাফ', '২ পাফ', '৩ পাফ', '৪ পাফ', '১ ক্যাপসুল (রোটাহেলার)'],
+                    F_DAY.concat(['সকাল-রাত', 'প্রতি ৪ ঘণ্টা পর', 'প্রতি ৬ ঘণ্টা পর']), ['প্রয়োজনে ২ পাফ', 'শ্বাসকষ্ট হলে ২ পাফ', 'নেবুলাইজারে ১ ডোজ', 'নেবুলাইজারে ২.৫ মিলি']);
+            },
+            Injection: function () {
+                return textDoseLines(['১ অ্যাম্পুল', '১ ভায়াল', '০.৫ মিলি', '১ মিলি', '২ মিলি', '৩ মিলি', '৫ মিলি', '১ গ্রাম', '২৫০ মিগ্রা', '৫০০ মিগ্রা', '৪০ মিগ্রা', '৮০ মিগ্রা', '১০ ইউনিট', '২০ ইউনিট', '৩০ ইউনিট'],
+                    ['একবার (Stat)', 'দিনে ১ বার', 'দিনে ২ বার', 'দিনে ৩ বার', 'রাতে ১ বার', 'প্রতি ৬ ঘণ্টা পর', 'প্রতি ৮ ঘণ্টা পর', 'প্রতি ১২ ঘণ্টা পর', 'সপ্তাহে ১ বার', 'মাসে ১ বার']);
+            },
+            Other: function () {
+                return textDoseLines(['১ টি', '২ টি', '১ প্যাকেট', '১ স্যাশে', '১ গ্লাস', '১ চা-চামচ', '১ টেবিল চামচ', '১ সাপোজিটরি', '১ পেসারি', '১ প্যাচ', '১ টি স্প্রে'],
+                    F_DAY.concat(F_HR));
+            },
+        };
+        const textDoseCache = {};
+        function doseTextOptsFor(type) {
+            if (!textDoseCache[type]) textDoseCache[type] = sugFromLines((TEXT_DOSE_LINES[type] || TEXT_DOSE_LINES.Other)());
+            return textDoseCache[type];
+        }
 
         // ---- Duration ----
         const DUR_OPTS = (function () {
@@ -2269,14 +2449,14 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
         // ---- Instruction (type onujayi age ashbe, baki-gulo likhle pawa jabe) ----
         const INSTR_BASE = ['খাবার পরে|after meal|ac', 'খাবার আগে|before meal|pc', 'খাবারের মাঝে', 'খালি পেটে|empty stomach', 'সকালে খালি পেটে', 'সকালে|morning', 'দুপুরে|noon', 'বিকালে|evening', 'রাতে|night', 'রাতে ঘুমানোর আগে|bedtime|hs', 'ঘুমানোর আগে', 'প্রয়োজনে|prn|sos', 'প্রয়োজন হলে', 'জ্বর হলে|fever', 'ব্যথা হলে|pain', 'বমি হলে|vomiting', 'পাতলা পায়খানা হলে|diarrhea', 'চুলকানি হলে|itching', 'কাশি হলে|cough', 'শ্বাসকষ্ট হলে|breathing', 'প্রতি ৪ ঘণ্টা পর পর', 'প্রতি ৬ ঘণ্টা পর পর', 'প্রতি ৮ ঘণ্টা পর পর', 'প্রতি ১২ ঘণ্টা পর পর', 'প্রতি ২৪ ঘণ্টায় একবার', 'নিয়মিত খাবেন', 'প্রতিদিন একই সময়ে', 'ভরা পেটে', 'খাবারের ৩০ মিনিট আগে', 'খাবারের ১ ঘণ্টা পর', 'পানির সাথে খাবেন', 'প্রচুর পানি পান করবেন', 'দুধের সাথে নয়', 'চা/কফির সাথে নয়', 'অ্যান্টাসিডের ২ ঘণ্টা পর', 'অন্য ওষুধের ১ ঘণ্টা পর', 'কোর্স শেষ করবেন', 'ডাক্তারের পরামর্শ অনুযায়ী'];
         const INSTR_BY_TYPE = {
-            Tablet:    ['চিবিয়ে খাবেন', 'গিলে খাবেন', 'গুঁড়ো করে পানিতে গুলিয়ে খাবেন', 'জিহ্বার নিচে রাখবেন', 'চুষে খাবেন'],
-            Capsule:   ['না ভেঙে গিলে খাবেন', 'পূর্ণ গ্লাস পানি দিয়ে খাবেন', 'শোয়া অবস্থায় খাবেন না'],
-            Syrup:     ['ঝাঁকিয়ে খাবেন', 'মেপে খাবেন', 'ঠান্ডা জায়গায় রাখবেন', 'খোলার ৭ দিনের মধ্যে ব্যবহার করবেন', 'ফ্রিজে রাখবেন'],
-            Injection: ['মাংসপেশিতে (IM)', 'শিরায় (IV)', 'চামড়ার নিচে (SC)', 'ধীরে ধীরে পুশ করবেন', 'স্যালাইনের সাথে দিবেন', 'একবার মাত্র (Stat)', 'Test dose করে দিবেন'],
-            Drop:      ['চোখে ১ ফোঁটা করে', 'চোখে ২ ফোঁটা করে', 'কানে ২ ফোঁটা করে', 'কানে ৩ ফোঁটা করে', 'নাকে ২ ফোঁটা করে', 'প্রতি নাকে ২ ফোঁটা করে', 'মুখে ১ মিলি দিবেন', 'ফোঁটা দেওয়ার পর ১ মিনিট চোখ বন্ধ রাখবেন'],
-            Cream:     ['আক্রান্ত স্থানে লাগাবেন', 'পাতলা করে লাগাবেন', 'দিনে ২ বার লাগাবেন', 'দিনে ৩ বার লাগাবেন', 'রাতে ঘুমানোর আগে লাগাবেন', 'লাগিয়ে হালকা মালিশ করবেন', 'পরিষ্কার করে শুকিয়ে লাগাবেন', 'গোসলের পর লাগাবেন', 'ক্ষতস্থানে লাগাবেন', 'চোখে লাগাবেন না', 'সূর্যের আলো এড়িয়ে চলবেন'],
-            Inhaler:   ['১ পাফ করে', '২ পাফ করে', 'শ্বাসকষ্ট হলে ২ পাফ', 'স্পেসার দিয়ে ব্যবহার করবেন', 'ব্যবহারের পর কুলকুচি করবেন', 'প্রতিদিন সকাল-রাত নিয়মিত'],
-            Other:     [],
+            Tablet:    ['চিবিয়ে খাবেন', 'গিলে খাবেন', 'গুঁড়ো করে পানিতে গুলিয়ে খাবেন', 'জিহ্বার নিচে রাখবেন', 'চুষে খাবেন', 'মুখে গলিয়ে খাবেন (ODT)', 'অর্ধেক করে খাবেন', 'খাবারের সাথে', 'খাবারের ১ ঘণ্টা আগে', 'সকালে খালি পেটে এক গ্লাস পানি দিয়ে', 'দুধ/অ্যান্টাসিড থেকে দূরে খাবেন', 'পুরো কোর্স শেষ করবেন', 'আয়রনের সাথে চা/কফি নয়'],
+            Capsule:   ['না ভেঙে গিলে খাবেন', 'পূর্ণ গ্লাস পানি দিয়ে খাবেন', 'শোয়া অবস্থায় খাবেন না', 'খাবারের ৩০ মিনিট আগে', 'সকালে খালি পেটে', 'পুরো কোর্স শেষ করবেন'],
+            Syrup:     ['ঝাঁকিয়ে খাবেন', 'খাওয়ার আগে ভালো করে ঝাঁকাবেন', 'মেপে খাবেন', 'মেজারিং কাপে মেপে খাবেন', 'ঠান্ডা জায়গায় রাখবেন', 'ফ্রিজে রাখবেন', 'খোলার ৭ দিনের মধ্যে ব্যবহার করবেন', 'খাওয়ার পর মুখ ধুয়ে নিন', 'পানিতে মিশিয়ে খাবেন'],
+            Injection: ['মাংসপেশিতে (IM)', 'গভীর IM', 'শিরায় (IV)', 'শিরায় ধীরে ধীরে (৩–৫ মিনিটে)', 'IV infusion ২০–৩০ মিনিটে', 'চামড়ার নিচে (SC)', 'পেটের চামড়ার নিচে (SC)', 'স্যালাইনের সাথে দিবেন', 'ধীরে ধীরে পুশ করবেন', 'একবার মাত্র (Stat)', 'Test dose করে দিবেন', 'খাবারের ১৫ মিনিট আগে (ইনসুলিন)', 'ঘুমানোর আগে (ইনসুলিন)', 'প্রতিবার ইনজেকশনের স্থান পরিবর্তন করবেন'],
+            Drop:      ['চোখে ১ ফোঁটা করে', 'চোখে ২ ফোঁটা করে', 'কানে ২ ফোঁটা করে', 'কানে ৩ ফোঁটা করে', 'কানে দিয়ে ৫ মিনিট কাত হয়ে শুয়ে থাকবেন', 'নাকে ২ ফোঁটা করে', 'প্রতি নাকে ২ ফোঁটা করে', 'মুখে ১ মিলি দিবেন', 'শিশুর নাকে ১ ফোঁটা করে', 'ফোঁটা দেওয়ার পর ১ মিনিট চোখ বন্ধ রাখবেন', 'লাগানোর আগে হাত ধুয়ে নিন', 'ড্রপারের মুখ চোখ/কান স্পর্শ করবেন না', 'অন্য চোখের ড্রপের ৫ মিনিট পর', 'খোলার ২৮ দিনের মধ্যে ব্যবহার করবেন'],
+            Cream:     ['আক্রান্ত স্থানে লাগাবেন', 'পাতলা করে লাগাবেন', 'দিনে ২ বার লাগাবেন', 'দিনে ৩ বার লাগাবেন', 'রাতে ঘুমানোর আগে লাগাবেন', 'লাগিয়ে হালকা মালিশ করবেন', 'পরিষ্কার করে শুকিয়ে লাগাবেন', 'গোসলের পর লাগাবেন', 'ক্ষতস্থানে লাগাবেন', 'মাথার ত্বকে লাগাবেন', 'চোখে লাগাবেন না', 'মুখের ভেতরে লাগাবেন না', 'লাগানোর পর হাত ধুয়ে নিন', 'সূর্যের আলো এড়িয়ে চলবেন', 'শুধু বাহ্যিক ব্যবহারের জন্য'],
+            Inhaler:   ['১ পাফ করে', '২ পাফ করে', 'শ্বাসকষ্ট হলে ২ পাফ', 'স্পেসার দিয়ে ব্যবহার করবেন', 'ব্যবহারের আগে ঝাঁকাবেন', 'গভীর শ্বাস নিয়ে ১০ সেকেন্ড ধরে রাখবেন', 'দুই পাফের মাঝে ১ মিনিট বিরতি দিন', 'ব্যবহারের পর কুলকুচি করবেন', 'রিলিভার আগে, প্রিভেন্টার পরে', 'প্রতিদিন সকাল-রাত নিয়মিত', 'নেবুলাইজারে দিবেন'],
+            Other:     ['পায়ুপথে ব্যবহার করবেন', 'যোনিপথে রাতে ব্যবহার করবেন', 'গার্গল করবেন', 'নেবুলাইজারে দিবেন', 'প্যাচ ২৪ ঘণ্টা পর পরিবর্তন করবেন', 'ORS ১ লিটার পানিতে গুলিয়ে অল্প অল্প করে খাবেন', 'পানিতে গুলিয়ে খাবেন', 'স্প্রে করবেন', 'শুধু বাহ্যিক ব্যবহারের জন্য'],
         };
         const instrCache = {};
         function instrOptsFor(type) {
@@ -2314,6 +2494,8 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                 const flip = below < 170 && above > below;
                 box.classList.toggle('up', flip);
                 box.style.maxHeight = Math.max(120, Math.min(260, flip ? above : below)) + 'px';
+                if (flip) { box.style.top = 'auto'; box.style.bottom = (host.offsetHeight - input.offsetTop) + 'px'; box.style.marginTop = '0'; }
+                else { box.style.bottom = 'auto'; box.style.top = (input.offsetTop + input.offsetHeight) + 'px'; box.style.marginTop = '4px'; }
             }
             function paint() {
                 box.querySelectorAll('.fld-opt').forEach(function (el, i) { el.classList.toggle('on', i === active); });
@@ -2365,6 +2547,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                     input.value = x.v;
                 }
                 dirty = true;
+                if (o.fire) input.dispatchEvent(new Event('input', { bubbles: true }));
                 close();
                 const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
                 if (!o.multi && o.next && fine) { const n = byId(o.next); if (n) n.focus(); }
@@ -2393,15 +2576,227 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
         }
 
         attachSuggest(medDose, function () { return DOSE_OPTS; }, { next: 'med-duration' });
-        attachSuggest(medDoseText, function () { return SYRUP_OPTS; }, { next: 'med-duration' });
+        attachSuggest(medDoseText, function () { return doseTextOptsFor(medType.value); }, { next: 'med-duration' });
         attachSuggest(byId('med-duration'), function () { return DUR_OPTS; }, { next: 'med-instruction' });
         attachSuggest(byId('med-instruction'), function () { return instrOptsFor(medType.value); }, { multi: true });
+
+
+        /* ================= Lazy tools ================= */
+        // ---- Summary strip ----
+        function refreshSummary() {
+            const n = val('patientName'), age = val('patientAge');
+            byId('sumPatient').textContent = n ? n + (age ? ' · ' + age + ' বছর' : '') : 'রোগী নির্বাচন হয়নি';
+            byId('sumMeds').textContent = currentMode() === 'investigation_only' ? '—' : medRowCount();
+            byId('sumCharge').textContent = money(currentCharge());
+            byId('sumBal').textContent = money(BALANCE);
+            byId('sumBalWrap').classList.toggle('bad', BALANCE < currentCharge());
+        }
+        byId('prescriptionForm').addEventListener('input', refreshSummary);
+        byId('prescriptionForm').addEventListener('change', refreshSummary);
+        new MutationObserver(refreshSummary).observe(prescriptionList, { childList: true });
+
+        // ---- Vitals flag (BP / Pulse / Temp) ----
+        function flagVitals() {
+            const set = function (id, cls) {
+                const box = byId(id).parentNode;
+                box.classList.remove('rx-v-high', 'rx-v-low', 'rx-v-ok', 'rx-v-fever');
+                if (cls) box.classList.add(cls);
+            };
+            const bp = toEn(val('vBp')).match(/(\d{2,3})\s*[\/\-]\s*(\d{2,3})/);
+            set('vBp', !bp ? '' : ((+bp[1] >= 140 || +bp[2] >= 90) ? 'rx-v-high' : ((+bp[1] < 90 || +bp[2] < 60) ? 'rx-v-low' : 'rx-v-ok')));
+            const pu = parseFloat(toEn(val('vPulse')));
+            set('vPulse', isNaN(pu) ? '' : (pu > 100 ? 'rx-v-high' : (pu < 60 ? 'rx-v-low' : 'rx-v-ok')));
+            const tp = parseFloat(toEn(val('vTemp')));
+            set('vTemp', isNaN(tp) ? '' : (tp >= 99.5 ? 'rx-v-fever' : (tp < 97 ? 'rx-v-low' : 'rx-v-ok')));
+        }
+        ['vBp', 'vPulse', 'vTemp'].forEach(function (id) { byId(id).addEventListener('input', flagVitals); });
+
+        // ---- Dose / Duration auto-format: 101 -> 1+0+1, 5 -> ৫ দিন ----
+        function normDose() {
+            const en = toEn(medDose.value).trim();
+            if (/^[0-9]{3}$/.test(en)) medDose.value = en.split('').join('+');
+            else if (/^[0-9.]+[\s,\-][0-9.]+[\s,\-][0-9.]+$/.test(en)) medDose.value = en.split(/[\s,\-]/).join('+');
+        }
+        function durStr(v) {
+            const m = toEn(v).trim().toLowerCase().match(/^(\d+)\s*(d|day|days|w|wk|week|weeks|m|mo|month|months|y|yr|year)?$/);
+            if (!m) return v;
+            const u = (m[2] || 'd')[0];
+            return toBn(m[1]) + ' ' + ({ d: 'দিন', w: 'সপ্তাহ', m: 'মাস', y: 'বছর' }[u]);
+        }
+        function normDur() { const d = byId('med-duration'); d.value = durStr(d.value); }
+        medDose.addEventListener('blur', normDose);
+        byId('med-duration').addEventListener('blur', normDur);
+
+        // ---- Medicine row actions: up / down / edit / delete ----
+        prescriptionList.addEventListener('click', function (e) {
+            const b = e.target.closest('[data-act]'); if (!b) return;
+            const tr = b.closest('tr'); const act = b.dataset.act;
+            if (act === 'up' && tr.previousElementSibling) tr.parentNode.insertBefore(tr, tr.previousElementSibling);
+            else if (act === 'down' && tr.nextElementSibling) tr.parentNode.insertBefore(tr.nextElementSibling, tr);
+            else if (act === 'del') { tr.remove(); checkEmpty(); }
+            else if (act === 'edit') {
+                const g = function (n) { const i = tr.querySelector('input[name$="[' + n + ']"]'); return i ? i.value : ''; };
+                medSearch.value = g('medicine_name'); medId.value = g('medicine_id'); pendingGeneric = tr.dataset.generic || '';
+                applyMedType(g('medicine_type') || 'Tablet');
+                const nums = [g('dose_morning'), g('dose_noon'), g('dose_night')].join('+');
+                if (isTextType(medType.value)) medDoseText.value = g('dose_text') || nums; else medDose.value = nums;
+                byId('med-duration').value = g('duration'); byId('med-instruction').value = g('instruction');
+                tr.remove(); checkEmpty();
+                medSearch.scrollIntoView({ behavior: 'smooth', block: 'center' }); medSearch.focus();
+                rxToast('এডিট করে আবার Add চাপুন');
+            }
+            dirty = true;
+        });
+
+        // ---- Smart Add: "napa 1+0+1 5d after" ----
+        const SMART_INS = { after: 'খাবার পরে', 'পরে': 'খাবার পরে', before: 'খাবার আগে', 'আগে': 'খাবার আগে', hs: 'রাতে ঘুমানোর আগে', bedtime: 'রাতে ঘুমানোর আগে', empty: 'খালি পেটে', 'খালি': 'খালি পেটে', prn: 'প্রয়োজনে', sos: 'প্রয়োজনে' };
+        async function smartAdd() {
+            const inp = byId('smartAdd'); const raw = inp.value.trim(); if (!raw) return;
+            let dose = '', dur = '', ins = [], name = [];
+            raw.split(/\s+/).forEach(function (tk) {
+                const en = toEn(tk).toLowerCase();
+                if (/^[0-9.]+([+\-][0-9.]+){2}$/.test(en)) dose = en.replace(/-/g, '+');
+                else if (/^\d+(d|day|days|w|wk|week|weeks|m|mo|month|months|y)$/.test(en)) dur = durStr(en);
+                else if (['cont', 'continue', 'চলবে'].indexOf(en) !== -1) dur = 'চলবে';
+                else if (SMART_INS[en]) { if (ins.indexOf(SMART_INS[en]) === -1) ins.push(SMART_INS[en]); }
+                else if (en !== 'meal' && tk !== 'খাবার') name.push(tk);
+            });
+            if (!name.length) { rxToast('ঔষধের নাম লিখুন'); return; }
+            const find = async function (term) {
+                try { const r = await fetch(SUGGEST_URL + '?term=' + encodeURIComponent(term)); const d = await r.json(); return Array.isArray(d) ? d : (d.data || []); } catch (x) { return []; }
+            };
+            let list = await find(name.join(' '));
+            if (!list.length && name.length > 1) list = await find(name[0]);
+            const it = list[0];
+            if (it) { medSearch.value = it.label; medId.value = it.id; pendingGeneric = (it.generic_name || '').toLowerCase(); applyMedType(it.dosage_form); }
+            else { medSearch.value = name.join(' '); medId.value = ''; pendingGeneric = ''; }
+            if (dose) { if (isTextType(medType.value)) medDoseText.value = dose; else medDose.value = dose; }
+            if (dur) byId('med-duration').value = dur;
+            if (ins.length) byId('med-instruction').value = ins.join(', ');
+            const before = medRowCount();
+            await addMedicineRow();
+            if (medRowCount() > before) inp.value = '';
+        }
+        byId('smartAddBtn').addEventListener('click', smartAdd);
+        byId('smartAdd').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); smartAdd(); } });
+
+        // ---- Complaint / Diagnosis / Risk suggestions ----
+        const COMPLAINT_OPTS = sugFromLines(['জ্বর|fever', 'শুকনো কাশি|dry cough', 'কফসহ কাশি|productive cough', 'কাশি|cough', 'সর্দি|cold', 'গলাব্যথা|sore throat', 'মাথাব্যথা|headache', 'মাথা ঘোরা|dizziness|vertigo', 'বমি বমি ভাব|nausea', 'বমি|vomiting', 'পাতলা পায়খানা|diarrhea|loose motion', 'কোষ্ঠকাঠিন্য|constipation', 'পেটে ব্যথা|abdominal pain', 'বুক জ্বালাপোড়া|heartburn|acidity', 'গ্যাস্ট্রিক|gastric|gas', 'বুকে ব্যথা|chest pain', 'শ্বাসকষ্ট|breathlessness|dyspnea', 'বুক ধড়ফড়|palpitation', 'পিঠে ব্যথা|back pain', 'কোমরে ব্যথা|low back pain', 'হাঁটুতে ব্যথা|knee pain', 'গিঁটে ব্যথা|joint pain', 'গায়ে ব্যথা|body ache|myalgia', 'দুর্বলতা|weakness', 'ক্লান্তি|fatigue', 'ঘুমের সমস্যা|insomnia', 'ক্ষুধামান্দ্য|anorexia|loss of appetite', 'ওজন কমে যাওয়া|weight loss', 'প্রস্রাবে জ্বালাপোড়া|dysuria|burning micturition', 'ঘন ঘন প্রস্রাব|frequency', 'গায়ে র‍্যাশ|rash', 'চুলকানি|itching', 'চোখ লাল|red eye', 'চোখে ব্যথা|eye pain', 'কানে ব্যথা|earache', 'নাক বন্ধ|nasal block', 'নাক দিয়ে পানি পড়া|rhinorrhea', 'দাঁতে ব্যথা|toothache', 'হাত-পা ঝিনঝিন|numbness|tingling', 'হাত-পা ফোলা|swelling|edema', 'অতিরিক্ত পিপাসা|polydipsia', 'অতিরিক্ত প্রস্রাব|polyuria', 'মাসিকের সমস্যা|menstrual problem', 'গলা খুসখুস|throat irritation', 'শরীরে কাঁপুনি|rigor|chill']);
+        const DX_OPTS = sugFromLines(['Viral fever|fever', 'Dengue fever|dengue', 'Typhoid fever|enteric', 'Upper respiratory tract infection (URTI)|uri|cold', 'Lower respiratory tract infection (LRTI)', 'Acute pharyngitis|tonsillitis|sore throat', 'Acute bronchitis', 'Bronchial asthma|asthma', 'COPD', 'Pneumonia', 'Allergic rhinitis', 'Sinusitis', 'Acute gastroenteritis|diarrhea', 'Dyspepsia|gastritis|gastric', 'GERD|acid reflux', 'Peptic ulcer disease (PUD)|ulcer', 'Irritable bowel syndrome (IBS)', 'Constipation', 'Urinary tract infection (UTI)', 'Hypertension (HTN)|bp|pressure', 'Diabetes mellitus (DM)|dm|sugar', 'Hypothyroidism|thyroid', 'Hyperthyroidism|thyroid', 'Iron deficiency anemia|anemia', 'Vitamin D deficiency', 'Migraine', 'Tension headache', 'Vertigo', 'Low back pain (LBP)|back pain', 'Osteoarthritis (OA)|arthritis', 'Rheumatoid arthritis (RA)|arthritis', 'Cervical spondylosis', 'Myalgia|body ache', 'Gout', 'Scabies', 'Tinea (fungal infection)|ringworm', 'Eczema|dermatitis', 'Urticaria|allergy', 'Acne vulgaris', 'Conjunctivitis|red eye', 'Otitis media|ear', 'Dental caries|toothache', 'Ischaemic heart disease (IHD)|heart', 'Anxiety disorder', 'Depression', 'Insomnia', 'Chronic kidney disease (CKD)', 'Fatty liver', 'Hepatitis', 'Worm infestation|helminthiasis', 'Pregnancy (ANC)|anc', 'Dysmenorrhea', 'PCOS', 'Menorrhagia', 'Wound / Abscess', 'Hemorrhoids|piles', 'Dehydration']);
+        const RISK_OPTS = sugFromLines(['Diabetes|dm', 'Hypertension|htn', 'Smoking|smoker', 'Alcohol', 'Obesity', 'Family history of DM', 'Family history of HTN', 'Family history of heart disease', 'Asthma', 'Allergy history', 'Drug allergy (Penicillin)', 'Pregnancy', 'Lactating mother', 'Elderly', 'Previous surgery', 'Heart disease', 'Kidney disease', 'Liver disease', 'Sedentary lifestyle']);
+        attachSuggest(byId('symptomsInput'), function () { return COMPLAINT_OPTS; }, { multi: true });
+        attachSuggest(byId('diagnosisInput'), function () { return DX_OPTS; }, { multi: true, fire: true });
+        attachSuggest(byId('riskInput'), function () { return RISK_OPTS; }, { multi: true });
+
+        // ---- Follow-up quick dates ----
+        (function () {
+            const fu = byId('followupDate');
+            const wrap = document.createElement('div'); wrap.className = 'rx-fu';
+            const lab = document.createElement('span');
+            const upd = function () {
+                lab.textContent = fu.value ? '📅 ' + new Date(fu.value + 'T00:00:00').toLocaleDateString('bn-BD', { weekday: 'long', day: 'numeric', month: 'long' }) : '';
+            };
+            [['৩ দিন', 3], ['৫ দিন', 5], ['৭ দিন', 7], ['১৪ দিন', 14], ['১ মাস', 30], ['২ মাস', 60]].forEach(function (x) {
+                const b = document.createElement('button'); b.type = 'button'; b.textContent = x[0];
+                b.addEventListener('click', function () {
+                    const d = new Date(); d.setDate(d.getDate() + x[1]);
+                    fu.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                    dirty = true; upd();
+                });
+                wrap.appendChild(b);
+            });
+            const c = document.createElement('button'); c.type = 'button'; c.textContent = '✕';
+            c.addEventListener('click', function () { fu.value = ''; upd(); });
+            wrap.appendChild(c); wrap.appendChild(lab);
+            fu.parentNode.appendChild(wrap);
+            fu.addEventListener('change', upd); upd();
+        })();
+
+        // ---- Keyboard shortcuts ----
+        document.addEventListener('keydown', function (e) {
+            const k = (e.key || '').toLowerCase();
+            if ((e.ctrlKey || e.metaKey) && k === 's') { e.preventDefault(); byId('submitBtn').click(); return; }
+            if (!e.altKey) return;
+            const go = function (n, el) { e.preventDefault(); goStep(n, { noScroll: true }); if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } };
+            if (k === 'p') go(1, patientSearchInput);
+            else if (k === 'x') go(3, byId('diagnosisInput'));
+            else if (k === 't') go(3, byId('investigations'));
+            else if (k === 'm' && currentMode() !== 'investigation_only') go(4, byId('smartAdd'));
+        });
+
+        // ---- Draft autosave (reload / net-er jonno) ----
+        const DRAFT_KEY = 'rxDraft:v1';
+        const DRAFT_IDS = ['patientMobile', 'patientName', 'patientAge', 'patientWeight', 'patientGender', 'patientBlood', 'patientAddress', 'vBp', 'vPulse', 'vTemp', 'symptomsInput', 'riskInput', 'diagnosisInput', 'investigations', 'investigationFindings', 'adviceInput', 'followupDate'];
+        function clearDraft() { try { localStorage.removeItem(DRAFT_KEY); } catch (x) {} }
+        function collectMeds() {
+            return Array.from(prescriptionList.querySelectorAll('tr:not(#empty-row)')).map(function (tr) {
+                const g = function (n) { const i = tr.querySelector('input[name$="[' + n + ']"]'); return i ? i.value : ''; };
+                const dt = g('dose_text');
+                return { id: g('medicine_id'), name: g('medicine_name'), type: g('medicine_type') || 'Tablet', dose: dt ? '' : [g('dose_morning'), g('dose_noon'), g('dose_night')].join('+'), doseText: dt, duration: g('duration'), instruction: g('instruction'), generic: tr.dataset.generic || '' };
+            });
+        }
+        let draftTimer;
+        function saveDraft() {
+            if (submitting) return;
+            try {
+                const f = {}; DRAFT_IDS.forEach(function (id) { f[id] = byId(id) ? byId(id).value : ''; });
+                const meds = collectMeds();
+                if (!f.patientName && !f.diagnosisInput && !f.symptomsInput && !meds.length) { clearDraft(); return; }
+                localStorage.setItem(DRAFT_KEY, JSON.stringify({ t: Date.now(), f: f, meds: meds, type: currentMode(), pid: patientIdInput.value }));
+            } catch (x) {}
+        }
+        const queueSave = function () { clearTimeout(draftTimer); draftTimer = setTimeout(saveDraft, 700); };
+        byId('prescriptionForm').addEventListener('input', queueSave);
+        byId('prescriptionForm').addEventListener('change', queueSave);
+        new MutationObserver(queueSave).observe(prescriptionList, { childList: true });
+
+        (function offerDraft() {
+            let d = null;
+            try { d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch (x) {}
+            if (!d || Date.now() - d.t > 24 * 3600 * 1000) { clearDraft(); return; }
+            if (HAS_PARENT || INIT_PATIENT || (OLD_MEDS && OLD_MEDS.length) || (SERIALS && SERIALS.length && byId('serialIdInput').value)) return;
+            const bar = document.createElement('div'); bar.className = 'rx-draft';
+            const who = (d.f.patientName || 'নাম ছাড়া') + ' · ' + new Date(d.t).toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+            bar.innerHTML = '<span>📝 অসমাপ্ত খসড়া আছে: <b>' + escHtml(who) + '</b> (' + d.meds.length + 'টি ঔষধ)</span>';
+            const ok = document.createElement('button'); ok.type = 'button'; ok.className = 'ok'; ok.textContent = 'ফিরিয়ে আনুন';
+            const no = document.createElement('button'); no.type = 'button'; no.className = 'no'; no.textContent = 'মুছে ফেলুন';
+            ok.onclick = function () {
+                DRAFT_IDS.forEach(function (id) { if (byId(id) && d.f[id] != null) byId(id).value = d.f[id]; });
+                if (d.pid) patientIdInput.value = d.pid;
+                if (d.type) setMode(d.type);
+                d.meds.forEach(function (m) { appendMedicineRow(m); });
+                flagVitals(); refreshSummary(); bar.remove(); dirty = true; rxToast('খসড়া ফিরে এসেছে');
+            };
+            no.onclick = function () { clearDraft(); bar.remove(); };
+            bar.appendChild(ok); bar.appendChild(no);
+            byId('prescriptionForm').insertBefore(bar, byId('prescriptionForm').querySelector('main'));
+        })();
+
+
+        /* ================= Theme toggle (Light glass / Dark neon) ================= */
+        (function () {
+            const root = document.querySelector('.prescription-builder');
+            const hero = root.querySelector('.rx-hero');
+            const btn = document.createElement('button');
+            btn.type = 'button'; btn.className = 'rx-theme-btn'; btn.title = 'Light / Dark';
+            const apply = function (dark) { root.classList.toggle('rx-dark', dark); btn.textContent = dark ? '☀️' : '🌙'; };
+            let dark = false;
+            try { dark = localStorage.getItem('rxTheme') === 'dark'; } catch (x) {}
+            apply(dark);
+            btn.addEventListener('click', function () {
+                dark = !root.classList.contains('rx-dark'); apply(dark);
+                try { localStorage.setItem('rxTheme', dark ? 'dark' : 'light'); } catch (x) {}
+            });
+            const link = hero.querySelector('a');
+            if (link) link.parentNode.insertBefore(btn, link); else hero.appendChild(btn);
+        })();
 
         /* ================= Init ================= */
         syncDoseField();
         checkEmpty();
         setMode(byId('typeInput').value || 'full');
         renderStepper();
+        refreshSummary();
         dirty = false;
 
         // Page khulei important popup (banner-er bodole)
