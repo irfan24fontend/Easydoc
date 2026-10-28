@@ -135,9 +135,11 @@
     function probe() {
         if (!ctx.pingUrl) return Promise.resolve(navigator.onLine);
         var url = ctx.pingUrl + (ctx.pingUrl.indexOf('?') === -1 ? '?' : '&') + '_=' + Date.now();
-        return fetch(url, { method: 'HEAD', cache: 'no-store', credentials: 'omit' })
-            .then(function () { return true; })
-            .catch(function () { return false; });
+        var ctl = window.AbortController ? new AbortController() : null;
+        var timer = ctl ? setTimeout(function () { ctl.abort(); }, 3500) : null;   // net atke thakle 3.5s e offline dhore nibe
+        return fetch(url, { method: 'HEAD', cache: 'no-store', credentials: 'omit', signal: ctl ? ctl.signal : undefined })
+            .then(function () { clearTimeout(timer); return true; })
+            .catch(function () { clearTimeout(timer); return false; });
     }
 
     function setOnline(v) {
@@ -145,6 +147,12 @@
         online = v;
         if (changed) renderBanner();
         if (v) trySync();
+    }
+
+    // Save er thik age live check: flag purano hote pare (wifi ache kintu net nei), tai ekhoni ping kore dekhi
+    function checkNow() {
+        if (!navigator.onLine) { setOnline(false); return Promise.resolve(false); }
+        return probe().then(function (v) { setOnline(v); return v; });
     }
 
     window.addEventListener('online', function () { setOnline(true); });
@@ -215,11 +223,16 @@
             '<script>window.onload=function(){setTimeout(function(){window.print();},200);};<\/script>' +
             '</body></html>';
 
-        var w = window.open('', '_blank');
-        if (!w) { alert('প্রিন্ট উইন্ডো ব্লক হয়েছে — পপআপ অনুমতি দিন।'); return; }
-        w.document.open();
-        w.document.write(html);
-        w.document.close();
+        // Hidden iframe e print - popup blocker (phone/Safari) e atke jabe na
+        var f = document.createElement('iframe');
+        f.setAttribute('aria-hidden', 'true');
+        f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+        document.body.appendChild(f);
+        var d = f.contentWindow.document;
+        d.open();
+        d.write(html);
+        d.close();
+        setTimeout(function () { if (f.parentNode) f.parentNode.removeChild(f); }, 180000);
     }
 
     /* ================= Queue from the visible form ================= */
@@ -414,6 +427,7 @@
     window.RxOffline = {
         isOnline: isOnline,
         queueFromForm: queueFromForm,
+        checkNow: checkNow,
         sync: trySync,
     };
 })();

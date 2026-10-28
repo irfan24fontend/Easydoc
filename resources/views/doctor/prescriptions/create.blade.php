@@ -2190,12 +2190,14 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
             if (submitting) return;
             const btn = byId('submitBtn');
             btn.disabled = true;
-            const ok = await preSubmitChecks();
+            let ok;
+            try { ok = await preSubmitChecks(); }
+            catch (err) { console.error('preSubmitChecks failed', err); ok = true; }   // net na thakle fetch fail hole Save atkabe na
             if (!ok) { btn.disabled = false; return; }
 
             // নেট/বিদ্যুৎ না থাকলে সার্ভারে পাঠানো যাবে না — RxOffline থাকলে ব্রাউজারেই সেভ ও প্রিন্ট করে দাও,
             // নেট ফিরলে rx-offline.js নিজে থেকেই sync করবে।
-            if (window.RxOffline && !window.RxOffline.isOnline()) {
+            if (window.RxOffline && !(await window.RxOffline.checkNow())) {
                 const r = await window.RxOffline.queueFromForm(rxForm, currentCharge(), currentMode());
                 btn.disabled = false;
                 if (!r.ok) {
