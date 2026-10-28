@@ -1,0 +1,8 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/easydoc/public_html
+    - /bin/mkdir -p $DEPLOYPATH/js $DEPLOYPATH/css
+    - /bin/cp -f public/sw.js $DEPLOYPATH/sw.js
+    - /bin/cp -rf public/js/. $DEPLOYPATH/js/
+    - /bin/cp -rf public/css/. $DEPLOYPATH/css/
