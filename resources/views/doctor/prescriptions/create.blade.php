@@ -98,6 +98,38 @@
         #rxToast { position: fixed; left: 50%; bottom: 88px; transform: translateX(-50%) translateY(10px); background: #0f172a; color: #fff; font-size: 12px; font-weight: 600; padding: 8px 14px; border-radius: 999px; z-index: 9998; opacity: 0; pointer-events: none; transition: all .2s; max-width: 90vw; text-align: center; }
         #rxToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+        /* ============ OFFLINE MODE (rx-offline.js) ============ */
+        #rxOfflineBanner { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; display: none; }
+        #rxOfflineBanner.show { display: block; }
+        #rxOfflineBanner .rxo-row { display: flex; align-items: center; gap: 10px; padding: 8px 14px; padding-top: calc(8px + env(safe-area-inset-top, 0px)); font-size: 12.5px; font-weight: 700; color: #fff; background: linear-gradient(90deg, #b91c1c, #991b1b); box-shadow: 0 4px 14px rgba(153,27,27,.35); }
+        #rxOfflineBanner.online .rxo-row { background: linear-gradient(90deg, #15803d, #166534); box-shadow: 0 4px 14px rgba(21,128,61,.3); }
+        #rxOfflineBanner .rxo-dot { width: 8px; height: 8px; border-radius: 99px; background: #fff; flex-shrink: 0; animation: rxoPulse 1.6s ease infinite; }
+        @keyframes rxoPulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+        #rxOfflineBanner .rxo-text { flex: 1; min-width: 0; }
+        #rxOfflineBanner .rxo-outbox-btn { border: 1px solid rgba(255,255,255,.5); background: rgba(255,255,255,.15); color: #fff; border-radius: 999px; padding: 4px 11px; font-size: 11.5px; font-weight: 800; white-space: nowrap; }
+        #rxOfflineBanner .rxo-outbox-btn b { margin-left: 3px; }
+        body.rxo-has-banner .prescription-builder { margin-top: 38px; }
+
+        #rxOfflineOutbox { position: fixed; inset: 0; z-index: 10000; background: rgba(15,23,42,.55); display: none; align-items: flex-end; justify-content: center; }
+        #rxOfflineOutbox.show { display: flex; }
+        #rxOfflineOutbox .rxo-panel { width: 100%; max-width: 480px; max-height: 80vh; background: #fff; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 -10px 40px rgba(0,0,0,.3); }
+        @media (min-width: 640px) { #rxOfflineOutbox { align-items: center; } #rxOfflineOutbox .rxo-panel { border-radius: 20px; margin-bottom: 0; } }
+        #rxOfflineOutbox .rxo-panel-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #e2e8f0; font-weight: 800; color: #0f172a; }
+        #rxOfflineOutbox .rxo-panel-head .rxo-actions { display: flex; gap: 8px; align-items: center; }
+        #rxOfflineOutbox .rxo-sync-btn { background: #4f46e5; color: #fff; border: 0; border-radius: 10px; padding: 6px 12px; font-size: 12px; font-weight: 700; }
+        #rxOfflineOutbox .rxo-close { border: 0; background: #f1f5f9; width: 30px; height: 30px; border-radius: 10px; color: #64748b; font-size: 14px; }
+        #rxOfflineOutbox .rxo-list { overflow-y: auto; padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px)); }
+        #rxOfflineOutbox .rxo-empty { text-align: center; color: #94a3b8; font-size: 13px; padding: 30px 10px; }
+        .rxo-item { border: 1px solid #e2e8f0; border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; }
+        .rxo-item .rxo-item-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+        .rxo-item .rxo-name { font-weight: 700; font-size: 13.5px; color: #0f172a; }
+        .rxo-item .rxo-charge { font-size: 12px; font-weight: 700; color: #4f46e5; white-space: nowrap; }
+        .rxo-item .rxo-meta { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+        .rxo-item .rxo-err { font-size: 11.5px; color: #e11d48; font-weight: 700; margin-top: 6px; background: #fff1f2; border-radius: 8px; padding: 5px 8px; }
+        .rxo-item .rxo-pill { display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: #fef3c7; color: #92400e; margin-top: 6px; }
+        .rxo-item .rxo-pill.ok { background: #d1fae5; color: #065f46; }
+        .rxo-item .rxo-print-btn { border: 1px solid #e2e8f0; background: #fff; color: #475569; border-radius: 8px; padding: 3px 10px; font-size: 11px; font-weight: 700; margin-top: 6px; }
+
         /* ============ MODERN SKIN ============ */
         .rx-hero { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #0ea5e9 100%); border-radius: 22px; padding: 18px 22px; box-shadow: 0 12px 32px rgba(79,70,229,.28); margin-bottom: 12px !important; }
         .rx-hero h1 { color: #fff !important; }
@@ -654,9 +686,53 @@
         </div>
     </div>
 </div>
+
+<!-- ===== Offline mode UI (rx-offline.js এগুলো নিয়ন্ত্রণ করে) ===== -->
+<div id="rxOfflineBanner">
+    <div class="rxo-row">
+        <span class="rxo-dot"></span>
+        <span class="rxo-text">অফলাইন</span>
+        <button type="button" class="rxo-outbox-btn">খসড়া <b class="rxo-count">0</b></button>
+    </div>
+</div>
+<div id="rxOfflineOutbox">
+    <div class="rxo-panel">
+        <div class="rxo-panel-head">
+            <span>অফলাইনে তৈরি প্রেসক্রিপশন</span>
+            <div class="rxo-actions">
+                <button type="button" class="rxo-sync-btn"><i class="fa-solid fa-rotate"></i> এখনই Sync</button>
+                <button type="button" class="rxo-close">✕</button>
+            </div>
+        </div>
+        <div class="rxo-list"></div>
+    </div>
+</div>
 @endsection
 
+@php
+    // Blade json directive e comma wala multi-line array dile ParseError hoy, tai array ta age banano holo
+    $rxOfflineCtx = [
+        'syncUrl'    => route('doctor.prescriptions.sync-offline'),
+        'pingUrl'    => asset('favicon.ico'),
+        'balance'    => (float) $balance,
+        'fullCharge' => (float) $fullCharge,
+        'invCharge'  => (float) $invCharge,
+        'doctor'     => [
+            'name'          => $doctor->user->name ?? '',
+            'qualification' => $doctor->qualification ?? '',
+            'designation'   => $doctor->designation ?? '',
+            'bmdc'          => $doctor->bmdc_number ?? '',
+        ],
+        'chamber'    => !empty($activeChamber) ? [
+            'name'     => $activeChamber->chamber_name,
+            'hospital' => $activeChamber->hospital_name,
+            'address'  => $activeChamber->address,
+            'phone'    => $activeChamber->phone,
+        ] : null,
+    ];
+@endphp
 @push('scripts')
+<script src="{{ asset('js/rx-offline.js') }}"></script>
 <script>
         const SUGGEST_URL = "{{ route('doctor.prescriptions.medicine-suggest') }}";
         const LOOKUP_URL = "{{ route('doctor.prescriptions.lookup-patient') }}";
@@ -666,6 +742,15 @@
         const PATTERN_URL = "{{ route('doctor.prescriptions.pattern-suggest') }}";
         const CHECK_URL = "{{ route('doctor.prescriptions.check-interactions') }}";
         const CSRF_TOKEN = "{{ csrf_token() }}";
+
+        // ===== অফলাইন মোডের জন্য দরকারি তথ্য (rx-offline.js এটা পড়ে) =====
+        // বিদ্যুৎ/নেট চলে গেলেও যাতে প্রেসক্রিপশন তৈরি ও প্রিন্ট করা যায়, তার জন্য।
+        window.RX_OFFLINE_CTX = @json($rxOfflineCtx);
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('{{ asset('sw.js') }}').catch(function () {});
+            });
+        }
         const HAS_PARENT = @json((bool) $parent);
         const INIT_PATIENT = @json($initPatient);
         const FULL_CHARGE = {{ $fullCharge }};
@@ -2107,6 +2192,37 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
             btn.disabled = true;
             const ok = await preSubmitChecks();
             if (!ok) { btn.disabled = false; return; }
+
+            // নেট/বিদ্যুৎ না থাকলে সার্ভারে পাঠানো যাবে না — RxOffline থাকলে ব্রাউজারেই সেভ ও প্রিন্ট করে দাও,
+            // নেট ফিরলে rx-offline.js নিজে থেকেই sync করবে।
+            if (window.RxOffline && !window.RxOffline.isOnline()) {
+                const r = await window.RxOffline.queueFromForm(rxForm, currentCharge(), currentMode());
+                btn.disabled = false;
+                if (!r.ok) {
+                    await appDialog({ type: 'warning', title: 'অফলাইনে সেভ করা গেলো না', message: r.error || 'অজানা সমস্যা হয়েছে।' });
+                    return;
+                }
+                submitting = false;
+                dirty = false;
+                clearDraft();
+                rxToast('📴 অফলাইনে সেভ হয়েছে — নেট ফিরলে sync হবে');
+
+                // পেজ reload না করেই ফর্ম খালি করে দাও, যাতে offline অবস্থাতেই পরের রোগীর জন্য ব্যবহার করা যায়
+                rxForm.reset();
+                prescriptionList.innerHTML = '';
+                checkEmpty();
+                patientIdInput.value = '';
+                pendingGeneric = '';
+                if (typeof patientDecisionPending !== 'undefined') patientDecisionPending = false;
+                patientMatches.classList.add('hidden');
+                byId('conflictBox')?.classList.add('hidden');
+                setMode('full');
+                if (typeof flagVitals === 'function') flagVitals();
+                refreshSummary();
+                if (typeof goStep === 'function') goStep(1);
+                patientMobileInput.focus();
+                return;
+            }
 
             submitting = true;
             dirty = false;

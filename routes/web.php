@@ -140,7 +140,8 @@ Route::middleware(['auth', 'role:doctor', 'doctor.approved'])
         Route::get('public-profile', [PublicProfileController::class, 'edit'])->name('public-profile.edit');
         Route::put('public-profile', [PublicProfileController::class, 'update'])->name('public-profile.update');
         Route::patch('public-profile/publish', [PublicProfileController::class, 'toggle'])->name('public-profile.toggle');
-
+        Route::post('prescriptions/sync-offline', [PrescriptionController::class, 'syncOffline'])
+    ->name('prescriptions.sync-offline');
         // Chambers (doctor shudhu nijer chamber dekhte pare; create/edit Super Admin kore)
         Route::get('chambers', [DoctorChamberController::class, 'index'])->name('chambers.index');
         Route::patch('chambers/{chamber}/toggle', [DoctorChamberController::class, 'toggle'])

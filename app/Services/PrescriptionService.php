@@ -19,6 +19,19 @@ class PrescriptionService
 
     public function create(Doctor $doctor, array $data): Prescription
     {
+        // Offline-sync idempotency: একই offline_ref আগেই sync হয়ে গিয়ে থাকলে
+        // (যেমন নেট flaky হয়ে একই batch দুইবার POST হলে) নতুন করে আবার তৈরি/চার্জ না করে
+        // আগের prescription-টাই ফেরত দাও।
+        if (!empty($data['offline_ref'])) {
+            $existing = Prescription::where('doctor_id', $doctor->id)
+                ->where('offline_ref', $data['offline_ref'])
+                ->first();
+
+            if ($existing) {
+                return $existing;
+            }
+        }
+
         $chamber = $doctor->activeChamber();
 
         if (!$chamber) {
@@ -74,6 +87,7 @@ class PrescriptionService
                 'advice' => $data['advice'] ?? null,
                 'followup_date' => $data['followup_date'] ?? null,
                 'charge_deducted' => $charge,
+                'offline_ref' => $data['offline_ref'] ?? null,
             ]);
 
             $medicines = $isInvestigation ? [] : ($data['medicines'] ?? []);

@@ -20,6 +20,7 @@ use App\Services\SerialService;
 use App\Services\TreatmentPatternService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class PrescriptionController extends Controller
 {
@@ -292,7 +293,6 @@ class PrescriptionController extends Controller
                 'id' => $dm->medicine->id,
                 'label' => $dm->medicine->brand_name . ($dm->medicine->strength ? ' (' . $dm->medicine->strength . ')' : ''),
                 'generic_name' => $dm->medicine->generic_name,
-                'dosage_form' => $dm->medicine->dosage_form,
             ])
             ->values();
 
@@ -494,6 +494,90 @@ class PrescriptionController extends Controller
             'html'         => $html,
             'css'          => $template->css,
             'paperSize'    => $template->paper_size,
+        ]);
+    }
+
+    /**
+     * বিদ্যুৎ/নেট না থাকাকালীন ব্রাউজারে (IndexedDB) জমে থাকা প্রেসক্রিপশনগুলো
+     * নেট ফেরার পর একসাথে sync করার endpoint। rx-offline.js এটা কল করে।
+     *
+     * - প্রতিটা item আলাদাভাবে validate ও create হয়, একটা fail করলে বাকিগুলো থেমে যায় না।
+     * - `offline_ref` দিয়ে idempotent (দ্বিতীয়বার sync হলে আবার চার্জ কাটবে না) —
+     *   দেখুন PrescriptionService::create() এবং migration add_offline_ref_to_prescriptions_table।
+     * - সবসময় HTTP 200 দেয় (batch নিজেই); প্রতিটা item-এর আসল ফলাফল results[] অ্যারেতে।
+     *   ডাক্তারের লগইন সেশন expire হয়ে থাকলে Laravel নিজেই 401/419 দেবে — সেটা rx-offline.js
+     *   ধরে, local queue মুছে ফেলে না, শুধু আবার লগইন করতে বলে।
+     */
+    public function syncOffline(Request $request)
+    {
+        $doctor = $this->currentDoctor();
+
+        $items = $request->input('items', []);
+        if (!is_array($items) || count($items) === 0) {
+            return response()->json(['results' => []]);
+        }
+
+        // একবারে বেশি আইটেম এলেও সার্ভার/DB-কে অতিরিক্ত চাপ না দিতে একটা reasonable cap
+        $items = array_slice($items, 0, 25);
+
+        $results = [];
+
+        foreach ($items as $item) {
+            $clientId = (string) ($item['client_id'] ?? '');
+
+            if ($clientId === '') {
+                $results[] = ['client_id' => null, 'ok' => false, 'error' => 'client_id ছাড়া item গ্রহণযোগ্য না।'];
+                continue;
+            }
+
+            $isInvestigation = ($item['type'] ?? 'full') === 'investigation_only';
+
+            $validator = Validator::make(
+                $item,
+                StorePrescriptionRequest::rulesFor($isInvestigation),
+                (new StorePrescriptionRequest())->messages()
+            );
+
+            if ($validator->fails()) {
+                $results[] = [
+                    'client_id' => $clientId,
+                    'ok' => false,
+                    'error' => 'ডেটা অসম্পূর্ণ: ' . $validator->errors()->first(),
+                ];
+                continue;
+            }
+
+            $data = $validator->validated();
+            $data['offline_ref'] = $clientId;
+
+            if ($request->filled("patient_id") === false && !empty($item['patient_id'])) {
+                $data['patient_id'] = $item['patient_id'];
+            }
+
+            try {
+                $prescription = $this->service->create($doctor, $data);
+                $prescription->loadMissing('patient');
+
+                $results[] = [
+                    'client_id'      => $clientId,
+                    'ok'             => true,
+                    'prescription_id'=> $prescription->id,
+                    'patient_code'   => $prescription->patient?->patient_code,
+                    'print_url'      => route('doctor.prescriptions.print', $prescription->id),
+                ];
+            } catch (Exception $e) {
+                // সবচেয়ে common কারণ: অফলাইনে cache করা ব্যালেন্স অনুযায়ী তৈরি হয়েছিল,
+                // কিন্তু নেট ফেরার মাঝে আসল ব্যালেন্স শেষ হয়ে গেছে। এটাই user-কে পরিষ্কার জানানো হচ্ছে,
+                // কোনো ডেটা চুপচাপ হারানো হচ্ছে না — rx-offline.js এই item-টা queue-তে রেখে দেবে।
+                $results[] = ['client_id' => $clientId, 'ok' => false, 'error' => $e->getMessage()];
+            }
+        }
+
+        $doctor->refresh();
+
+        return response()->json([
+            'results' => $results,
+            'balance' => (float) ($doctor->wallet->balance ?? 0),
         ]);
     }
 }

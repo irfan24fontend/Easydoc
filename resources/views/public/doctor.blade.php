@@ -46,8 +46,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="color-scheme" content="light dark">
-    <meta name="theme-color" content="#4c1d95">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#0c2d57">
     <title>{{ $title }}</title>
     <meta name="description" content="{{ $desc }}">
     <link rel="canonical" href="{{ $url }}">
@@ -62,329 +62,257 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
 
-    <script>
-        // theme আগেই বসিয়ে দিই, যাতে পেজ লোডে ঝিকমিক না করে
-        (function () {
-            try {
-                var t = localStorage.getItem('pp-theme');
-                if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', t);
-            } catch (e) {}
-        })();
-    </script>
-
     <style>
         :root{
-            --p1:#7c3aed; --p2:#06b6d4; --p3:#ec4899;
-            --ink:#0f172a; --ink-soft:#475569; --mute:#94a3b8;
-            --bg:#f5f3ff; --glass:rgba(255,255,255,.66); --glass-b:rgba(255,255,255,.85); --line:rgba(124,58,237,.16);
-            --chip:rgba(124,58,237,.10); --chip-ink:#5b21b6; --shadow:0 18px 50px rgba(76,29,149,.14);
-            --display:"Plus Jakarta Sans","Hind Siliguri",system-ui,sans-serif;
-            --body:"Hind Siliguri",system-ui,-apple-system,"Segoe UI",sans-serif;
-            --grad:linear-gradient(135deg,#6d28d9,#4f46e5 50%,#0891b2);
-        }
-        [data-theme="dark"]{
-            --ink:#f1f5f9; --ink-soft:#cbd5e1; --mute:#64748b;
-            --bg:#050816; --glass:rgba(15,23,42,.62); --glass-b:rgba(148,163,184,.18); --line:rgba(148,163,184,.2);
-            --chip:rgba(139,92,246,.18); --chip-ink:#c4b5fd; --shadow:0 18px 50px rgba(0,0,0,.5);
+            --navy:#0c2d57; --navy-2:#143d73; --teal:#0f766e;
+            --ink:#1f2937; --body:#374151; --mute:#6b7280; --line:#e5e7eb; --bg:#f3f5f8; --card:#fff;
+            --serif:"Source Serif 4","Hind Siliguri",Georgia,"Times New Roman",serif;
+            --sans:"Inter","Hind Siliguri",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
         }
         *,*::before,*::after{box-sizing:border-box}
         html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-        body{margin:0;font:400 16px/1.7 var(--body);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .3s,color .3s}
-        h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.02em;line-height:1.2}
+        body{margin:0;font:400 16px/1.65 var(--sans);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+        h1,h2,h3{font-family:var(--serif);margin:0;color:var(--navy);line-height:1.25}
         p{margin:0} a{color:inherit} img{max-width:100%;display:block}
-        :focus-visible{outline:3px solid var(--p2);outline-offset:2px;border-radius:10px}
+        :focus-visible{outline:3px solid #93c5fd;outline-offset:2px;border-radius:6px}
 
-        /* ---------- aurora background ---------- */
-        .aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
-        .aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;animation:float 18s ease-in-out infinite}
-        .aurora i:nth-child(1){width:520px;height:520px;background:#a78bfa;top:-160px;left:-120px}
-        .aurora i:nth-child(2){width:460px;height:460px;background:#22d3ee;top:10%;right:-140px;animation-delay:-6s}
-        .aurora i:nth-child(3){width:520px;height:520px;background:#f472b6;bottom:-200px;left:30%;animation-delay:-12s;opacity:.35}
-        [data-theme="dark"] .aurora i{opacity:.28}
-        .aurora::after{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(124,58,237,.18) 1px,transparent 1px);background-size:26px 26px;mask-image:linear-gradient(#000,transparent 70%);-webkit-mask-image:linear-gradient(#000,transparent 70%)}
-        @keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,30px) scale(1.12)}}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+        .preview{background:#fef3c7;color:#78350f;text-align:center;padding:9px 16px;font-weight:600;font-size:14px;border-bottom:1px solid #fde68a}
 
-        .page{width:min(1100px,100%);margin-inline:auto;padding:0 16px calc(110px + env(safe-area-inset-bottom,0px))}
-        .preview{background:linear-gradient(90deg,#f59e0b,#f97316);color:#fff;text-align:center;padding:10px 16px;font-weight:700;font-size:14px}
+        /* top bar */
+        .top{background:#fff;border-bottom:1px solid var(--line)}
+        .top-in{max-width:1080px;margin:0 auto;padding:13px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+        .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 18px var(--serif);color:var(--navy)}
+        .brand i{width:26px;height:26px;border-radius:6px;background:var(--navy);display:grid;place-items:center}
+        .top small{color:var(--mute);font-size:13px;display:flex;align-items:center;gap:6px}
+        .top small svg{color:var(--teal)}
 
-        /* ---------- top bar ---------- */
-        .bar{display:flex;justify-content:space-between;align-items:center;padding:calc(16px + env(safe-area-inset-top,0px)) 4px 14px}
-        .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:800 18px var(--display);letter-spacing:-.02em}
-        .brand i{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:var(--grad);box-shadow:0 8px 22px rgba(99,102,241,.45)}
-        .theme{border:1px solid var(--glass-b);background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--ink);width:42px;height:42px;border-radius:14px;font-size:17px;cursor:pointer;transition:transform .2s}
-        .theme:hover{transform:rotate(18deg) scale(1.06)}
+        .page{max-width:1080px;margin:0 auto;padding:20px 20px 60px}
 
-        /* ---------- glass ---------- */
-        .glass{background:var(--glass);backdrop-filter:blur(20px) saturate(170%);-webkit-backdrop-filter:blur(20px) saturate(170%);border:1px solid var(--glass-b);border-radius:28px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.35)}
+        /* identity card */
+        .profile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px;display:grid;grid-template-columns:176px 1fr;gap:28px}
+        .photo{width:176px;height:220px;border-radius:10px;overflow:hidden;background:#e8edf3;border:1px solid var(--line)}
+        .photo img{width:100%;height:100%;object-fit:cover;object-position:center top}
+        .photo .ph{width:100%;height:100%;display:grid;place-items:center;font:700 48px var(--serif);color:var(--navy)}
+        .kicker{font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--teal)}
+        .ident h1{font-size:clamp(24px,3.4vw,34px);font-weight:700;margin:6px 0 8px;overflow-wrap:anywhere}
+        .creds{font-size:16px;font-weight:500;color:var(--ink)}
+        .desig{font-size:15px;color:var(--mute);margin-top:2px}
+        .tag{margin-top:12px;font-size:15.5px;color:var(--body);max-width:64ch}
+        .keyfacts{grid-column:1/-1;margin:0;padding-top:20px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px 24px}
+        .keyfacts dt{font-size:11.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--mute);margin-bottom:3px}
+        .keyfacts dd{margin:0;font-size:15.5px;font-weight:600;color:var(--ink);overflow-wrap:anywhere}
+        .vf{display:inline-flex;align-items:center;gap:4px;margin-left:6px;font-size:12px;font-weight:600;color:var(--teal);background:#ecfdf5;border:1px solid #a7f3d0;padding:1px 8px;border-radius:5px;vertical-align:1px}
 
-        /* ---------- hero ---------- */
-        .hero{padding:30px;display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;position:relative;overflow:hidden;animation:rise .7s ease both}
-        .hero::before{content:'';position:absolute;width:380px;height:380px;right:-120px;top:-180px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.28),transparent 65%);pointer-events:none}
-        .avatar{position:relative;width:160px;height:160px;border-radius:48px;isolation:isolate}
-        .avatar::before{content:'';position:absolute;inset:-5px;border-radius:52px;background:conic-gradient(from 0deg,#7c3aed,#06b6d4,#ec4899,#7c3aed);animation:spin 7s linear infinite;z-index:-2;filter:blur(1px)}
-        .avatar::after{content:'';position:absolute;inset:0;border-radius:48px;background:var(--bg);z-index:-1}
-        .avatar img,.avatar .ph{width:100%;height:100%;border-radius:44px;object-fit:cover;border:4px solid var(--bg)}
-        .avatar .ph{display:grid;place-items:center;font:800 46px var(--display);color:#fff;background:var(--grad)}
-        .avatar .verified{position:absolute;right:-8px;bottom:-8px;width:40px;height:40px;border-radius:14px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#059669,#06b6d4);border:3px solid var(--bg);box-shadow:0 8px 20px rgba(5,150,105,.45)}
-        .id h1{font-size:clamp(26px,4.4vw,42px);font-weight:800;background:linear-gradient(135deg,var(--ink) 30%,var(--p1));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-        .spec{display:inline-flex;align-items:center;gap:8px;margin-top:10px;font:700 14px var(--display);color:var(--chip-ink);background:var(--chip);border:1px solid var(--line);padding:6px 14px;border-radius:999px}
-        .degrees{margin-top:10px;font-weight:500;color:var(--ink-soft);font-size:15px}
-        .tagline{margin-top:10px;color:var(--ink-soft);font-size:16px;max-width:60ch}
-        .actions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px}
+        /* sticky section nav */
+        .subnav{position:sticky;top:0;z-index:30;margin-top:16px;background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:10px}
+        .subnav-in{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding:0 6px}
+        .subnav-in::-webkit-scrollbar{display:none}
+        .subnav a{flex:none;text-decoration:none;font-size:14.5px;font-weight:600;color:var(--mute);padding:14px 16px;border-bottom:2px solid transparent;margin-bottom:-1px}
+        .subnav a:hover{color:var(--navy)}
+        .subnav a.on{color:var(--navy);border-bottom-color:var(--navy)}
 
-        .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:0;cursor:pointer;text-decoration:none;font:700 14.5px var(--display);padding:13px 22px;border-radius:16px;transition:transform .18s,filter .18s,box-shadow .18s}
-        .btn:hover{transform:translateY(-2px)}
-        .btn-primary{color:#fff;background:var(--grad);box-shadow:0 10px 26px rgba(99,102,241,.4)}
-        .btn-primary:hover{filter:brightness(1.1);box-shadow:0 14px 32px rgba(99,102,241,.5)}
-        .btn-soft{color:var(--chip-ink);background:var(--chip);border:1px solid var(--line)}
-        .btn-soft:hover{background:rgba(124,58,237,.18)}
-        .btn-wa{color:#fff;background:linear-gradient(135deg,#16a34a,#22c55e);box-shadow:0 10px 26px rgba(34,197,94,.35)}
-        .btn-fb{color:#fff;background:linear-gradient(135deg,#1d4ed8,#3b82f6);box-shadow:0 10px 26px rgba(59,130,246,.35)}
+        /* layout */
+        .layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:20px;margin-top:20px;align-items:start}
+        .main{display:grid;gap:20px;min-width:0}
+        .sec{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px 28px;scroll-margin-top:72px}
+        .sec h2{font-size:21px;padding-bottom:13px;margin-bottom:18px;border-bottom:1px solid var(--line)}
+        .about{white-space:pre-line;font-size:16px;line-height:1.85;color:var(--body)}
+        .sub{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:22px 0 10px}
+        .tags{display:flex;flex-wrap:wrap;gap:8px}
+        .tags span{font-size:14px;color:var(--body);background:#f9fafb;border:1px solid var(--line);padding:5px 12px;border-radius:6px}
 
-        /* ---------- stat tiles ---------- */
-        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px;animation:rise .8s .08s ease both}
-        .stat{padding:16px 18px;display:flex;align-items:center;gap:13px;border-radius:22px}
-        .stat .si{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;color:#fff;background:var(--grad);flex:none;box-shadow:0 8px 20px rgba(99,102,241,.35)}
-        .stat:nth-child(2) .si{background:linear-gradient(135deg,#ec4899,#8b5cf6)}
-        .stat:nth-child(3) .si{background:linear-gradient(135deg,#06b6d4,#10b981)}
-        .stat:nth-child(4) .si{background:linear-gradient(135deg,#f59e0b,#ef4444)}
-        .stat small{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)}
-        .stat b{font:800 16px var(--display)}
+        .entries{list-style:none;margin:0;padding:0}
+        .entries li{display:grid;grid-template-columns:1fr auto;gap:2px 16px;padding:15px 0;border-top:1px solid var(--line)}
+        .entries li:first-child{border-top:0;padding-top:0}
+        .entries li:last-child{padding-bottom:0}
+        .entries strong{font-size:16px;font-weight:600;color:var(--ink)}
+        .entries span{color:var(--mute);font-size:15px;grid-column:1}
+        .entries em{grid-column:2;grid-row:1/span 2;align-self:start;font-style:normal;font-size:14px;font-weight:600;color:var(--mute);white-space:nowrap}
 
-        /* ---------- tabs ---------- */
-        .tabs{position:sticky;top:10px;z-index:30;margin:18px 0;padding:6px;border-radius:20px}
-        .tabs-in{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
-        .tabs-in::-webkit-scrollbar{display:none}
-        .tabs a{flex:none;text-decoration:none;font:700 14px var(--display);padding:10px 20px;border-radius:14px;color:var(--ink-soft);transition:all .2s}
-        .tabs a:hover{color:var(--p1)}
-        .tabs a.on{color:#fff;background:var(--grad);box-shadow:0 8px 20px rgba(99,102,241,.4)}
-
-        /* ---------- layout ---------- */
-        .grid{display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:start}
-        .col{display:grid;gap:20px;min-width:0}
-        @media (max-width:900px){.grid{grid-template-columns:1fr}.hero{grid-template-columns:1fr;text-align:center;justify-items:center;padding:26px 20px}.actions{justify-content:center}.tagline{margin-inline:auto}}
-        .card{padding:26px}
-        .card h2{font-size:19px;font-weight:800;display:flex;align-items:center;gap:12px;margin-bottom:16px}
-        .card h2::before{content:'';width:5px;height:22px;border-radius:5px;background:linear-gradient(var(--p1),var(--p2))}
-        .sticky{position:sticky;top:86px}
-        @media (max-width:900px){.sticky{position:static}}
-        .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
-        .reveal.in{opacity:1;transform:none}
-
-        .facts{list-style:none;margin:0;padding:0;display:grid;gap:14px}
-        .facts li{display:flex;gap:13px;align-items:flex-start}
-        .fi{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;flex:none;color:var(--chip-ink);background:var(--chip);border:1px solid var(--line)}
-        .facts small{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)}
-        .facts b{font-weight:700;word-break:break-word}
-        .facts a{text-decoration:none;color:var(--p1)} .facts a:hover{text-decoration:underline}
-        .ok{display:inline-flex;align-items:center;gap:5px;margin-top:3px;font-size:12px;font-weight:700;color:#059669;background:rgba(16,185,129,.12);padding:2px 10px;border-radius:999px}
-
-        .about{white-space:pre-line;color:var(--ink-soft);font-size:16.5px;line-height:1.85}
-        .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
-        .chip{font:700 13px var(--display);color:var(--chip-ink);background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(6,182,212,.12));border:1px solid var(--line);padding:7px 15px;border-radius:999px;transition:transform .15s}
-        .chip:hover{transform:translateY(-2px)}
-
-        .timeline{list-style:none;margin:0;padding:0 0 0 6px;display:grid;gap:18px;position:relative}
-        .timeline::before{content:'';position:absolute;left:25px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--p1),var(--p2),transparent)}
-        .timeline li{display:flex;gap:16px;align-items:flex-start;position:relative}
-        .dot{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;flex:none;color:#fff;background:var(--grad);box-shadow:0 0 0 5px var(--bg),0 8px 20px rgba(99,102,241,.35);z-index:1}
-        .timeline strong{display:block;font:800 16px var(--display)}
-        .timeline span{display:block;color:var(--ink-soft);font-size:15px}
-        .timeline em{display:inline-block;margin-top:4px;font-style:normal;font-size:12px;font-weight:700;color:var(--chip-ink);background:var(--chip);padding:2px 11px;border-radius:999px}
-
-        .empty{color:var(--mute)}
-        .chamber{position:relative;padding:20px 22px 20px 26px;border-radius:22px;background:rgba(255,255,255,.35);border:1px solid var(--line);overflow:hidden}
-        [data-theme="dark"] .chamber{background:rgba(30,41,59,.4)}
-        .chamber::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--p1),var(--p2),var(--p3))}
+        .chamber{border:1px solid var(--line);border-radius:10px;padding:20px 22px}
         .chamber + .chamber{margin-top:14px}
-        .chamber h3{font-size:18px;font-weight:800}
-        .hosp{color:var(--p1);font-weight:700;font-size:14px;margin-top:2px}
-        .rows{display:grid;gap:10px;margin:14px 0}
-        .rows > div{display:flex;gap:11px;align-items:flex-start;color:var(--ink-soft);font-size:15px}
-        .rows svg{flex:none;margin-top:3px;color:var(--p1)}
-        .rows a{color:var(--p1);font-weight:700;text-decoration:none}
+        .chamber h3{font-size:18px}
+        .hosp{color:var(--teal);font-weight:600;font-size:14.5px;margin-top:2px}
+        .info{margin:16px 0 0;display:grid;gap:10px}
+        .info div{display:grid;grid-template-columns:84px 1fr;gap:12px;font-size:15px}
+        .info dt{color:var(--mute);font-size:13.5px;padding-top:1px}
+        .info dd{margin:0;color:var(--ink)}
+        .info a{color:var(--navy);font-weight:600;text-decoration:none}
         .days{display:flex;flex-wrap:wrap;gap:6px}
-        .days b{font:700 12.5px var(--display);color:var(--chip-ink);background:var(--chip);border:1px solid var(--line);padding:3px 12px;border-radius:999px}
-        .btns{display:flex;flex-wrap:wrap;gap:10px}
-        .btns .btn{padding:11px 18px;font-size:13.5px}
+        .days b{font-weight:600;font-size:13px;color:var(--body);background:#f3f4f6;border:1px solid var(--line);padding:1px 9px;border-radius:5px}
+        .row-btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 
-        .linkbox{padding:14px 18px;border-radius:16px;background:var(--chip);border:1px dashed rgba(124,58,237,.4);font-weight:700;color:var(--chip-ink);word-break:break-all;font-size:14px}
-        .share-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+        /* buttons */
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-decoration:none;font:600 15px var(--sans);padding:11px 18px;border-radius:8px;border:1px solid transparent;transition:background .15s,border-color .15s}
+        .btn svg{width:18px;height:18px;flex:none}
+        .btn-primary{background:var(--navy);color:#fff}
+        .btn-primary:hover{background:var(--navy-2)}
+        .btn-line{background:#fff;color:var(--navy);border-color:#cbd5e1}
+        .btn-line:hover{background:#f8fafc;border-color:var(--navy)}
+        .btn-block{width:100%}
 
-        footer{margin:34px 0 0;text-align:center;color:var(--mute);font-size:13px;display:grid;gap:6px}
-        footer a{color:var(--p1);font-weight:700;text-decoration:none}
+        /* sidebar */
+        .side{display:grid;gap:20px;position:sticky;top:76px}
+        .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px}
+        .card h2{font-size:18px;margin-bottom:14px}
+        .fee{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:16px}
+        .fee span{font-size:14px;color:var(--mute)}
+        .fee b{font:700 24px var(--serif);color:var(--navy)}
+        .next{font-size:14.5px;color:var(--body);margin-bottom:16px}
+        .next b{display:block;font-size:15.5px;color:var(--ink)}
+        .stack{display:grid;gap:10px}
+        .contact{list-style:none;margin:0;padding:0;display:grid;gap:12px;font-size:14.5px}
+        .contact small{display:block;font-size:11.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
+        .contact a{color:var(--navy);font-weight:600;text-decoration:none;overflow-wrap:anywhere}
+        .linkbox{font-size:13px;color:var(--body);background:#f9fafb;border:1px solid var(--line);border-radius:8px;padding:9px 12px;word-break:break-all;margin-bottom:10px}
+        .share-row{display:flex;gap:8px;flex-wrap:wrap}
+        .share-row .btn{flex:1 1 0;padding:9px 6px;font-size:13.5px;min-width:0;white-space:nowrap}
+        .empty{color:var(--mute)}
 
-        /* ---------- mobile dock ---------- */
-        .dock{display:none}
+        footer{margin-top:28px;text-align:center;color:var(--mute);font-size:13px;display:grid;gap:4px}
+        footer a{color:var(--navy);font-weight:600;text-decoration:none}
+
+        .mbar{display:none}
+
         @media (max-width:900px){
-            .dock{display:flex;gap:8px;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:40;padding:8px;border-radius:24px;background:var(--glass);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid var(--glass-b);box-shadow:0 18px 50px rgba(76,29,149,.3)}
-            .dock .btn{flex:1;padding:13px 8px;font-size:13.5px;border-radius:18px}
+            .layout{grid-template-columns:1fr}
+            .side{position:static;order:-1}
+            .sec{scroll-margin-top:64px}
         }
-        @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+        @media (max-width:640px){
+            .page{padding:14px 12px 96px}
+            .top-in{padding:11px 14px} .top small{display:none}
+            .profile{grid-template-columns:104px 1fr;gap:14px 16px;padding:18px}
+            .photo{width:104px;height:132px}
+            .photo .ph{font-size:30px}
+            .ident h1{font-size:21px;margin:4px 0 6px}
+            .kicker{font-size:11px}
+            .creds{font-size:14.5px} .desig{font-size:13.5px}
+            .tag{grid-column:1/-1;margin-top:0}
+            .ident{display:contents}
+            .ident > .head{grid-column:2}
+            .keyfacts{grid-template-columns:1fr 1fr;gap:14px 16px;padding-top:16px}
+            .sec{padding:20px 18px;border-radius:10px}
+            .sec h2{font-size:19px}
+            .chamber{padding:16px}
+            .info div{grid-template-columns:70px 1fr}
+            .entries li{grid-template-columns:1fr}
+            .entries em{grid-column:1;grid-row:auto}
+            .subnav a{padding:13px 13px;font-size:14px}
+            .mbar{display:flex;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 14px rgba(15,23,42,.06)}
+            .mbar .btn{flex:1 1 0;min-width:0;padding:12px 8px;font-size:14.5px}
+        }
     </style>
 </head>
 <body>
-
-<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 
 @if ($isPreview)
     <div class="preview">Preview only. This profile is not visible to the public{{ $profile->is_published ? ' until your account is approved.' : ' because it is hidden. Publish it from Public Profile > Manage.' }}</div>
 @endif
 
-<div class="page">
-
-    <div class="bar">
+<div class="top">
+    <div class="top-in">
         <a href="{{ url('/') }}" class="brand">
-            <i aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></i>
+            <i aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></i>
             {{ config('app.name', 'EasyDoc') }}
         </a>
-        <button type="button" class="theme" id="themeBtn" aria-label="Toggle dark mode">🌙</button>
+        <small>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z"/><path d="m9 12 2 2 4-4"/></svg>
+            Verified practitioner profile
+        </small>
     </div>
+</div>
 
-    <header>
-        <div class="hero glass">
-            <div class="avatar">
-                @if ($photo)
-                    <img src="{{ $photo }}" alt="Photo of {{ $name }}" width="160" height="160">
-                @else
-                    <div class="ph" aria-hidden="true">{{ $initials }}</div>
-                @endif
-                <span class="verified" title="BMDC verified by {{ config('app.name', 'EasyDoc') }}" aria-label="BMDC verified">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                </span>
-            </div>
+<div class="page">
 
-            <div class="id">
+    <header class="profile">
+        <div class="photo">
+            @if ($photo)
+                <img src="{{ $photo }}" alt="Photo of {{ $name }}" width="176" height="220">
+            @else
+                <div class="ph" aria-hidden="true">{{ $initials }}</div>
+            @endif
+        </div>
+
+        <div class="ident">
+            <div class="head">
+                <p class="kicker">{{ $doctor->speciality }}</p>
                 <h1>{{ $name }}</h1>
-                <p class="spec">{!! $ico['spec'] !!} {{ $doctor->speciality }}</p>
-                <p class="degrees">{{ $doctor->qualification }}@if ($doctor->designation) &middot; {{ $doctor->designation }}@endif</p>
-                <p class="tagline">{{ $profile->tagline }}</p>
+                <p class="creds">{{ $doctor->qualification }}</p>
+                @if ($doctor->designation)<p class="desig">{{ $doctor->designation }}</p>@endif
             </div>
-
-            <div class="actions">
-                @if ($phone)<a class="btn btn-primary" href="tel:{{ $phone }}">{!! $ico['phone'] !!} Call now</a>@endif
-                @if ($chambers->isNotEmpty())<a class="btn {{ $phone ? 'btn-soft' : 'btn-primary' }}" href="#chambers">{!! $ico['pin'] !!} Chambers</a>@endif
-                <button type="button" class="btn btn-soft" data-share="{{ $url }}" data-title="{{ $name }}">{!! $ico['share'] !!} Share</button>
-            </div>
+            @if ($profile->tagline)<p class="tag">{{ $profile->tagline }}</p>@endif
         </div>
 
-        <div class="stats">
-            <div class="stat glass"><span class="si">{!! $ico['id'] !!}</span><div><small>BMDC</small><b>{{ $doctor->bmdc_number }}</b></div></div>
-            @if ($doctor->experienceLabel())<div class="stat glass"><span class="si">{!! $ico['work'] !!}</span><div><small>Experience</small><b>{{ $doctor->experienceLabel() }}</b></div></div>@endif
-            @if ($profile->consultation_fee !== null)<div class="stat glass"><span class="si">{!! $ico['fee'] !!}</span><div><small>Consultation</small><b>&#2547;{{ number_format($profile->consultation_fee) }}</b></div></div>@endif
-            @if (count($languages))<div class="stat glass"><span class="si">{!! $ico['lang'] !!}</span><div><small>Languages</small><b>{{ implode(', ', $languages) }}</b></div></div>@endif
-        </div>
-
-        <nav class="tabs glass" aria-label="Profile sections">
-            <div class="tabs-in" id="tabsIn">
-                <a href="#about" class="on">About</a>
-                <a href="#education">Education</a>
-                @if (count($workExp))<a href="#experience">Experience</a>@endif
-                <a href="#chambers">Chambers</a>
-                <a href="#share">Share</a>
+        <dl class="keyfacts">
+            <div>
+                <dt>BMDC registration</dt>
+                <dd>{{ $doctor->bmdc_number }} <span class="vf"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Verified</span></dd>
             </div>
-        </nav>
+            @if ($doctor->experienceLabel())<div><dt>Experience</dt><dd>{{ $doctor->experienceLabel() }}</dd></div>@endif
+            @if (count($languages))<div><dt>Languages</dt><dd>{{ implode(', ', $languages) }}</dd></div>@endif
+            @if ($profile->consultation_fee !== null)<div><dt>Consultation fee</dt><dd>&#2547;{{ number_format($profile->consultation_fee) }}</dd></div>@endif
+        </dl>
     </header>
 
-    <main class="grid">
-
-        {{-- Left column: facts --}}
-        <div class="col">
-            <section class="card glass sticky reveal" aria-label="Quick facts">
-                <h2>Quick facts</h2>
-                <ul class="facts">
-                    <li>
-                        <span class="fi">{!! $ico['id'] !!}</span>
-                        <div><small>BMDC registration</small><b>{{ $doctor->bmdc_number }}</b><br>
-                            <span class="ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Verified by {{ config('app.name', 'EasyDoc') }}</span></div>
-                    </li>
-                    <li><span class="fi">{!! $ico['spec'] !!}</span><div><small>Speciality</small><b>{{ $doctor->speciality }}</b></div></li>
-                    @if ($doctor->experienceLabel())
-                        <li><span class="fi">{!! $ico['work'] !!}</span><div><small>Experience</small><b>{{ $doctor->experienceLabel() }}</b></div></li>
-                    @endif
-                    @if (count($languages))
-                        <li><span class="fi">{!! $ico['lang'] !!}</span><div><small>Languages</small><b>{{ implode(', ', $languages) }}</b></div></li>
-                    @endif
-                    @if ($profile->consultation_fee !== null)
-                        <li><span class="fi">{!! $ico['fee'] !!}</span><div><small>Consultation fee</small><b>&#2547;{{ number_format($profile->consultation_fee) }} per visit</b></div></li>
-                    @endif
-                    @if ($phone)
-                        <li><span class="fi">{!! $ico['phone'] !!}</span><div><small>Mobile</small><b><a href="tel:{{ $phone }}">{{ $phone }}</a></b></div></li>
-                    @endif
-                    @if ($email)
-                        <li><span class="fi">{!! $ico['mail'] !!}</span><div><small>Email</small><b><a href="mailto:{{ $email }}">{{ $email }}</a></b></div></li>
-                    @endif
-                    @if ($profile->website_url)
-                        <li><span class="fi">{!! $ico['link'] !!}</span><div><small>Website</small><b><a href="{{ $profile->website_url }}" target="_blank" rel="noopener nofollow">Visit website</a></b></div></li>
-                    @endif
-                    @if ($profile->facebook_url)
-                        <li><span class="fi">{!! $ico['link'] !!}</span><div><small>Facebook</small><b><a href="{{ $profile->facebook_url }}" target="_blank" rel="noopener nofollow">Facebook page</a></b></div></li>
-                    @endif
-                </ul>
-            </section>
+    <nav class="subnav" aria-label="Profile sections">
+        <div class="subnav-in" id="tabsIn">
+            <a href="#about" class="on">About</a>
+            <a href="#education">Education</a>
+            @if (count($workExp))<a href="#experience">Experience</a>@endif
+            <a href="#chambers">Chambers</a>
         </div>
+    </nav>
 
-        {{-- Right column: content --}}
-        <div class="col">
+    <div class="layout">
 
-            <section class="card glass reveal" id="about">
+        <div class="main">
+
+            <section class="sec" id="about">
                 <h2>About</h2>
                 <p class="about">{{ $profile->about }}</p>
                 @if (count($expertise))
-                    <div class="chips" aria-label="Areas of expertise">
-                        @foreach ($expertise as $item)<span class="chip">{{ $item }}</span>@endforeach
-                    </div>
+                    <p class="sub">Areas of expertise</p>
+                    <div class="tags">@foreach ($expertise as $item)<span>{{ $item }}</span>@endforeach</div>
                 @endif
             </section>
 
-            <section class="card glass reveal" id="education">
+            <section class="sec" id="education">
                 <h2>Education</h2>
-                <ol class="timeline">
+                <ul class="entries">
                     @foreach ($education as $e)
                         <li>
-                            <span class="dot">{!! $ico['spec'] !!}</span>
-                            <div>
-                                <strong>{{ $e['degree'] }}</strong>
-                                <span>{{ $e['institution'] }}</span>
-                                @if (! empty($e['year']))<em>{{ $e['year'] }}</em>@endif
-                            </div>
+                            <strong>{{ $e['degree'] }}</strong>
+                            <span>{{ $e['institution'] }}</span>
+                            @if (! empty($e['year']))<em>{{ $e['year'] }}</em>@endif
                         </li>
                     @endforeach
                     @if ($doctor->medical_college && ! collect($education)->contains(fn ($e) => $str::contains($str::lower($e['institution']), $str::lower($doctor->medical_college))))
-                        <li>
-                            <span class="dot">{!! $ico['spec'] !!}</span>
-                            <div><strong>MBBS</strong><span>{{ $doctor->medical_college }}</span></div>
-                        </li>
+                        <li><strong>MBBS</strong><span>{{ $doctor->medical_college }}</span></li>
                     @endif
-                </ol>
+                </ul>
             </section>
 
             @if (count($workExp))
-            <section class="card glass reveal" id="experience">
+            <section class="sec" id="experience">
                 <h2>Professional experience</h2>
-                <ol class="timeline">
+                <ul class="entries">
                     @foreach ($workExp as $w)
                         <li>
-                            <span class="dot">{!! $ico['work'] !!}</span>
-                            <div>
-                                <strong>{{ $w['position'] }}</strong>
-                                <span>{{ $w['organization'] }}</span>
-                                @if (! empty($w['from']))<em>{{ $w['from'] }} &ndash; {{ ! empty($w['to']) ? $w['to'] : 'Present' }}</em>@endif
-                            </div>
+                            <strong>{{ $w['position'] }}</strong>
+                            <span>{{ $w['organization'] }}</span>
+                            @if (! empty($w['from']))<em>{{ $w['from'] }} &ndash; {{ ! empty($w['to']) ? $w['to'] : 'Present' }}</em>@endif
                         </li>
                     @endforeach
-                </ol>
+                </ul>
             </section>
             @endif
 
-            <section class="card glass reveal" id="chambers">
+            <section class="sec" id="chambers">
                 <h2>Chambers</h2>
                 @if ($chambers->isEmpty())
                     <p class="empty">No active chamber is listed right now.</p>
@@ -394,42 +322,64 @@
                         <article class="chamber">
                             <h3>{{ $c->chamber_name }}</h3>
                             <p class="hosp">{{ $c->hospital_name }}</p>
-                            <div class="rows">
-                                <div>{!! $ico['pin'] !!}<span>{{ $c->address }}</span></div>
-                                <div>{!! $ico['cal'] !!}
-                                    @if (count($days) > 1)
-                                        <span class="days">@foreach ($days as $d)<b>{{ $d }}</b>@endforeach</span>
-                                    @else
-                                        <span>{{ $c->visiting_days }}</span>
-                                    @endif
-                                </div>
-                                <div>{!! $ico['clock'] !!}<span>{{ $c->visiting_time }}</span></div>
+                            <dl class="info">
+                                <div><dt>Address</dt><dd>{{ $c->address }}</dd></div>
+                                <div><dt>Days</dt><dd>@if (count($days) > 1)<span class="days">@foreach ($days as $d)<b>{{ $d }}</b>@endforeach</span>@else{{ $c->visiting_days }}@endif</dd></div>
+                                <div><dt>Time</dt><dd>{{ $c->visiting_time }}</dd></div>
                                 @if ($profile->show_contact && $c->phone)
-                                    <div>{!! $ico['phone'] !!}<a href="tel:{{ preg_replace('/\s+/', '', $c->phone) }}">{{ $c->phone }}</a></div>
+                                    <div><dt>Phone</dt><dd><a href="tel:{{ preg_replace('/\s+/', '', $c->phone) }}">{{ $c->phone }}</a></dd></div>
                                 @endif
-                            </div>
-                            <div class="btns">
-                                <a class="btn btn-primary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ urlencode($c->address) }}">{!! $ico['nav'] !!} Directions</a>
+                            </dl>
+                            <div class="row-btns">
+                                <a class="btn btn-primary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ urlencode($c->address) }}">{!! $ico['nav'] !!} Get directions</a>
                                 @if ($profile->show_contact && $c->phone)
-                                    <a class="btn btn-soft" href="tel:{{ preg_replace('/\s+/', '', $c->phone) }}">{!! $ico['phone'] !!} Call</a>
+                                    <a class="btn btn-line" href="tel:{{ preg_replace('/\s+/', '', $c->phone) }}">{!! $ico['phone'] !!} Call chamber</a>
                                 @endif
                             </div>
                         </article>
                     @endforeach
                 @endif
             </section>
+        </div>
 
-            <section class="card glass reveal share" id="share">
+        {{-- Sidebar --}}
+        <aside class="side">
+            <div class="card">
+                <h2>Appointment</h2>
+                @if ($profile->consultation_fee !== null)
+                    <div class="fee"><span>Consultation fee</span><b>&#2547;{{ number_format($profile->consultation_fee) }}</b></div>
+                @endif
+                @if ($firstChamber)
+                    <div class="next"><b>{{ $firstChamber->chamber_name }}</b>{{ $firstChamber->visiting_days }} &middot; {{ $firstChamber->visiting_time }}</div>
+                @endif
+                <div class="stack">
+                    @if ($phone)<a class="btn btn-primary btn-block" href="tel:{{ $phone }}">{!! $ico['phone'] !!} Call {{ $phone }}</a>@endif
+                    @if ($firstChamber)<a class="btn {{ $phone ? 'btn-line' : 'btn-primary' }} btn-block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ urlencode($firstChamber->address) }}">{!! $ico['nav'] !!} Get directions</a>@endif
+                </div>
+            </div>
+
+            @if ($email || $profile->website_url || $profile->facebook_url)
+            <div class="card">
+                <h2>Contact</h2>
+                <ul class="contact">
+                    @if ($email)<li><small>Email</small><a href="mailto:{{ $email }}">{{ $email }}</a></li>@endif
+                    @if ($profile->website_url)<li><small>Website</small><a href="{{ $profile->website_url }}" target="_blank" rel="noopener nofollow">Visit website</a></li>@endif
+                    @if ($profile->facebook_url)<li><small>Facebook</small><a href="{{ $profile->facebook_url }}" target="_blank" rel="noopener nofollow">Facebook page</a></li>@endif
+                </ul>
+            </div>
+            @endif
+
+            <div class="card" id="share">
                 <h2>Share this profile</h2>
                 <div class="linkbox">{{ $url }}</div>
                 <div class="share-row">
-                    <button type="button" class="btn btn-primary" data-copy="{{ $url }}">{!! $ico['link'] !!} Copy link</button>
-                    <a class="btn btn-wa" target="_blank" rel="noopener" href="https://wa.me/?text={{ urlencode($name . ' - ' . $url) }}">WhatsApp</a>
-                    <a class="btn btn-fb" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($url) }}">Facebook</a>
+                    <button type="button" class="btn btn-line" data-copy="{{ $url }}">Copy link</button>
+                    <a class="btn btn-line" target="_blank" rel="noopener" href="https://wa.me/?text={{ urlencode($name . ' - ' . $url) }}">WhatsApp</a>
+                    <a class="btn btn-line" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($url) }}">Facebook</a>
                 </div>
-            </section>
-        </div>
-    </main>
+            </div>
+        </aside>
+    </div>
 
     <footer>
         <p>This page is for general information and is not a substitute for medical advice. In an emergency, go to the nearest hospital.</p>
@@ -438,14 +388,14 @@
 </div>
 
 {{-- Mobile action bar --}}
-<div class="dock" aria-label="Quick actions">
+<div class="mbar" aria-label="Quick actions">
     @if ($phone)
         <a class="btn btn-primary" href="tel:{{ $phone }}">{!! $ico['phone'] !!} Call</a>
-    @elseif ($firstChamber)
-        <a class="btn btn-primary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ urlencode($firstChamber->address) }}">{!! $ico['nav'] !!} Directions</a>
     @endif
-    @if ($chambers->isNotEmpty())<a class="btn btn-soft" href="#chambers">{!! $ico['pin'] !!} Chambers</a>@endif
-    <button type="button" class="btn btn-soft" data-share="{{ $url }}" data-title="{{ $name }}">{!! $ico['share'] !!} Share</button>
+    @if ($firstChamber)
+        <a class="btn {{ $phone ? 'btn-line' : 'btn-primary' }}" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ urlencode($firstChamber->address) }}">{!! $ico['nav'] !!} Directions</a>
+    @endif
+    <button type="button" class="btn btn-line" data-share="{{ $url }}" data-title="{{ $name }}">{!! $ico['share'] !!} Share</button>
 </div>
 
 <script>
@@ -481,20 +431,9 @@
         });
     });
 
-    // Dark / light toggle
-    var root = document.documentElement, tb = document.getElementById('themeBtn');
-    function paintTheme() { tb.textContent = root.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'; }
-    tb.addEventListener('click', function () {
-        var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        root.setAttribute('data-theme', next);
-        try { localStorage.setItem('pp-theme', next); } catch (e) {}
-        paintTheme();
-    });
-    paintTheme();
-
-    // Tab highlight while scrolling
+    // Highlight the section tab while scrolling
     var bar = document.getElementById('tabsIn');
-    var links = [].slice.call(document.querySelectorAll('.tabs a'));
+    var links = [].slice.call(document.querySelectorAll('.subnav a'));
     var byId = {};
     links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
 
@@ -516,14 +455,6 @@
             var s = document.getElementById(id);
             if (s) io.observe(s);
         });
-
-        // Reveal cards as they scroll into view
-        var rv = new IntersectionObserver(function (entries) {
-            entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); rv.unobserve(e.target); } });
-        }, { threshold: 0.08 });
-        document.querySelectorAll('.reveal').forEach(function (el) { rv.observe(el); });
-    } else {
-        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
     }
 })();
 </script>

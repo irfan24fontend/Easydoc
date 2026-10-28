@@ -13,6 +13,7 @@ class Prescription extends Model
         'clinical_complaints', 'diagnosis', 'risk_factors',
         'investigations', 'investigation_findings', 'advice',
         'followup_date', 'followup_reminder_sent', 'charge_deducted',
+        'offline_ref',
     ];
 
     protected $casts = [

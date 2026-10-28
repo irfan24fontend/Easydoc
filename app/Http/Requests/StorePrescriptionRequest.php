@@ -15,6 +15,16 @@ class StorePrescriptionRequest extends FormRequest
     {
         $isInvestigation = $this->input('type') === 'investigation_only';
 
+        return static::rulesFor($isInvestigation);
+    }
+
+    /**
+     * একই rule-set এখান থেকে এবং PrescriptionController::syncOffline()
+     * (অফলাইনে তৈরি একাধিক prescription একসাথে sync করার endpoint) — দুই জায়গা থেকেই
+     * ব্যবহার হয়, যাতে ভবিষ্যতে rule বদলালে দুই জায়গায় আলাদা করে মনে করে বদলাতে না হয়।
+     */
+    public static function rulesFor(bool $isInvestigation): array
+    {
         return [
             'type' => 'nullable|in:full,investigation_only',
 
