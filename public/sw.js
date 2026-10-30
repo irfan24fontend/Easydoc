@@ -2,7 +2,7 @@
  * sw.js — শুধু prescription create পেজ আর তার static asset-গুলো অফলাইনে reload করার জন্য।
  * কোনো POST/API কল এখানে ধরা হয় না — সেটা rx-offline.js নিজে IndexedDB দিয়ে সামলায়।
  */
-const CACHE = 'easydoc-rx-v2';
+const CACHE = 'easydoc-rx-v3';
 
 self.addEventListener('install', () => {
     self.skipWaiting();
@@ -25,7 +25,7 @@ self.addEventListener('fetch', (event) => {
     if (url.origin !== location.origin) return;
 
     // Prescription create পেজ — আগে নেট দিয়ে চেষ্টা (সবসময় সবচেয়ে ফ্রেশ ডেটা), ব্যর্থ হলে cache
-    if (url.pathname.startsWith('/doctor/prescriptions/create')) {
+    if (url.pathname.indexOf('/doctor/prescriptions/create') !== -1) {   // sub-folder (/~user/...) hole-o kaj korbe
         event.respondWith(
             fetch(req)
                 .then((res) => {
@@ -34,7 +34,7 @@ self.addEventListener('fetch', (event) => {
                     return res;
                 })
                 .catch(() =>
-                    caches.match(req).then((cached) => cached || caches.match('/doctor/prescriptions/create'))
+                    caches.match(req).then((cached) => cached || caches.match(new URL('doctor/prescriptions/create', self.registration.scope).href))
                 )
         );
         return;
