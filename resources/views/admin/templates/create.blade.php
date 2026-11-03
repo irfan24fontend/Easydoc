@@ -133,6 +133,7 @@
                                     <button type="button" class="btn btn-outline-success btn-sm variable-btn" data-variable="&#123;&#123;{{ $v }}&#125;&#125;">&#123;&#123;{{ $v }}&#125;&#125;</button>
                                 @endforeach
                                 <button type="button" class="btn btn-outline-secondary btn-sm variable-btn" data-variable="&#123;&#123;logo&#125;&#125;">&#123;&#123;logo&#125;&#125;</button>
+                                <button type="button" class="btn btn-outline-info btn-sm variable-btn" data-variable="&#123;&#123;verification_qr&#125;&#125;">QR verification</button>
                             </div>
                         </div>
 
@@ -183,6 +184,9 @@
 <style>
 .variable-container { display: flex; flex-wrap: wrap; gap: 7px; }
 .variable-btn { cursor: pointer; font-size: 12px; }
+.verification-qr-preview { display: inline-flex; width: 70px; height: 70px; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border: 1px dashed #0c8c84; background: repeating-conic-gradient(#0c8c84 0 25%, #fff 0 50%) 50% / 12px 12px; color: #0f172a; text-align: center; }
+.verification-qr-preview span { padding: 2px 5px; background: #fff; font-size: 10px; font-weight: 700; }
+.verification-qr-preview small { padding: 1px 3px; background: #fff; font-size: 6px; }
 
 .nav-tabs .nav-link { cursor: pointer; color: #64748b; font-weight: 600; font-size: 0.85rem; border: none; border-bottom: 2px solid transparent; }
 .nav-tabs .nav-link.active { color: #0c8c84; border-bottom-color: #0c8c84; background: transparent; }
@@ -259,6 +263,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </tbody></table>`;
 
     const demoLogo = `<div class="demo-logo"><div class="logo-circle">+</div></div>`;
+    const demoVerificationQr = `<div class="verification-qr-preview"><span>QR</span><small>Verify prescription</small></div>`;
 
     /* ================= STARTER TEMPLATES ================= */
     const templates = {
@@ -452,6 +457,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; }
         });
         html = html.split(token('medicine_table')).join(medicineTable);
         html = html.split(token('logo')).join(demoLogo);
+        html = html.split(token('verification_qr')).join(demoVerificationQr);
         return html;
     }
 

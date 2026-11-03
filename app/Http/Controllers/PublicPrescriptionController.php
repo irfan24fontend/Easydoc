@@ -125,11 +125,13 @@ class PublicPrescriptionController extends Controller
             'advice'           => nl2br(e($prescription->advice)),
             'medicine_table'   => $medicineTable,
             'logo'             => $logo,
+            'verification_qr'  => '<div class="rx-verification"><div class="verification-qr-code" data-verification-url="' . e($verificationUrl) . '"></div><strong>Verify prescription</strong><a class="rx-verification-url" href="' . e($verificationUrl) . '">Scan to verify</a></div>',
             'followup_block'   => $followupBlock,
             'followup_date'    => $fuText,
         ];
 
         $html = $template->html;
+        $hasVerificationQr = str_contains($html, '{{verification_qr}}');
         foreach ($replacements as $key => $value) {
             $html = str_replace('{{' . $key . '}}', $value, $html);
         }
@@ -140,6 +142,7 @@ class PublicPrescriptionController extends Controller
             'css'          => $template->css,
             'paperSize'    => $template->paper_size,
             'verificationUrl' => $verificationUrl,
+            'hasVerificationQr' => $hasVerificationQr,
             'isPublic'     => true,
         ], 200, $headers);
     }

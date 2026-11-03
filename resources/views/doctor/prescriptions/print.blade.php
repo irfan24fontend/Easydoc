@@ -151,13 +151,13 @@
             position: relative;
         }
         .rx-verification {
-            position: absolute; right: 5mm; bottom: 5mm; z-index: 5;
+            display: inline-flex; flex-direction: column; align-items: center;
             width: 27mm; padding: 1.5mm; background: #fff; color: #0f172a;
             border: .25mm solid #cbd5e1; border-radius: 1mm; text-align: center;
             font: 7pt/1.2 Arial, sans-serif;
         }
-        .rx-verification-code { width: 22mm; height: 22mm; margin: 0 auto 1mm; }
-        .rx-verification-code img, .rx-verification-code canvas { display: block; width: 100%; height: 100%; }
+        .verification-qr-code { width: 22mm; height: 22mm; margin: 0 auto 1mm; }
+        .verification-qr-code img, .verification-qr-code canvas { display: block; width: 100%; height: 100%; }
         .rx-verification-url { display: block; margin-top: .5mm; color: #334155; font-size: 5.5pt; overflow-wrap: anywhere; }
 
         /* ---------- Toast ---------- */
@@ -328,11 +328,13 @@
     <main class="rx-stage" id="stage">
         <div class="rx-sheet" id="sheet">
             {!! $html !!}
-            <aside class="rx-verification" aria-label="Prescription authenticity verification">
-                <div id="verificationQr" class="rx-verification-code"></div>
-                <strong>Verify prescription</strong>
-                <a class="rx-verification-url" href="{{ $verificationUrl }}">Scan to verify</a>
-            </aside>
+            @unless($hasVerificationQr)
+                <aside class="rx-verification" aria-label="Prescription authenticity verification">
+                    <div class="verification-qr-code" data-verification-url="{{ $verificationUrl }}"></div>
+                    <strong>Verify prescription</strong>
+                    <a class="rx-verification-url" href="{{ $verificationUrl }}">Scan to verify</a>
+                </aside>
+            @endunless
         </div>
     </main>
 
@@ -367,13 +369,14 @@
     <script>
     (function () {
         var CFG = @json($cfg);
-        var verificationQr = document.getElementById('verificationQr');
-        if (verificationQr && window.QRCode) {
-            new QRCode(verificationQr, {
-                text: @json($verificationUrl),
-                width: 120,
-                height: 120,
-                correctLevel: QRCode.CorrectLevel.M
+        if (window.QRCode) {
+            document.querySelectorAll('.verification-qr-code').forEach(function (element) {
+                new QRCode(element, {
+                    text: element.dataset.verificationUrl || @json($verificationUrl),
+                    width: 120,
+                    height: 120,
+                    correctLevel: QRCode.CorrectLevel.M
+                });
             });
         }
         var stage = document.getElementById('stage');
