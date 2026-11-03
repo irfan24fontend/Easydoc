@@ -1,9 +1,9 @@
 <style>
-    :root { --wl-brand:#4f46e5; --wl-ink:#0f172a; --wl-muted:#64748b; --wl-line:#e5e9f0; --wl-bkash:#e2136e; }
+    :root { --wl-brand:#0c8c84; --wl-ink:#0f172a; --wl-muted:#64748b; --wl-line:#e5e9f0; --wl-bkash:#e2136e; }
 
     .wl-hero { position:relative; overflow:hidden; border-radius:22px; padding:1.5rem 1.8rem; color:#fff; margin-bottom:1.25rem;
-        background:radial-gradient(1200px 300px at 90% -20%, rgba(255,255,255,.18), transparent 60%), linear-gradient(135deg,#4f46e5 0%,#6d28d9 55%,#7c3aed 100%);
-        box-shadow:0 14px 34px rgba(79,70,229,.28); }
+        background:radial-gradient(1200px 300px at 90% -20%, rgba(255,255,255,.18), transparent 60%), linear-gradient(135deg,#0c8c84 0%,#0a6b65 55%,#0c8c84 100%);
+        box-shadow:0 14px 34px rgba(12,140,132,.28); }
     .wl-hero::after { content:""; position:absolute; right:-60px; bottom:-80px; width:240px; height:240px; border-radius:50%; background:rgba(255,255,255,.07); }
     .wl-hero h1 { font-size:1.45rem; font-weight:800; letter-spacing:-.02em; margin:0; }
     .wl-hero p { margin:.3rem 0 0; opacity:.9; font-size:.86rem; max-width:620px; position:relative; z-index:1; }

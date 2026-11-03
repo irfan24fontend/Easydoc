@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\WalletInvoice;
-use Illuminate\Http\Request;
-
+use Illuminate\Http\Request;
 class InvoiceController extends Controller
 {
     public function index(Request $request)

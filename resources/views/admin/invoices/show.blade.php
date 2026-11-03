@@ -4,7 +4,7 @@
 
 @push('styles')
 <style>
-    .inv-wrap { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --brand:#4f46e5; color: var(--ink); }
+    .inv-wrap { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --brand:#0c8c84; color: var(--ink); }
     .inv-sheet {
         width: 210mm; max-width: 100%; min-height: 297mm; margin: 0 auto; background: #fff;
         padding: 16mm 16mm 12mm; border-radius: 8px; box-shadow: 0 4px 24px rgba(15,23,42,.10);
@@ -72,7 +72,7 @@
     </div>
     <div class="d-flex gap-2">
         <a href="{{ route('admin.invoices.index') }}" class="btn btn-light border px-4 fw-medium text-secondary">All Invoices</a>
-        <button type="button" onclick="window.print()" class="btn btn-primary px-4 fw-semibold" style="background-color: #4f46e5; border-color: #4f46e5;">
+        <button type="button" onclick="window.print()" class="btn btn-primary px-4 fw-semibold" style="background-color: #0c8c84; border-color: #0c8c84;">
             <i class="fa-solid fa-print me-1"></i> Print / Save as PDF
         </button>
     </div>

@@ -14,6 +14,7 @@ class StoreChamberRequestRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'request_token'   => ['required', 'uuid'],
             'chamber_name'    => ['required', 'string', 'max:255'],
             'hospital_name'   => ['required', 'string', 'max:255'],
             'phone'           => ['required', 'string', 'max:30'],

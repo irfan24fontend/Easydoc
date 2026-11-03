@@ -18,13 +18,11 @@ class ChamberRequestController extends Controller
     {
         $doctor = $request->user()->doctor;
         $wallet = $this->service->walletFor($doctor);
-        $fee    = ChamberRequestService::FEE;
+        $fee    = $doctor->getCharge('chamber_request');
+        $balance = (float) $wallet->balance;
+        $hasBalance = $balance >= (float) $fee;
 
-        return view('doctor.chambers.request', [
-            'balance'    => $wallet->balance,
-            'fee'        => $fee,
-            'hasBalance' => $wallet->balance >= $fee,
-        ]);
+        return view('doctor.chambers.request', compact('balance', 'fee', 'hasBalance'));
     }
 
     public function store(StoreChamberRequestRequest $request)

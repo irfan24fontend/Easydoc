@@ -7,8 +7,7 @@ use App\Models\Serial;
 use App\Services\SerialService;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Http\Request;
-
+use Illuminate\Http\Request;
 class QueueController extends Controller
 {
     public function __construct(protected SerialService $service) {}

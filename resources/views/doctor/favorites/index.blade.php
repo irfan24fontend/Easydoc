@@ -4,20 +4,20 @@
 
 @push('styles')
 <style>
-    .fv { --ink:#0f172a; --muted:#64748b; --line:#e8ecf3; --soft:#f6f8fc; --brand:#4f46e5; --brand-soft:#eef2ff; --amber:#b45309; --amber-soft:#fef3c7; --green:#047857; --green-soft:#d1fae5; --red:#b91c1c; --red-soft:#fee2e2; color:var(--ink); }
+    .fv { --ink:#0f172a; --muted:#64748b; --line:#e8ecf3; --soft:#f6f8fc; --brand:#0c8c84; --brand-soft:#e3f3f0; --amber:#b45309; --amber-soft:#fef3c7; --green:#047857; --green-soft:#d1fae5; --red:#b91c1c; --red-soft:#fee2e2; color:var(--ink); }
     .fv *, .fv *::before, .fv *::after { box-sizing:border-box; }
 
     /* ---------- Header ---------- */
     .fv-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem; }
     .fv-title { display:flex; align-items:center; gap:.85rem; }
-    .fv-title .badge-ic { width:46px; height:46px; border-radius:14px; display:grid; place-items:center; color:#fff; font-size:1.15rem; background:linear-gradient(135deg,#6366f1,#7c3aed); box-shadow:0 8px 20px rgba(99,102,241,.3); flex:none; }
+    .fv-title .badge-ic { width:46px; height:46px; border-radius:14px; display:grid; place-items:center; color:#fff; font-size:1.15rem; background:linear-gradient(135deg,#0c8c84,#0c8c84); box-shadow:0 8px 20px rgba(12,140,132,.3); flex:none; }
     .fv-title h1 { font-size:1.35rem; font-weight:800; letter-spacing:-.02em; margin:0; }
     .fv-title p { margin:.1rem 0 0; font-size:.84rem; color:var(--muted); }
     .fv-head-actions { display:flex; gap:.5rem; flex-wrap:wrap; }
     .fv-btn { display:inline-flex; align-items:center; gap:.45rem; border:1px solid var(--line); background:#fff; color:var(--ink); font-weight:700; font-size:.84rem; padding:.55rem .95rem; border-radius:12px; cursor:pointer; transition:.15s; }
     .fv-btn:hover { background:var(--soft); border-color:#d5dbe7; }
-    .fv-btn.primary { background:var(--brand); border-color:var(--brand); color:#fff; box-shadow:0 6px 16px rgba(79,70,229,.28); }
-    .fv-btn.primary:hover { background:#4338ca; }
+    .fv-btn.primary { background:var(--brand); border-color:var(--brand); color:#fff; box-shadow:0 6px 16px rgba(12,140,132,.28); }
+    .fv-btn.primary:hover { background:#0a6b65; }
 
     /* ---------- Stats ---------- */
     .fv-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:.75rem; margin-bottom:1rem; }
@@ -45,7 +45,7 @@
     /* ---------- Search / autocomplete ---------- */
     .fv-search { position:relative; }
     .fv-input { width:100%; border:1px solid var(--line); background:var(--soft); border-radius:12px; padding:.62rem .85rem; font-size:.88rem; color:var(--ink); transition:.15s; }
-    .fv-input:focus { outline:none; background:#fff; border-color:#a5b4fc; box-shadow:0 0 0 4px rgba(99,102,241,.12); }
+    .fv-input:focus { outline:none; background:#fff; border-color:#a8dcd6; box-shadow:0 0 0 4px rgba(12,140,132,.12); }
     .fv-input.is-invalid { border-color:#f87171; box-shadow:0 0 0 4px rgba(248,113,113,.15); }
     .fv-input-ic { position:relative; }
     .fv-input-ic i { position:absolute; left:.85rem; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:.8rem; pointer-events:none; }
@@ -61,7 +61,7 @@
     /* ---------- Tags ---------- */
     .fv-tag { display:inline-flex; align-items:center; gap:.3rem; font-size:.68rem; font-weight:800; padding:.2rem .55rem; border-radius:999px; white-space:nowrap; }
     .fv-tag.fav { background:var(--amber-soft); color:var(--amber); }
-    .fv-tag.def { background:var(--brand-soft); color:#3730a3; }
+    .fv-tag.def { background:var(--brand-soft); color:#075f5a; }
     .fv-tag.brand { background:var(--green-soft); color:#065f46; }
 
     /* ---------- Brands ---------- */
@@ -92,7 +92,7 @@
     .fv-dose .mut { color:var(--muted); }
     .fv-acts { display:flex; gap:.3rem; }
     .fv-ic-btn { width:34px; height:34px; border-radius:10px; border:1px solid var(--line); background:#fff; color:#475569; display:grid; place-items:center; cursor:pointer; transition:.15s; }
-    .fv-ic-btn:hover { background:var(--brand-soft); color:var(--brand); border-color:#c7d2fe; }
+    .fv-ic-btn:hover { background:var(--brand-soft); color:var(--brand); border-color:#9bd2cc; }
     .fv-ic-btn.danger:hover { background:var(--red-soft); color:var(--red); border-color:#fecaca; }
 
     .fv-empty { text-align:center; padding:2.2rem 1rem; color:var(--muted); font-size:.88rem; }
@@ -107,7 +107,7 @@
     .fv-modal .modal-footer { border:0; padding:.6rem 1.4rem 1.2rem; gap:.5rem; }
     .fv-lbl { display:block; font-size:.78rem; font-weight:800; color:#334155; margin-bottom:.35rem; }
     .fv-lbl small { font-weight:600; color:var(--muted); }
-    .fv-picked { display:none; align-items:center; gap:.7rem; background:var(--brand-soft); border:1px solid #c7d2fe; border-radius:14px; padding:.65rem .8rem; }
+    .fv-picked { display:none; align-items:center; gap:.7rem; background:var(--brand-soft); border:1px solid #9bd2cc; border-radius:14px; padding:.65rem .8rem; }
     .fv-picked.show { display:flex; }
     .fv-picked .t { font-weight:800; font-size:.9rem; }
     .fv-picked .s { font-size:.76rem; color:var(--muted); }
@@ -120,7 +120,7 @@
     .fv-pick .box b { display:block; font-size:.86rem; }
     .fv-pick .box small { display:block; font-size:.74rem; line-height:1.5; color:var(--muted); margin-top:.1rem; }
     .fv-pick .box .tick { margin-left:auto; width:20px; height:20px; border-radius:50%; border:1.5px solid #cbd5e1; display:grid; place-items:center; color:transparent; font-size:.6rem; flex:none; }
-    .fv-pick input:checked + .box { border-color:var(--brand); background:#f8f9ff; box-shadow:0 0 0 3px rgba(99,102,241,.1); }
+    .fv-pick input:checked + .box { border-color:var(--brand); background:#f8f9ff; box-shadow:0 0 0 3px rgba(12,140,132,.1); }
     .fv-pick input:checked + .box .ic { background:var(--brand); color:#fff; }
     .fv-pick input:checked + .box .tick { background:var(--brand); border-color:var(--brand); color:#fff; }
     .fv-pick input:focus-visible + .box { outline:2px solid #818cf8; outline-offset:2px; }
@@ -132,7 +132,7 @@
     .fv-warn a { color:#92400e; font-weight:800; cursor:pointer; text-decoration:underline; }
     .fv-chips { display:flex; flex-wrap:wrap; gap:.3rem; margin-top:.45rem; }
     .fv-chip { border:1px solid var(--line); background:#fff; border-radius:999px; padding:.18rem .65rem; font-size:.74rem; cursor:pointer; color:#334155; }
-    .fv-chip:hover { background:var(--brand-soft); border-color:#c7d2fe; color:var(--brand); }
+    .fv-chip:hover { background:var(--brand-soft); border-color:#9bd2cc; color:var(--brand); }
 
     /* ---------- Info modals ---------- */
     .fv-steps { display:grid; gap:.65rem; }
@@ -558,7 +558,7 @@
     defSwitch.addEventListener('change', syncDefault);
 
     function showPicked(label, sub) {
-        picked.innerHTML = '<span class="fv-av" style="background:#fff;color:#4f46e5">' + esc((label || '?').charAt(0).toUpperCase()) + '</span>' +
+        picked.innerHTML = '<span class="fv-av" style="background:#fff;color:#0c8c84">' + esc((label || '?').charAt(0).toUpperCase()) + '</span>' +
             '<div><div class="t">' + esc(label) + '</div>' + (sub ? '<div class="s">' + esc(sub) + '</div>' : '') + '</div>';
         picked.classList.add('show');
         $('fvLabelField').value = label; $('fvSubField').value = sub || ''; $('fvFormField').value = current.form || '';

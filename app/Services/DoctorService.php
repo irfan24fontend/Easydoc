@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Hash;
 
 class DoctorService
 {
+    public function __construct(private WalletService $walletService)
+    {
+    }
 
     public function create(array $data)
     {
@@ -111,11 +114,11 @@ class DoctorService
 
             // Create Doctor Wallet
 
-            $doctor->wallet()->create([
-
-                'balance' => 0
-
-            ]);
+            $wallet = $doctor->wallet()->create(['balance' => 0]);
+            $bonus = (float) config('easydoc.registration_bonus', 100);
+            if ($bonus > 0) {
+                $this->walletService->credit($wallet, $bonus, 'Welcome registration bonus');
+            }
 
 
 

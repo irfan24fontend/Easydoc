@@ -8,8 +8,7 @@ use App\Http\Requests\UpdateChamberRequest;
 use App\Models\Chamber;
 use App\Models\Doctor;
 use App\Models\PrescriptionTemplate;
-use App\Services\ChamberService;
-
+use App\Services\ChamberService;
 class ChamberController extends Controller
 {
     public function __construct(

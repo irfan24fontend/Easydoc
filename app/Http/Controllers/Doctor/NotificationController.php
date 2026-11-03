@@ -9,7 +9,6 @@ use App\Models\DoctorNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class NotificationController extends Controller
 {
@@ -19,7 +18,7 @@ class NotificationController extends Controller
     }
 
     /** My notification list. */
-    public function index(): View
+    public function index()
     {
         $doctor = $this->doctor();
 
@@ -33,7 +32,7 @@ class NotificationController extends Controller
     }
 
     /** News: everything the Super Admin has broadcast. */
-    public function news(): View
+    public function news()
     {
         $items = Announcement::latest()->paginate(10);
 

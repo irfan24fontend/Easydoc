@@ -50,7 +50,7 @@
         width: 100%; padding: 0.55rem 0.9rem 0.55rem 2.3rem; border-radius: 10px; border: 1px solid #e2e8f0;
         font-size: 0.85rem; background: #f8fafc;
     }
-    .topbar-search input:focus { outline: none; border-color: #4f46e5; background: #fff; }
+    .topbar-search input:focus { outline: none; border-color: #0c8c84; background: #fff; }
 
     .topbar-right { display: flex; align-items: center; gap: 10px; }
 
@@ -65,7 +65,7 @@
         border-radius: 999px; padding: 0.35rem 0.9rem 0.35rem 0.35rem;
     }
     .profile-avatar {
-        width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#4f46e5,#4338ca);
+        width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#0c8c84,#0a6b65);
         color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem;
     }
     .profile-name { font-size: 0.8rem; font-weight: 700; color: #0f172a; line-height: 1.1; }
@@ -79,7 +79,7 @@
         align-items: center; justify-content: center; cursor: pointer;
     }
     .topbar-toggle:hover { background: #f1f5f9; }
-    .topbar-toggle:focus-visible { outline: 3px solid #c7d2fe; outline-offset: 2px; }
+    .topbar-toggle:focus-visible { outline: 3px solid #9bd2cc; outline-offset: 2px; }
 
     @media (max-width: 991px) {
         .topbar { padding: 0.65rem 1rem; }

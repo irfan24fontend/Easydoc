@@ -5,7 +5,7 @@
 @push('styles')
 <style>
     .serial-no {
-        width: 40px; height: 40px; border-radius: 12px; background: #eef2ff; color: #4338ca;
+        width: 40px; height: 40px; border-radius: 12px; background: #e3f3f0; color: #0a6b65;
         display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.05rem;
     }
     .count-box { border-radius: 12px; padding: .6rem .9rem; background: #f8fafc; border: 1px solid #eef0f4; text-align: center; }
@@ -27,6 +27,18 @@
 
             <form method="POST" action="{{ route('assistant.serials.store') }}">
                 @csrf
+
+                @if($operationalChambers->isEmpty())
+                    <div class="alert alert-warning">No assigned active chamber is available. Ask your doctor to assign a chamber and activate it.</div>
+                @else
+                    <div class="mb-3">
+                        <label class="field-label">Chamber *</label>
+                        <select name="chamber_id" id="chamberId" class="form-select" required>
+                            @foreach($operationalChambers as $chamber)
+                                <option value="{{ $chamber->id }}" {{ old('chamber_id', $selectedChamber?->id) == $chamber->id ? 'selected' : '' }}>{{ $chamber->chamber_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
                 <div class="mb-3">
                     <label class="field-label">সিরিয়ালের তারিখ *</label>
@@ -97,6 +109,7 @@
                 <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mt-2">
                     <i class="fa-solid fa-plus me-1"></i> সিরিয়াল দিন
                 </button>
+                @endif
             </form>
         </div>
     </div>
@@ -106,6 +119,13 @@
 
         {{-- ============ তারিখ ফিল্টার ============ --}}
         <form method="GET" action="{{ route('assistant.serials.index') }}" class="cardx p-3 mb-3 d-flex flex-wrap gap-2 align-items-center">
+            @if($operationalChambers->isNotEmpty())
+                <select name="chamber_id" class="form-select form-select-sm" style="max-width:220px;" onchange="this.form.submit()">
+                    @foreach($operationalChambers as $chamber)
+                        <option value="{{ $chamber->id }}" {{ $selectedChamber?->id === $chamber->id ? 'selected' : '' }}>{{ $chamber->chamber_name }}</option>
+                    @endforeach
+                </select>
+            @endif
             <a href="{{ route('assistant.serials.index', ['date' => \Carbon\Carbon::parse($date)->subDay()->toDateString()]) }}" class="btn btn-outline-secondary btn-sm" title="আগের দিন"><i class="fa-solid fa-chevron-left"></i></a>
             <input type="date" name="date" value="{{ $date }}" class="form-control form-control-sm" style="max-width:160px;" onchange="this.form.submit()">
             <a href="{{ route('assistant.serials.index', ['date' => \Carbon\Carbon::parse($date)->addDay()->toDateString()]) }}" class="btn btn-outline-secondary btn-sm" title="পরের দিন"><i class="fa-solid fa-chevron-right"></i></a>
@@ -214,7 +234,7 @@
         const status = document.getElementById('lookupStatus');
         if (!mobile) return;
 
-        fetch(`${LOOKUP_URL}?mobile=${encodeURIComponent(mobile)}&date=${encodeURIComponent(document.getElementById('serialDate').value)}`, { headers: { 'Accept': 'application/json' } })
+        fetch(`${LOOKUP_URL}?mobile=${encodeURIComponent(mobile)}&date=${encodeURIComponent(document.getElementById('serialDate').value)}&chamber_id=${encodeURIComponent(document.getElementById('chamberId')?.value || '')}`, { headers: { 'Accept': 'application/json' } })
             .then(res => res.json())
             .then(data => {
                 if (!data.found) {

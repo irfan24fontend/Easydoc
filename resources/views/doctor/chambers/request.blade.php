@@ -4,14 +4,14 @@
 
 @push('styles')
 <style>
-    :root { --rq-brand: #4f46e5; --rq-ink: #0f172a; --rq-muted: #64748b; --rq-line: #e5e9f0; }
+    :root { --rq-brand: #0c8c84; --rq-ink: #0f172a; --rq-muted: #64748b; --rq-line: #e5e9f0; }
 
     /* ---------- Hero ---------- */
     .rq-hero {
         position: relative; overflow: hidden; border-radius: 22px; padding: 1.5rem 1.8rem; color: #fff;
         background: radial-gradient(1200px 300px at 90% -20%, rgba(255,255,255,.18), transparent 60%),
-                    linear-gradient(135deg, #4f46e5 0%, #6d28d9 55%, #7c3aed 100%);
-        box-shadow: 0 14px 34px rgba(79,70,229,.28);
+                    linear-gradient(135deg, #0c8c84 0%, #0a6b65 55%, #0c8c84 100%);
+        box-shadow: 0 14px 34px rgba(12,140,132,.28);
     }
     .rq-hero::after { content: ""; position: absolute; right: -60px; bottom: -80px; width: 240px; height: 240px; border-radius: 50%; background: rgba(255,255,255,.07); }
     .rq-hero h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; margin: 0; }
@@ -23,14 +23,14 @@
     .rq-card { background: #fff; border: 1px solid var(--rq-line); border-radius: 20px; padding: 1.35rem 1.4rem; box-shadow: 0 1px 3px rgba(15,23,42,.05); }
     .rq-card + .rq-card { margin-top: 1.25rem; }
     .rq-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 1.1rem; }
-    .rq-card-head .ico { width: 40px; height: 40px; border-radius: 12px; background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: .95rem; flex-shrink: 0; }
+    .rq-card-head .ico { width: 40px; height: 40px; border-radius: 12px; background: #e3f3f0; color: #0c8c84; display: flex; align-items: center; justify-content: center; font-size: .95rem; flex-shrink: 0; }
     .rq-card-head h2 { margin: 0; font-size: 1rem; font-weight: 800; color: var(--rq-ink); }
     .rq-card-head p { margin: 0; font-size: .78rem; color: var(--rq-muted); }
 
     .rq-card .form-label { font-size: .8rem; font-weight: 700; color: #334155; margin-bottom: .35rem; }
     .rq-card .form-label .opt { font-weight: 500; color: #94a3b8; }
     .rq-card .form-control { border: 1px solid #e2e8f0; border-radius: 12px; padding: .6rem .9rem; font-size: .9rem; background: #f8fafc; transition: all .15s; }
-    .rq-card .form-control:focus { background: #fff; border-color: var(--rq-brand); box-shadow: 0 0 0 4px rgba(79,70,229,.1); }
+    .rq-card .form-control:focus { background: #fff; border-color: var(--rq-brand); box-shadow: 0 0 0 4px rgba(12,140,132,.1); }
     .rq-card .form-control.is-invalid { border-color: #f87171; background: #fffafa; }
     .rq-card .form-control.is-invalid:focus { box-shadow: 0 0 0 4px rgba(248,113,113,.15); }
 
@@ -39,15 +39,15 @@
     .rq-day { position: relative; margin: 0; cursor: pointer; }
     .rq-day input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
     .rq-day span { display: inline-block; padding: .45rem .95rem; border-radius: 999px; border: 1px solid #e2e8f0; background: #fff; color: #475569; font-size: .82rem; font-weight: 700; transition: all .15s; }
-    .rq-day:hover span { background: #eef2ff; border-color: #c7d2fe; color: #4338ca; }
-    .rq-day input:checked + span { background: var(--rq-brand); border-color: var(--rq-brand); color: #fff; box-shadow: 0 4px 12px rgba(79,70,229,.25); }
-    .rq-day input:focus-visible + span { box-shadow: 0 0 0 4px rgba(79,70,229,.25); }
+    .rq-day:hover span { background: #e3f3f0; border-color: #9bd2cc; color: #0a6b65; }
+    .rq-day input:checked + span { background: var(--rq-brand); border-color: var(--rq-brand); color: #fff; box-shadow: 0 4px 12px rgba(12,140,132,.25); }
+    .rq-day input:focus-visible + span { box-shadow: 0 0 0 4px rgba(12,140,132,.25); }
 
     /* ---------- Dropzone ---------- */
     .rq-drop { display: block; border: 2px dashed #cbd5e1; border-radius: 16px; padding: 1.8rem 1rem; text-align: center; background: #f8fafc; cursor: pointer; transition: all .15s; margin: 0; }
-    .rq-drop:hover, .rq-drop.drag { border-color: var(--rq-brand); background: #eef2ff; }
+    .rq-drop:hover, .rq-drop.drag { border-color: var(--rq-brand); background: #e3f3f0; }
     .rq-drop.is-invalid { border-color: #f87171; background: #fffafa; }
-    .rq-drop .big { width: 52px; height: 52px; border-radius: 16px; background: #eef2ff; color: #4f46e5; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: .6rem; }
+    .rq-drop .big { width: 52px; height: 52px; border-radius: 16px; background: #e3f3f0; color: #0c8c84; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: .6rem; }
     .rq-drop .t1 { font-weight: 800; color: var(--rq-ink); font-size: .92rem; }
     .rq-drop .t2 { font-size: .76rem; color: var(--rq-muted); margin-top: .15rem; }
     .rq-drop input { display: none; }
@@ -76,8 +76,8 @@
     .rq-line.total b.bad { color: #b91c1c; }
     .rq-warn { margin-top: .9rem; font-size: .8rem; color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: .6rem .75rem; }
 
-    .rq-submit { width: 100%; margin-top: 1rem; border: 0; border-radius: 14px; padding: .8rem 1rem; font-weight: 800; font-size: .92rem; color: #fff; background: linear-gradient(135deg, #4f46e5, #7c3aed); box-shadow: 0 10px 22px rgba(79,70,229,.3); transition: transform .15s, box-shadow .15s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-    .rq-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 14px 28px rgba(79,70,229,.36); }
+    .rq-submit { width: 100%; margin-top: 1rem; border: 0; border-radius: 14px; padding: .8rem 1rem; font-weight: 800; font-size: .92rem; color: #fff; background: linear-gradient(135deg, #0c8c84, #0c8c84); box-shadow: 0 10px 22px rgba(12,140,132,.3); transition: transform .15s, box-shadow .15s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .rq-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 14px 28px rgba(12,140,132,.36); }
     .rq-submit:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; }
     .rq-submit .spin { display: none; width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; animation: rqSpin .7s linear infinite; }
     .rq-submit.busy .spin { display: inline-block; }
@@ -87,8 +87,8 @@
     .rq-steps h3 { font-size: .86rem; font-weight: 800; color: var(--rq-ink); margin: 0 0 .8rem; }
     .rq-step { display: flex; gap: 11px; position: relative; padding-bottom: .9rem; }
     .rq-step:last-child { padding-bottom: 0; }
-    .rq-step:not(:last-child)::before { content: ""; position: absolute; left: 13px; top: 28px; bottom: 2px; width: 2px; background: #e0e7ff; }
-    .rq-step .n { width: 28px; height: 28px; border-radius: 50%; background: #eef2ff; color: #4338ca; font-weight: 800; font-size: .78rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .rq-step:not(:last-child)::before { content: ""; position: absolute; left: 13px; top: 28px; bottom: 2px; width: 2px; background: #cfe9e5; }
+    .rq-step .n { width: 28px; height: 28px; border-radius: 50%; background: #e3f3f0; color: #0a6b65; font-weight: 800; font-size: .78rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .rq-step .tx { font-size: .8rem; color: #475569; line-height: 1.45; padding-top: 2px; }
     .rq-step .tx b { color: var(--rq-ink); display: block; }
 
@@ -138,6 +138,7 @@
 
         <form id="rqForm" method="POST" action="{{ route('doctor.chambers.request.store') }}" enctype="multipart/form-data">
             @csrf
+            <input type="hidden" name="request_token" value="{{ old('request_token', (string) \Illuminate\Support\Str::uuid()) }}">
 
             <div class="row g-4">
 

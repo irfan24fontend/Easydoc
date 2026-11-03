@@ -20,10 +20,10 @@
     .pid-badge {
         display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         font-weight: 700; font-size: 0.8rem; padding: 0.25rem 0.6rem; border-radius: 6px;
-        background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; white-space: nowrap;
+        background: #e3f3f0; color: #0a6b65; border: 1px solid #cfe9e5; white-space: nowrap;
     }
     .type-badge { font-size: 0.7rem; font-weight: 700; padding: 0.3rem 0.65rem; border-radius: 999px; white-space: nowrap; display: inline-block; }
-    .type-full { background: #e0e7ff; color: #3730a3; }
+    .type-full { background: #cfe9e5; color: #075f5a; }
     .type-inv { background: #ccfbf1; color: #115e59; }
     .state-pending { background: #fef3c7; color: #92400e; }
     .state-done { background: #dcfce7; color: #166534; }
@@ -34,8 +34,8 @@
     }
     .btn-action-text.view  { color: #475569; background-color: #f1f5f9; border: 1px solid #e2e8f0; }
     .btn-action-text.view:hover { background-color: #475569; color: #fff; }
-    .btn-action-text.print { color: #4f46e5; background-color: #eeebff; border: 1px solid #e0e7ff; }
-    .btn-action-text.print:hover { background-color: #4f46e5; color: #fff; }
+    .btn-action-text.print { color: #0c8c84; background-color: #daf0ed; border: 1px solid #cfe9e5; }
+    .btn-action-text.print:hover { background-color: #0c8c84; color: #fff; }
     .btn-action-text.edit  { color: #b45309; background-color: #fef3c7; border: 1px solid #fde68a; }
     .btn-action-text.edit:hover { background-color: #b45309; color: #fff; }
     .btn-action-text.cont  { color: #fff; background-color: #f59e0b; border: 1px solid #f59e0b; }
@@ -52,7 +52,7 @@
                 <h1 class="h4 fw-bold text-dark m-0">Prescription List</h1>
                 <p class="text-muted small m-0">আপনার সব প্রেসক্রিপশন — Patient ID, নাম বা মোবাইল দিয়ে খুঁজুন।</p>
             </div>
-            <a href="{{ route('doctor.prescriptions.create') }}" class="btn btn-primary px-4 fw-semibold" style="background-color: #4f46e5; border-color: #4f46e5;">
+            <a href="{{ route('doctor.prescriptions.create') }}" class="btn btn-primary px-4 fw-semibold" style="background-color: #0c8c84; border-color: #0c8c84;">
                 <i class="fa-solid fa-plus me-1"></i> New Prescription
             </a>
         </div>

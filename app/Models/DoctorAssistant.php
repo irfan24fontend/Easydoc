@@ -17,4 +17,9 @@ class DoctorAssistant extends Model
     {
         return $this->belongsTo(Doctor::class);
     }
+
+    public function chambers()
+    {
+        return $this->belongsToMany(Chamber::class, 'doctor_assistant_chamber')->withTimestamps();
+    }
 }

@@ -18,10 +18,11 @@ use App\Services\PatientService;
 use App\Services\PrescriptionService;
 use App\Services\SerialService;
 use App\Services\TreatmentPatternService;
+use App\Services\WalletService;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Validator;
 class PrescriptionController extends Controller
 {
     public function __construct(
@@ -29,6 +30,7 @@ class PrescriptionController extends Controller
         protected MedicineSuggestionService $suggestionService,
         protected PatientService $patientService,
         protected SerialService $serialService,
+        protected WalletService $walletService,
     ) {}
 
     /**
@@ -68,6 +70,8 @@ class PrescriptionController extends Controller
             ->latest()
             ->paginate(15)
             ->withQueryString();
+
+        $prescriptions->getCollection()->each(fn (Prescription $prescription) => $prescription->patient?->append('patient_code'));
 
         return view('doctor.prescriptions.index', compact('prescriptions'));
     }
@@ -173,6 +177,7 @@ class PrescriptionController extends Controller
         abort_unless($prescription->doctor_id === $doctor->id, 403);
 
         $prescription->load(['patient', 'medicines', 'chamber']);
+        $prescription->patient?->append('patient_code');
 
         return view('doctor.prescriptions.show', compact('prescription'));
     }
@@ -311,6 +316,10 @@ class PrescriptionController extends Controller
     public function aiDiagnosis(Request $request, AiSuggestionService $ai)
     {
         $request->validate(['symptoms' => 'required|string']);
+        $doctor = $this->currentDoctor();
+        if ($error = $this->checkAiChargeRequest($request, $doctor, 'ai_diagnosis')) {
+            return $error;
+        }
 
         try {
             $result = $ai->suggestDiagnosis(
@@ -326,7 +335,14 @@ class PrescriptionController extends Controller
             return response()->json(['error' => 'AI suggestion ব্যর্থ হয়েছে, আবার চেষ্টা করুন।'], 500);
         }
 
-        return response()->json($result);
+        if ($error = $this->applyAiCharge($request, $doctor, 'ai_diagnosis')) {
+            return $error;
+        }
+        $doctor->wallet?->refresh();
+        return response()->json(array_merge($result, [
+            'charged' => $doctor->getCharge('ai_diagnosis'),
+            'balance' => (float) ($doctor->wallet?->balance ?? 0),
+        ]));
     }
 
     public function aiMedicine(Request $request, AiSuggestionService $ai)
@@ -335,6 +351,10 @@ class PrescriptionController extends Controller
             'diagnosis' => 'required|string',
             'symptoms' => 'nullable|string',
         ]);
+        $doctor = $this->currentDoctor();
+        if ($error = $this->checkAiChargeRequest($request, $doctor, 'ai_medicine')) {
+            return $error;
+        }
 
         try {
             $result = $ai->suggestMedicines(
@@ -375,9 +395,15 @@ class PrescriptionController extends Controller
             ];
         }
 
+        if ($error = $this->applyAiCharge($request, $doctor, 'ai_medicine')) {
+            return $error;
+        }
+        $doctor->wallet?->refresh();
         return response()->json([
             'medicines' => $resolved,
             'advice' => $result['advice'] ?? '',
+            'charged' => $doctor->getCharge('ai_medicine'),
+            'balance' => (float) ($doctor->wallet?->balance ?? 0),
         ]);
     }
 
@@ -394,6 +420,10 @@ class PrescriptionController extends Controller
             'risk_factors'   => 'nullable|string|max:1000',
             'diagnosis'      => 'nullable|string|max:1000',
         ]);
+        $doctor = $this->currentDoctor();
+        if ($error = $this->checkAiChargeRequest($request, $doctor, 'ai_interaction')) {
+            return $error;
+        }
 
         try {
             $result = $ai->check(
@@ -409,7 +439,60 @@ class PrescriptionController extends Controller
             return response()->json(['error' => 'AI conflict check ব্যর্থ হয়েছে, আবার চেষ্টা করুন।'], 500);
         }
 
-        return response()->json($result);
+        if ($error = $this->applyAiCharge($request, $doctor, 'ai_interaction')) {
+            return $error;
+        }
+        $doctor->wallet?->refresh();
+        return response()->json(array_merge($result, [
+            'charged' => $doctor->getCharge('ai_interaction'),
+            'balance' => (float) ($doctor->wallet?->balance ?? 0),
+        ]));
+    }
+
+    protected function checkAiChargeRequest(Request $request, Doctor $doctor, string $chargeType): ?JsonResponse
+    {
+        $key = $request->header('Idempotency-Key');
+        if (!is_string($key) || !preg_match('/^[A-Za-z0-9:_-]{8,120}$/', $key)) {
+            return response()->json(['error' => 'Invalid or missing request key. Please retry.'], 422);
+        }
+
+        $idempotencyKey = 'ai:' . $chargeType . ':' . hash('sha256', $key);
+        $wallet = $doctor->wallet;
+        if ($wallet && \App\Models\WalletTransaction::where('wallet_id', $wallet->id)
+            ->where('idempotency_key', $idempotencyKey)->exists()) {
+            return null;
+        }
+
+        $charge = $doctor->getCharge($chargeType);
+        if (!$wallet || (float) $wallet->balance < $charge) {
+            return response()->json([
+                'error' => 'Insufficient wallet balance for this AI action.',
+                'required' => $charge,
+                'balance' => (float) ($wallet?->balance ?? 0),
+            ], 402);
+        }
+
+        return null;
+    }
+
+    protected function applyAiCharge(Request $request, Doctor $doctor, string $chargeType): ?JsonResponse
+    {
+        try {
+            $this->walletService->debit(
+                $doctor->wallet,
+                $doctor->getCharge($chargeType),
+                str_replace('_', ' ', ucfirst($chargeType)) . ' AI request',
+                'ai:' . $chargeType . ':' . hash('sha256', (string) $request->header('Idempotency-Key'))
+            );
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'required' => $doctor->getCharge($chargeType),
+                'balance' => (float) ($doctor->wallet?->fresh()?->balance ?? 0),
+            ], 402);
+        }
+
+        return null;
     }
 
     public function print(Prescription $prescription)
@@ -425,6 +508,8 @@ class PrescriptionController extends Controller
         if (!$template) {
             return view('doctor.prescriptions.print-fallback', compact('prescription'));
         }
+
+        $verificationUrl = route('prescription.verify', $prescription->ensureVerificationToken());
 
         if ($prescription->medicines->isEmpty()) {
             $medicineTable = '<div class="no-medicine-note" style="padding:14px 6px;font-size:12.5px;color:#64748b;">'
@@ -450,29 +535,29 @@ class PrescriptionController extends Controller
             : '<div class="rx-section"><div class="rx-label">Investigation Findings:</div><div class="rx-text">' . nl2br(e($findings)) . '</div></div>';
 
         $logo = $doctor->photo
-            ? '<img src="' . asset('storage/' . $doctor->photo) . '" style="max-width:70px;">'
+            ? '<img src="' . e(asset('storage/' . $doctor->photo)) . '" style="max-width:70px;">'
             : '<div style="width:55px;height:55px;border-radius:50%;border:3px solid #4f46e5;display:flex;align-items:center;justify-content:center;font-weight:700;">+</div>';
 
         $replacements = [
-            'doctor_name' => $doctor->user->name ?? '',
-            'doctor_degree' => $doctor->qualification ?? '',
-            'doctor_bmdc' => $doctor->bmdc_number ?? '',
-            'chamber_name' => $chamber->chamber_name ?? '',
-            'hospital_name' => $chamber->hospital_name ?? '',
-            'hospital_address' => $chamber->address ?? '',
-            'hospital_phone' => $chamber->phone ?? '',
-            'date' => $prescription->created_at->format('d M Y'),
-            'patient_name' => $prescription->patient->name ?? '',
-            'patient_id' => $prescription->patient->patient_code ?? '',
-            'patient_code' => $prescription->patient->patient_code ?? '',
-            'patient_age' => $prescription->patient->age ?? '',
-            'patient_gender' => $prescription->patient->gender ?? '',
-            'patient_weight' => $prescription->patient->weight ? $prescription->patient->weight . ' kg' : '',
-            'blood_group' => $prescription->patient->blood_group ?? '',
-            'patient_address' => $prescription->patient->address ?? '',
-            'bp' => $prescription->bp ?? '',
-            'pulse' => $prescription->pulse ?? '',
-            'temperature' => $prescription->temperature ?? '',
+            'doctor_name' => e($doctor->user->name ?? ''),
+            'doctor_degree' => e($doctor->qualification ?? ''),
+            'doctor_bmdc' => e($doctor->bmdc_number ?? ''),
+            'chamber_name' => e($chamber->chamber_name ?? ''),
+            'hospital_name' => e($chamber->hospital_name ?? ''),
+            'hospital_address' => e($chamber->address ?? ''),
+            'hospital_phone' => e($chamber->phone ?? ''),
+            'date' => e($prescription->created_at->format('d M Y')),
+            'patient_name' => e($prescription->patient->name ?? ''),
+            'patient_id' => e($prescription->patient->patient_code ?? ''),
+            'patient_code' => e($prescription->patient->patient_code ?? ''),
+            'patient_age' => e($prescription->patient->age ?? ''),
+            'patient_gender' => e($prescription->patient->gender ?? ''),
+            'patient_weight' => e($prescription->patient->weight ? $prescription->patient->weight . ' kg' : ''),
+            'blood_group' => e($prescription->patient->blood_group ?? ''),
+            'patient_address' => e($prescription->patient->address ?? ''),
+            'bp' => e($prescription->bp ?? ''),
+            'pulse' => e($prescription->pulse ?? ''),
+            'temperature' => e($prescription->temperature ?? ''),
             'diagnosis' => nl2br(e($prescription->diagnosis)),
             'clinical_complaints' => nl2br(e($prescription->clinical_complaints)),
             'risk_factors' => nl2br(e($prescription->risk_factors)),
@@ -494,6 +579,7 @@ class PrescriptionController extends Controller
             'html'         => $html,
             'css'          => $template->css,
             'paperSize'    => $template->paper_size,
+            'verificationUrl' => $verificationUrl,
         ]);
     }
 

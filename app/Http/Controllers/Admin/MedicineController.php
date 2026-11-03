@@ -7,8 +7,7 @@ use App\Http\Requests\StoreMedicineRequest;
 use App\Http\Requests\UpdateMedicineRequest;
 use App\Models\Medicine;
 use App\Services\MedicineService;
-use Illuminate\Http\Request;
-
+use Illuminate\Http\Request;
 class MedicineController extends Controller
 {
     public function __construct(

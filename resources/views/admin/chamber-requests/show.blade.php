@@ -3,7 +3,7 @@
 @section('content')
 <style>
     .cr-back { display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-weight: 700; font-size: .82rem; margin-bottom: .5rem; }
-    .cr-back:hover { color: #4f46e5; }
+    .cr-back:hover { color: #0c8c84; }
     .cr-title { font-size: 1.3rem; font-weight: 800; color: #0f172a; margin: 0; }
 
     .cr-card { background: #fff; border: 1px solid #eef0f4; border-radius: 16px; padding: 1.3rem 1.4rem; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
@@ -16,7 +16,7 @@
     .cr-pad { max-height: 30rem; width: 100%; border-radius: 12px; border: 1px solid #eef0f4; object-fit: contain; background: #f8fafc; }
 
     .cr-tpl-select { border: 1px solid #e2e8f0; border-radius: 12px; padding: .6rem .9rem; font-size: .89rem; background: #f8fafc; }
-    .cr-tpl-select:focus { background: #fff; border-color: #4f46e5; box-shadow: 0 0 0 4px rgba(79,70,229,.1); }
+    .cr-tpl-select:focus { background: #fff; border-color: #0c8c84; box-shadow: 0 0 0 4px rgba(12,140,132,.1); }
 
     .cr-btn-approve { border: 0; border-radius: 12px; padding: .6rem 1.2rem; font-weight: 800; font-size: .86rem; color: #fff; background: linear-gradient(135deg,#16a34a,#15803d); box-shadow: 0 8px 18px rgba(21,128,61,.25); }
     .cr-btn-approve:hover { color: #fff; filter: brightness(1.05); }

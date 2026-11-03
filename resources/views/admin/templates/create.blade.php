@@ -185,14 +185,14 @@
 .variable-btn { cursor: pointer; font-size: 12px; }
 
 .nav-tabs .nav-link { cursor: pointer; color: #64748b; font-weight: 600; font-size: 0.85rem; border: none; border-bottom: 2px solid transparent; }
-.nav-tabs .nav-link.active { color: #4f46e5; border-bottom-color: #4f46e5; background: transparent; }
+.nav-tabs .nav-link.active { color: #0c8c84; border-bottom-color: #0c8c84; background: transparent; }
 
 .starter-card { border: 2px solid #e2e8f0; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; transition: all .15s ease; }
-.starter-card:hover { border-color: #4f46e5; box-shadow: 0 4px 10px rgba(79,70,229,.12); }
+.starter-card:hover { border-color: #0c8c84; box-shadow: 0 4px 10px rgba(12,140,132,.12); }
 .starter-swatch { height: 55px; border-radius: 6px; margin-bottom: 6px; }
 .swatch-classic { background: linear-gradient(135deg,#43a63b,#f39a19); }
 .swatch-minimal { background: linear-gradient(135deg,#e2e8f0,#3b82f6); }
-.swatch-modern  { background: linear-gradient(135deg,#4f46e5,#ec4899); }
+.swatch-modern  { background: linear-gradient(135deg,#0c8c84,#ec4899); }
 .starter-name { font-size: 12px; font-weight: 600; color: #334155; }
 
 .CodeMirror { height: 520px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; }
@@ -413,19 +413,19 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; }
             css: `* { box-sizing: border-box; }
 body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; }
 .mc-page { width: 100%; min-height: 1123px; background: #fff; }
-.mc-header { background: linear-gradient(135deg,#4f46e5,#7c3aed); color: #fff; padding: 30px 50px; display: flex; justify-content: space-between; align-items: center; }
+.mc-header { background: linear-gradient(135deg,#0c8c84,#0c8c84); color: #fff; padding: 30px 50px; display: flex; justify-content: space-between; align-items: center; }
 .mc-header h1 { margin: 0 0 4px; font-size: 24px; }
 .mc-header p { margin: 0; font-size: 13px; opacity: .9; }
 .mc-badge { width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; }
-.mc-clinicbar { background: #f5f3ff; color: #4f46e5; font-size: 12px; padding: 8px 50px; font-weight: 600; }
+.mc-clinicbar { background: #f0f8f7; color: #0c8c84; font-size: 12px; padding: 8px 50px; font-weight: 600; }
 .mc-patientcard { margin: 20px 50px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 20px; display: flex; gap: 25px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
 .mc-grid { display: grid; grid-template-columns: 32% 68%; gap: 20px; padding: 0 50px 40px; }
 .mc-box { background: #f8fafc; border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
-.mc-box h5 { margin: 0 0 6px; font-size: 13px; color: #4f46e5; }
+.mc-box h5 { margin: 0 0 6px; font-size: 13px; color: #0c8c84; }
 .mc-box p { margin: 0; font-size: 13px; line-height: 1.5; }
-.mc-rxsign { font-size: 30px; font-weight: 700; color: #7c3aed; margin-bottom: 10px; }
+.mc-rxsign { font-size: 30px; font-weight: 700; color: #0c8c84; margin-bottom: 10px; }
 .medicine-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; background: #fff; border-radius: 8px; overflow: hidden; }
-.medicine-table th { background: #ede9fe; font-size: 12px; padding: 8px; text-align: left; }
+.medicine-table th { background: #daf0ed; font-size: 12px; padding: 8px; text-align: left; }
 .medicine-table td { font-size: 13px; padding: 8px; border-bottom: 1px solid #f1f5f9; }
 @media print { .mc-page { width: 210mm; min-height: 297mm; } @page { size: A4; margin: 0; } }`,
         },

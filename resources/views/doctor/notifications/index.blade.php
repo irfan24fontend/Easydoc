@@ -7,18 +7,18 @@
 <style>
     .nt-item { display:grid; grid-template-columns:44px 1fr auto; gap:.9rem; align-items:start; padding:.95rem 1rem; border:1px solid var(--wl-line); border-radius:14px; background:#fff; text-decoration:none; color:inherit; width:100%; text-align:left; font:inherit; cursor:pointer; }
     .nt-item + .nt-item { margin-top:.6rem; }
-    .nt-item.unread { background:#f5f3ff; border-color:#ddd6fe; }
-    .nt-item:focus-visible { outline:3px solid #c7d2fe; outline-offset:2px; }
-    .nt-item:hover { border-color:#c7d2fe; color:inherit; }
-    .nt-ico { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:1.1rem; background:#e0e7ff; color:#4338ca; }
-    .nt-ico.feature { background:#ede9fe; color:#6d28d9; }
+    .nt-item.unread { background:#f0f8f7; border-color:#b9e0db; }
+    .nt-item:focus-visible { outline:3px solid #9bd2cc; outline-offset:2px; }
+    .nt-item:hover { border-color:#9bd2cc; color:inherit; }
+    .nt-ico { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:1.1rem; background:#cfe9e5; color:#0a6b65; }
+    .nt-ico.feature { background:#daf0ed; color:#0a6b65; }
     .nt-ico.news { background:#e0f2fe; color:#0369a1; }
     .nt-ico.recharge { background:#d1fae5; color:#047857; }
     .nt-ico.notice { background:#fef3c7; color:#b45309; }
     .nt-title { font-weight:800; color:var(--wl-ink); }
     .nt-body { font-size:.88rem; color:#475569; margin-top:.15rem; overflow-wrap:anywhere; }
     .nt-meta { font-size:.75rem; color:var(--wl-muted); margin-top:.35rem; }
-    .nt-dot { width:9px; height:9px; border-radius:50%; background:#4f46e5; display:inline-block; margin-right:.35rem; }
+    .nt-dot { width:9px; height:9px; border-radius:50%; background:#0c8c84; display:inline-block; margin-right:.35rem; }
 </style>
 @endpush
 

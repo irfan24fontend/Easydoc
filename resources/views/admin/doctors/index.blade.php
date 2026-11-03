@@ -45,8 +45,8 @@
         display: inline-block;
         transition: all 0.2s ease;
     }
-    .btn-action-text.view { color: #4f46e5; background-color: #eeebff; border: 1px solid #e0e7ff; }
-    .btn-action-text.view:hover { background-color: #4f46e5; color: #ffffff; }
+    .btn-action-text.view { color: #0c8c84; background-color: #daf0ed; border: 1px solid #cfe9e5; }
+    .btn-action-text.view:hover { background-color: #0c8c84; color: #ffffff; }
     
     .btn-action-text.edit { color: #b45309; background-color: #fef3c7; border: 1px solid #fde68a; }
     .btn-action-text.edit:hover { background-color: #d97706; color: #ffffff; }
@@ -64,7 +64,7 @@
                 <h1 class="h4 fw-bold text-dark m-0">Doctors</h1>
                 <p class="text-muted small m-0">Manage active medical personnel records.</p>
             </div>
-            <a href="{{ route('admin.doctors.create') }}" class="btn btn-primary px-4 fw-semibold" style="background-color: #4f46e5; border-color: #4f46e5;">
+            <a href="{{ route('admin.doctors.create') }}" class="btn btn-primary px-4 fw-semibold" style="background-color: #0c8c84; border-color: #0c8c84;">
                 + Add Doctor
             </a>
         </div>

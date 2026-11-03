@@ -9,8 +9,8 @@
     .page-head p { color: #64748b; font-size: 0.875rem; margin: 0.25rem 0 0; }
 
     .btn-brand {
-        background: linear-gradient(135deg, #4f46e5, #4338ca); color: #fff !important; border: none; border-radius: 10px;
-        font-weight: 600; font-size: 0.875rem; padding: 0.65rem 1.25rem; box-shadow: 0 4px 10px rgba(79,70,229,.25);
+        background: linear-gradient(135deg, #0c8c84, #0a6b65); color: #fff !important; border: none; border-radius: 10px;
+        font-weight: 600; font-size: 0.875rem; padding: 0.65rem 1.25rem; box-shadow: 0 4px 10px rgba(12,140,132,.25);
     }
     .btn-brand:hover { filter: brightness(1.05); color: #fff; }
 
@@ -24,7 +24,7 @@
     .search-box { position: relative; width: 300px; max-width: 100%; }
     .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.8rem; }
     .search-box input { width: 100%; padding: 0.55rem 0.75rem 0.55rem 2.1rem; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 0.85rem; background: #f8fafc; }
-    .search-box input:focus { outline: none; border-color: #4f46e5; background: #fff; }
+    .search-box input:focus { outline: none; border-color: #0c8c84; background: #fff; }
 
     .saas-table { width: 100%; border-collapse: collapse; }
     .saas-table thead th { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #64748b; background: #f8fafc; padding: 0.85rem 1.1rem; border-bottom: 1px solid #eef0f4; text-align: left; }
@@ -46,7 +46,7 @@
     .not-sponsored { font-size: 0.75rem; color: #cbd5e1; }
 
     .icon-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; display: inline-flex; align-items: center; justify-content: center; color: #64748b; font-size: 0.8rem; transition: .15s; }
-    .icon-btn:hover { background: #4f46e5; border-color: #4f46e5; color: #fff; }
+    .icon-btn:hover { background: #0c8c84; border-color: #0c8c84; color: #fff; }
     .icon-btn.danger:hover { background: #dc2626; border-color: #dc2626; }
 
     .empty-state { text-align: center; padding: 4rem 1rem; }
@@ -73,7 +73,7 @@
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-lg-4">
         <div class="stat-card">
-            <div class="stat-icon" style="background:#eef2ff; color:#4f46e5;"><i class="fa-solid fa-pills"></i></div>
+            <div class="stat-icon" style="background:#e3f3f0; color:#0c8c84;"><i class="fa-solid fa-pills"></i></div>
             <div>
                 <div class="stat-num">{{ $medicines->total() }}</div>
                 <div class="stat-label">মোট মেডিসিন</div>

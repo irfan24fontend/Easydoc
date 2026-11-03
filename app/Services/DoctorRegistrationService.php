@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Storage;
 
 class DoctorRegistrationService
 {
+    public function __construct(private WalletService $walletService)
+    {
+    }
+
     /**
      * Create the user + doctor record for a self-registered doctor.
      * The doctor starts as "pending" until the Super Admin approves.
@@ -54,7 +58,11 @@ class DoctorRegistrationService
                     'approval_status'  => Doctor::STATUS_PENDING,
                 ]);
 
-                $doctor->wallet()->create(['balance' => 0]);
+                $wallet = $doctor->wallet()->create(['balance' => 0]);
+                $bonus = (float) config('easydoc.registration_bonus', 100);
+                if ($bonus > 0) {
+                    $this->walletService->credit($wallet, $bonus, 'Welcome registration bonus');
+                }
 
                 return $user;
             });

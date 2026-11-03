@@ -14,8 +14,6 @@ use Throwable;
 
 class ChamberRequestService
 {
-    public const FEE = 500;
-
     public function __construct(private WalletService $walletService)
     {
     }
@@ -33,44 +31,63 @@ class ChamberRequestService
      */
     public function submit(Doctor $doctor, array $data, UploadedFile $pad): Chamber
     {
-        $wallet = $this->walletFor($doctor);
+        $token = $data['request_token'];
+        $existing = Chamber::where('doctor_id', $doctor->id)->where('request_token', $token)->first();
+        if ($existing) {
+            return $existing;
+        }
 
-        if (! $this->walletService->hasSufficientBalance($wallet, self::FEE)) {
-            throw new Exception(
-                'নতুন চেম্বার যোগ করতে কমপক্ষে ' . self::FEE . ' টাকা ব্যালেন্স লাগবে। অনুগ্রহ করে রিচার্জ করুন।'
-            );
+        $fee = $doctor->getCharge('chamber_request');
+        $wallet = $this->walletFor($doctor);
+        if (!$this->walletService->hasSufficientBalance($wallet, $fee)) {
+            throw new Exception('Insufficient wallet balance. Required: ৳' . number_format($fee, 2) . '. Please recharge and try again.');
         }
 
         $path = $pad->store('chamber-pads', 'public');
-
         try {
-            return DB::transaction(function () use ($doctor, $data, $wallet, $path) {
+            [$chamber, $created] = DB::transaction(function () use ($doctor, $data, $wallet, $path, $fee, $token) {
+                $lockedWallet = Wallet::whereKey($wallet->id)->lockForUpdate()->firstOrFail();
+                $existing = Chamber::where('doctor_id', $doctor->id)->where('request_token', $token)->first();
+                if ($existing) {
+                    return [$existing, false];
+                }
+                if ((float) $lockedWallet->balance < $fee) {
+                    throw new Exception('Insufficient wallet balance. Required: ৳' . number_format($fee, 2) . '. Please recharge and try again.');
+                }
 
                 $chamber = Chamber::create([
-                    'doctor_id'      => $doctor->id,
-                    'chamber_name'   => $data['chamber_name'],
-                    'hospital_name'  => $data['hospital_name'],
-                    'phone'          => $data['phone'],
-                    'email'          => $data['email'] ?? null,
-                    'address'        => $data['address'],
-                    'visiting_days'  => implode(', ', $data['visiting_days']),
-                    'visiting_time'  => $data['visiting_time'],
-                    'pad_image'      => $path,
-                    'status'         => false,
-                    'doctor_active'  => false,
+                    'doctor_id' => $doctor->id,
+                    'chamber_name' => $data['chamber_name'],
+                    'hospital_name' => $data['hospital_name'],
+                    'phone' => $data['phone'],
+                    'email' => $data['email'] ?? null,
+                    'address' => $data['address'],
+                    'visiting_days' => implode(', ', $data['visiting_days']),
+                    'visiting_time' => $data['visiting_time'],
+                    'pad_image' => $path,
+                    'status' => false,
+                    'doctor_active' => false,
                     'request_status' => Chamber::REQUEST_WAITING,
-                    'requested_at'   => now(),
-                    'fee_charged'    => self::FEE,
+                    'requested_at' => now(),
+                    'fee_charged' => $fee,
+                    'request_token' => $token,
                 ]);
 
                 $this->walletService->debit(
-                    $wallet,
-                    self::FEE,
-                    'নতুন চেম্বার রিকোয়েস্ট ফি (#' . $chamber->id . ')'
+                    $lockedWallet,
+                    $fee,
+                    'New chamber request fee (#' . $chamber->id . ')',
+                    'chamber-request:' . $doctor->id . ':' . $token
                 );
 
-                return $chamber;
+                return [$chamber, true];
             });
+
+            if (!$created) {
+                Storage::disk('public')->delete($path);
+            }
+
+            return $chamber;
         } catch (Throwable $e) {
             Storage::disk('public')->delete($path);
             throw $e;

@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAssistantRequest;
 use App\Http\Requests\UpdateAssistantRequest;
 use App\Models\DoctorAssistant;
-use App\Services\AssistantService;
-
+use App\Models\Chamber;
+use App\Services\AssistantService;
 class AssistantController extends Controller
 {
     public function __construct(protected AssistantService $service) {}
@@ -15,9 +15,11 @@ class AssistantController extends Controller
     public function index()
     {
         $doctor = auth()->user()->doctor;
-        $assistants = $doctor->assistants()->with('user')->latest()->get();
+        $assistants = $doctor->assistants()->with(['user', 'chambers'])->latest()->get();
+        $chambers = $doctor->chambers()->where('request_status', Chamber::REQUEST_APPROVED)
+            ->where('status', true)->get();
 
-        return view('doctor.assistants.index', compact('assistants'));
+        return view('doctor.assistants.index', compact('assistants', 'chambers'));
     }
 
     public function store(StoreAssistantRequest $request)

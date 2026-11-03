@@ -11,9 +11,9 @@
         color: #475569; font-size: .83rem; font-weight: 700; padding: .55rem .95rem; border-radius: 12px;
         text-decoration: none; transition: all .15s;
     }
-    .cr-tab:hover { border-color: #c7d2fe; background: #fafbff; color: #4338ca; }
+    .cr-tab:hover { border-color: #9bd2cc; background: #fafbff; color: #0a6b65; }
     .cr-tab .c { background: #f1f5f9; color: #64748b; border-radius: 999px; padding: .05rem .55rem; font-size: .74rem; font-weight: 800; }
-    .cr-tab.active { background: linear-gradient(135deg,#4f46e5,#4338ca); border-color: transparent; color: #fff; box-shadow: 0 6px 14px rgba(79,70,229,.25); }
+    .cr-tab.active { background: linear-gradient(135deg,#0c8c84,#0a6b65); border-color: transparent; color: #fff; box-shadow: 0 6px 14px rgba(12,140,132,.25); }
     .cr-tab.active .c { background: rgba(255,255,255,.22); color: #fff; }
 
     .cr-card { background: #fff; border: 1px solid #eef0f4; border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.03); overflow: hidden; }
@@ -25,10 +25,10 @@
     .cr-chamber { font-weight: 700; color: #0f172a; }
     .cr-hospital { font-size: .76rem; color: #94a3b8; }
     .cr-review {
-        display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; font-weight: 800; color: #4f46e5;
-        text-decoration: none; background: #eef2ff; padding: .4rem .85rem; border-radius: 10px; transition: background .15s;
+        display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; font-weight: 800; color: #0c8c84;
+        text-decoration: none; background: #e3f3f0; padding: .4rem .85rem; border-radius: 10px; transition: background .15s;
     }
-    .cr-review:hover { background: #e0e7ff; color: #4338ca; }
+    .cr-review:hover { background: #cfe9e5; color: #0a6b65; }
     .cr-empty { padding: 3rem 1rem; text-align: center; color: #94a3b8; }
     .cr-empty i { font-size: 2rem; display: block; margin-bottom: .6rem; color: #cbd5e1; }
 </style>

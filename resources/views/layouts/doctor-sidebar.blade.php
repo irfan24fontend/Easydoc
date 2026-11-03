@@ -213,12 +213,12 @@
         border-bottom: 1px solid rgba(255,255,255,.08);
     }
     .brand-icon {
-        width: 40px; height: 40px; border-radius: 11px; background: linear-gradient(135deg,#4f46e5,#4338ca);
+        width: 40px; height: 40px; border-radius: 11px; background: linear-gradient(135deg,#0c8c84,#0a6b65);
         display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.05rem;
-        box-shadow: 0 4px 10px rgba(79,70,229,.3);
+        box-shadow: 0 4px 10px rgba(12,140,132,.3);
     }
     .sidebar-brand h4 { margin: 0; color: #fff; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
-    .sidebar-brand span { color: #6366f1; font-size: 10px; font-weight: 700; letter-spacing: .1em; }
+    .sidebar-brand span { color: #0c8c84; font-size: 10px; font-weight: 700; letter-spacing: .1em; }
 
     .nav-section-label {
         display: block; text-transform: uppercase; font-size: 10.5px; font-weight: 700; letter-spacing: .08em;
@@ -232,7 +232,7 @@
     }
     .side-link i { width: 18px; text-align: center; font-size: 0.9rem; }
     .side-link:hover { background: rgba(255,255,255,.06); color: #fff; }
-    .side-link.active { background: linear-gradient(135deg,#4f46e5,#4338ca); color: #fff; box-shadow: 0 4px 10px rgba(79,70,229,.25); }
+    .side-link.active { background: linear-gradient(135deg,#0c8c84,#0a6b65); color: #fff; box-shadow: 0 4px 10px rgba(12,140,132,.25); }
     .side-link.disabled { opacity: 0.45; cursor: not-allowed; }
     .soon-badge { margin-left: auto; font-size: 9px; font-weight: 700; background: rgba(255,255,255,.1); padding: 2px 6px; border-radius: 999px; }
     .count-badge { margin-left: auto; font-size: 11px; font-weight: 800; background: #f59e0b; color: #0f172a; padding: 1px 8px; border-radius: 999px; }
@@ -251,14 +251,14 @@
     }
     .side-sublink i { width: 16px; text-align: center; font-size: 0.78rem; }
     .side-sublink:hover { background: rgba(255,255,255,.06); color: #fff; }
-    .side-sublink.active { background: linear-gradient(135deg,#4f46e5,#4338ca); color: #fff; box-shadow: 0 4px 10px rgba(79,70,229,.25); }
+    .side-sublink.active { background: linear-gradient(135deg,#0c8c84,#0a6b65); color: #fff; box-shadow: 0 4px 10px rgba(12,140,132,.25); }
     .side-sublink.disabled { opacity: .5; cursor: default; }
     .side-sublink.disabled:hover { background: transparent; color: #cbd5e1; }
 
     .sidebar-footer { padding: 1rem; border-top: 1px solid rgba(255,255,255,.08); background: rgba(0,0,0,.15); }
 
-    .wallet-mini { background: rgba(79,70,229,.15); border: 1px solid rgba(99,102,241,.3); border-radius: 10px; padding: 0.7rem 0.9rem; }
-    .wallet-mini-label { font-size: 0.72rem; color: #a5b4fc; font-weight: 600; }
+    .wallet-mini { background: rgba(12,140,132,.15); border: 1px solid rgba(12,140,132,.3); border-radius: 10px; padding: 0.7rem 0.9rem; }
+    .wallet-mini-label { font-size: 0.72rem; color: #a8dcd6; font-weight: 600; }
     .wallet-mini-amount { font-size: 0.95rem; color: #fff; font-weight: 800; }
 
     .footer-avatar {

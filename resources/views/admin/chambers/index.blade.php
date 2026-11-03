@@ -13,10 +13,10 @@
     .page-head p { color: #64748b; font-size: 0.875rem; margin: 0.25rem 0 0; }
 
     .btn-brand {
-        background: linear-gradient(135deg, #4f46e5, #4338ca);
+        background: linear-gradient(135deg, #0c8c84, #0a6b65);
         color: #fff !important; border: none; border-radius: 10px;
         font-weight: 600; font-size: 0.875rem; padding: 0.65rem 1.25rem;
-        box-shadow: 0 4px 10px rgba(79,70,229,.25);
+        box-shadow: 0 4px 10px rgba(12,140,132,.25);
     }
     .btn-brand:hover { filter: brightness(1.05); color: #fff; }
 
@@ -42,7 +42,7 @@
         width: 100%; padding: 0.55rem 0.75rem 0.55rem 2.1rem; border-radius: 10px;
         border: 1px solid #e2e8f0; font-size: 0.85rem; background: #f8fafc;
     }
-    .search-box input:focus { outline: none; border-color: #4f46e5; background: #fff; }
+    .search-box input:focus { outline: none; border-color: #0c8c84; background: #fff; }
 
     .saas-table { width: 100%; border-collapse: collapse; }
     .saas-table thead th {
@@ -54,8 +54,8 @@
     .saas-table tbody tr:last-child td { border-bottom: none; }
 
     .avatar-circle {
-        width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg,#eef2ff,#e0e7ff);
-        color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+        width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg,#e3f3f0,#cfe9e5);
+        color: #0a6b65; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
     }
     .doctor-name { font-weight: 700; color: #0f172a; font-size: 0.85rem; }
     .doctor-sub { font-size: 0.75rem; color: #94a3b8; }
@@ -65,13 +65,13 @@
     .pill-inactive { background: #f1f5f9; color: #64748b; }
     .pill-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
-    .tpl-badge { font-size: 0.72rem; font-weight: 600; background: #f5f3ff; color: #6d28d9; padding: 0.25rem 0.6rem; border-radius: 6px; }
+    .tpl-badge { font-size: 0.72rem; font-weight: 600; background: #f0f8f7; color: #0a6b65; padding: 0.25rem 0.6rem; border-radius: 6px; }
 
     .icon-btn {
         width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff;
         display: inline-flex; align-items: center; justify-content: center; color: #64748b; font-size: 0.8rem; transition: .15s;
     }
-    .icon-btn:hover { background: #4f46e5; border-color: #4f46e5; color: #fff; }
+    .icon-btn:hover { background: #0c8c84; border-color: #0c8c84; color: #fff; }
     .icon-btn.danger:hover { background: #dc2626; border-color: #dc2626; }
 
     .empty-state { text-align: center; padding: 4rem 1rem; }
@@ -102,7 +102,7 @@
         <div class="row g-3 mb-4">
             <div class="col-sm-6 col-lg-4">
                 <div class="stat-card">
-                    <div class="stat-icon" style="background:#eef2ff; color:#4f46e5;"><i class="fa-solid fa-hospital"></i></div>
+                    <div class="stat-icon" style="background:#e3f3f0; color:#0c8c84;"><i class="fa-solid fa-hospital"></i></div>
                     <div>
                         <div class="stat-num">{{ $chambers->total() }}</div>
                         <div class="stat-label">মোট চেম্বার</div>

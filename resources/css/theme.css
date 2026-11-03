@@ -1,0 +1,77 @@
+:root {
+    --ed-ink: #10262b;
+    --ed-ink-soft: #46606a;
+    --ed-teal: #0c8c84;
+    --ed-teal-deep: #0a6b65;
+    --ed-mint: #e3f3f0;
+    --ed-mist: #f3f7f7;
+    --ed-line: #d3e0e0;
+
+    --bs-primary: var(--ed-teal);
+    --bs-primary-rgb: 12, 140, 132;
+    --bs-link-color: var(--ed-teal-deep);
+    --bs-link-hover-color: #075f5a;
+    --bs-body-color: var(--ed-ink);
+    --bs-body-bg: var(--ed-mist);
+    --bs-border-color: var(--ed-line);
+}
+
+body {
+    color: var(--ed-ink);
+    background-color: var(--ed-mist);
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--ed-teal);
+    --bs-btn-border-color: var(--ed-teal);
+    --bs-btn-hover-bg: var(--ed-teal-deep);
+    --bs-btn-hover-border-color: var(--ed-teal-deep);
+    --bs-btn-active-bg: #075f5a;
+    --bs-btn-active-border-color: #075f5a;
+    --bs-btn-focus-shadow-rgb: 12, 140, 132;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--ed-teal-deep);
+    --bs-btn-border-color: #9bc9c4;
+    --bs-btn-hover-bg: var(--ed-teal);
+    --bs-btn-hover-border-color: var(--ed-teal);
+    --bs-btn-active-bg: var(--ed-teal-deep);
+    --bs-btn-active-border-color: var(--ed-teal-deep);
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: #71b9b2;
+    box-shadow: 0 0 0 .2rem rgba(12, 140, 132, .16);
+}
+
+.form-check-input:checked {
+    background-color: var(--ed-teal);
+    border-color: var(--ed-teal);
+}
+
+.page-item.active .page-link {
+    background-color: var(--ed-teal);
+    border-color: var(--ed-teal);
+}
+
+.text-primary { color: var(--ed-teal-deep) !important; }
+.bg-primary { background-color: var(--ed-teal) !important; }
+
+@media screen {
+    html body {
+        cursor: url("/images/medical-pointer.svg") 4 3, auto;
+    }
+
+    html body a,
+    html body button,
+    html body [role="button"],
+    html body label[for],
+    html body select,
+    html body input[type="checkbox"],
+    html body input[type="radio"] {
+        cursor: url("/images/medical-pointer.svg") 4 3, pointer !important;
+    }
+}

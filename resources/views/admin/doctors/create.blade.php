@@ -29,8 +29,8 @@
         transition: all 0.2s ease;
     }
     .modern-input:focus, .modern-select:focus {
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        border-color: #0c8c84;
+        box-shadow: 0 0 0 4px rgba(12, 140, 132, 0.1);
         outline: none;
     }
     .form-label-custom {
@@ -49,11 +49,11 @@
         background-color: #f8fafc;
     }
     .image-dropzone:hover {
-        border-color: #4f46e5;
-        background-color: rgba(79, 70, 229, 0.02);
+        border-color: #0c8c84;
+        background-color: rgba(12, 140, 132, 0.02);
     }
     .btn-gradient {
-        background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+        background: linear-gradient(135deg, #0c8c84 0%, #075f5a 100%);
         color: white !important;
         border: none;
         border-radius: 10px;
@@ -62,7 +62,7 @@
     }
     .btn-gradient:hover {
         transform: translateY(-1px);
-        box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        box-shadow: 0 10px 15px -3px rgba(12, 140, 132, 0.3);
     }
 </style>
 
@@ -72,7 +72,7 @@
         <!-- Header Section -->
         <div class="d-flex justify-content-between align-items-center mb-5">
             <div>
-                <span class="badge bg-indigo-50 text-indigo-700 text-uppercase tracking-wider px-2.5 py-1 mb-2 font-semibold" style="font-size: 0.65rem; background-color: #e0e7ff; color: #4338ca;">Medical Network</span>
+                <span class="badge bg-teal-50 text-teal-800 text-uppercase tracking-wider px-2.5 py-1 mb-2 font-semibold" style="font-size: 0.65rem; background-color: #cfe9e5; color: #0a6b65;">Medical Network</span>
                 <h1 class="h2 fw-bold text-slate-900 m-0">Onboard Professional</h1>
             </div>
             <a href="{{ url()->previous() }}" class="btn btn-light border rounded-pill px-4 text-secondary small fw-medium transition-all">
@@ -90,7 +90,7 @@
                     <!-- Box 1: Profile Platform Identity -->
                     <div class="glass-card p-4 mb-4">
                         <div class="d-flex items-center gap-2 mb-4">
-                            <div class="p-2 bg-indigo-50 text-indigo-600 rounded-3" style="background-color: #e0e7ff; color: #4f46e5;">
+                            <div class="p-2 bg-teal-50 text-teal-700 rounded-3" style="background-color: #cfe9e5; color: #0c8c84;">
                                 <i class="fas fa-shield-alt fs-5"></i>
                             </div>
                             <div>
@@ -195,7 +195,7 @@
                                 <input type="file" name="photo" id="avatarInput" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" style="z-index: 5;">
                                 <div id="dropzoneContent">
                                     <div class="d-inline-flex p-3 bg-white rounded-circle shadow-sm mb-2 text-slate-400">
-                                        <i class="fas fa-cloud-upload-alt fs-4 text-indigo-500"></i>
+                                        <i class="fas fa-cloud-upload-alt fs-4 text-teal-600"></i>
                                     </div>
                                     <p class="small fw-semibold text-slate-700 m-0">Upload new avatar</p>
                                     <p class="text-muted m-0" style="font-size: 11px;">Drag file here or browse</p>

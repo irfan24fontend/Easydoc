@@ -2,7 +2,9 @@
 
 namespace App\Models;
 use \App\Models\Concerns\HasShareLink;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Prescription extends Model
 {
@@ -56,5 +58,30 @@ class Prescription extends Model
     public function isInvestigationOnly(): bool
     {
         return $this->type === 'investigation_only';
+    }
+
+    /** Create a stable, unguessable public token used only to verify this prescription. */
+    public function ensureVerificationToken(): string
+    {
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            if ($this->verification_token) {
+                return $this->verification_token;
+            }
+
+            $token = Str::random(40);
+
+            try {
+                static::query()
+                    ->whereKey($this->getKey())
+                    ->whereNull('verification_token')
+                    ->update(['verification_token' => $token, 'updated_at' => now()]);
+            } catch (UniqueConstraintViolationException) {
+                continue;
+            }
+
+            $this->refresh();
+        }
+
+        throw new \RuntimeException('Unable to create a prescription verification link.');
     }
 }

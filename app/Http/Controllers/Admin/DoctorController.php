@@ -39,19 +39,14 @@ class DoctorController extends Controller
             'rejected' => Doctor::where('approval_status', Doctor::STATUS_REJECTED)->count(),
         ];
 
-        return view(
-            'admin.doctors.index',
-            compact('doctors', 'counts', 'status')
-        );
+        return view('admin.doctors.index', compact('doctors', 'counts', 'status'));
     }
 
 
 
     public function create()
     {
-        return view(
-            'admin.doctors.create'
-        );
+        return view('admin.doctors.create');
     }
 
 
@@ -81,10 +76,7 @@ class DoctorController extends Controller
         $doctor->load('user');
 
 
-        return view(
-            'admin.doctors.show',
-            compact('doctor')
-        );
+        return view('admin.doctors.show', compact('doctor'));
 
     }
 
@@ -96,10 +88,7 @@ class DoctorController extends Controller
         $doctor->load('user');
 
 
-        return view(
-            'admin.doctors.edit',
-            compact('doctor')
-        );
+        return view('admin.doctors.edit', compact('doctor'));
 
     }
 
@@ -149,6 +138,22 @@ class DoctorController extends Controller
                 'Doctor updated successfully'
             );
 
+    }
+
+    public function updateCharges(Request $request, Doctor $doctor)
+    {
+        $data = $request->validate([
+            'prescription_charge' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'investigation_advice_charge' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'ai_diagnosis_charge' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'ai_medicine_charge' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'ai_interaction_charge' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'chamber_request_charge' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+        ]);
+
+        $doctor->update($data);
+
+        return back()->with('success', 'Doctor charge settings updated.');
     }
 
 

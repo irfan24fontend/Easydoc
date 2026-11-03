@@ -16,7 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Invoice {{ $invoice->invoice_no }}</title>
     <style>
-        :root { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --brand:#4f46e5; }
+        :root { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --brand:#0c8c84; }
         * { box-sizing:border-box; }
         body { margin:0; background:#e5e7eb; color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Bengali",sans-serif; font-size:14px; }
 

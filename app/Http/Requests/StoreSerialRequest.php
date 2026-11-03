@@ -15,6 +15,7 @@ class StoreSerialRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'chamber_id' => 'required|integer|exists:chambers,id',
             // ফাঁকা থাকলে আজকের তারিখ; আজ থেকে সর্বোচ্চ ৩০ দিন পর্যন্ত advance সিরিয়াল
             'serial_date' => [
                 'nullable',

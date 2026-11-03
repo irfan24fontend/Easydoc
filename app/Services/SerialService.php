@@ -46,10 +46,11 @@ class SerialService
     }
 
     /** নির্দিষ্ট তারিখের কিউ */
-    public function queueFor(Doctor $doctor, string $date)
+    public function queueFor(Doctor $doctor, string $date, ?int $chamberId = null)
     {
         return Serial::with('patient')
             ->where('doctor_id', $doctor->id)
+            ->when($chamberId, fn ($query) => $query->where('chamber_id', $chamberId))
             ->where('serial_date', $date)
             ->orderBy('serial_number')
             ->get();
@@ -61,9 +62,10 @@ class SerialService
     }
 
     /** আজ ও সামনের যেসব তারিখে সিরিয়াল আছে (তারিখ + সংখ্যা) */
-    public function upcomingDates(Doctor $doctor, int $limit = 7)
+    public function upcomingDates(Doctor $doctor, int $limit = 7, ?int $chamberId = null)
     {
         return Serial::where('doctor_id', $doctor->id)
+            ->when($chamberId, fn ($query) => $query->where('chamber_id', $chamberId))
             ->where('serial_date', '>=', self::today())
             ->where('status', '!=', 'cancelled')
             ->selectRaw('serial_date, COUNT(*) as total')
@@ -95,7 +97,11 @@ class SerialService
      */
     public function create(Doctor $doctor, User $by, array $data): Serial
     {
-        $chamber = $doctor->activeChamber();
+        $chamber = $doctor->chambers()->operational()->whereKey($data['chamber_id'] ?? 0)->first();
+        $assistant = $by->assistantProfile;
+        if (! $chamber || ! $assistant || $assistant->doctor_id !== $doctor->id || ! $assistant->chambers()->whereKey($chamber->id)->exists()) {
+            throw new Exception('This chamber is not assigned to your account.');
+        }
         $today = self::today();
         $date = $this->normalizeDate($data['serial_date'] ?? null);
 

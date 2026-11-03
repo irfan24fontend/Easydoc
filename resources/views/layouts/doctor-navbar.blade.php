@@ -57,7 +57,7 @@
     }
 
     .chamber-chip {
-        font-size: 0.8rem; font-weight: 700; background: #eef2ff; color: #4338ca;
+        font-size: 0.8rem; font-weight: 700; background: #e3f3f0; color: #0a6b65;
         padding: 0.45rem 0.9rem; border-radius: 999px;
     }
     .chamber-chip.chip-warning { background: #fef3c7; color: #92400e; }
@@ -70,14 +70,14 @@
     }
     .icon-pill:hover { background: #f8fafc; }
     .sidebar-toggle { flex-shrink: 0; }
-    .sidebar-toggle:hover { color: #4f46e5; border-color: #c7d2fe; background: #eef2ff; }
+    .sidebar-toggle:hover { color: #0c8c84; border-color: #9bd2cc; background: #e3f3f0; }
 
     .profile-pill {
         display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid #e2e8f0;
         border-radius: 999px; padding: 0.35rem 0.9rem 0.35rem 0.35rem;
     }
     .profile-avatar {
-        width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#4f46e5,#4338ca);
+        width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#0c8c84,#0a6b65);
         color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem;
     }
     .profile-name { font-size: 0.8rem; font-weight: 700; color: #0f172a; line-height: 1.1; }

@@ -21,7 +21,7 @@
     .panel-card { background: #fff; border: 1px solid #eef0f4; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
     .panel-head { padding: 1.1rem 1.4rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
     .panel-head h6 { margin: 0; font-weight: 800; color: #0f172a; font-size: 0.9rem; }
-    .panel-head a { font-size: 0.78rem; font-weight: 700; color: #4f46e5; text-decoration: none; }
+    .panel-head a { font-size: 0.78rem; font-weight: 700; color: #0c8c84; text-decoration: none; }
 
     .saas-table { width: 100%; }
     .saas-table thead th {
@@ -32,16 +32,16 @@
     .saas-table tbody tr:last-child td { border-bottom: none; }
 
     .avatar-circle {
-        width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg,#eef2ff,#e0e7ff);
-        color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem;
+        width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg,#e3f3f0,#cfe9e5);
+        color: #0a6b65; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem;
     }
 
     .quick-action {
         display: flex; align-items: center; gap: 12px; padding: 0.9rem 1.1rem; border: 1px solid #eef0f4;
         border-radius: 12px; text-decoration: none; color: #0f172a; font-weight: 700; font-size: 0.85rem; margin-bottom: 0.6rem;
     }
-    .quick-action:hover { border-color: #4f46e5; background: #fafbff; color: #0f172a; }
-    .quick-action i { width: 36px; height: 36px; border-radius: 9px; background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; }
+    .quick-action:hover { border-color: #0c8c84; background: #fafbff; color: #0f172a; }
+    .quick-action i { width: 36px; height: 36px; border-radius: 9px; background: #e3f3f0; color: #0c8c84; display: flex; align-items: center; justify-content: center; }
 </style>
 
 <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 page-head mb-4">
@@ -55,7 +55,7 @@
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card">
             <div>
-                <div class="stat-icon" style="background:#eef2ff; color:#4f46e5;"><i class="fa-solid fa-user-doctor"></i></div>
+                <div class="stat-icon" style="background:#e3f3f0; color:#0c8c84;"><i class="fa-solid fa-user-doctor"></i></div>
                 <div class="stat-num">{{ $stats['total_doctors'] }}</div>
                 <div class="stat-label">মোট ডাক্তার</div>
             </div>
@@ -85,7 +85,7 @@
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card">
             <div>
-                <div class="stat-icon" style="background:#ede9fe; color:#7c3aed;"><i class="fa-solid fa-wallet"></i></div>
+                <div class="stat-icon" style="background:#daf0ed; color:#0c8c84;"><i class="fa-solid fa-wallet"></i></div>
                 <div class="stat-num">৳{{ number_format($stats['wallet_balance'], 2) }}</div>
                 <div class="stat-label">মোট ওয়ালেট ব্যালেন্স</div>
             </div>

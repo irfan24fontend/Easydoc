@@ -41,7 +41,7 @@
 .rx-linkbox input{flex:1;min-width:0;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px}
 .rx-linkbox button,.rx-b{padding:10px 14px;border:0;border-radius:8px;background:#0f766e;color:#fff;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;line-height:1.2}
 .rx-actions{display:flex;flex-wrap:wrap;gap:8px}
-.rx-jpg{background:#2563eb}.rx-pdf{background:#dc2626}.rx-print{background:#475569}.rx-wa{background:#16a34a}.rx-sms{background:#7c3aed}.rx-native{background:#0891b2}.rx-revoke{background:#fff;color:#b91c1c;border:1px solid #fecaca}
+.rx-jpg{background:#2563eb}.rx-pdf{background:#dc2626}.rx-print{background:#475569}.rx-wa{background:#16a34a}.rx-sms{background:#0c8c84}.rx-native{background:#0c8c84}.rx-revoke{background:#fff;color:#b91c1c;border:1px solid #fecaca}
 @media(max-width:520px){.rx-actions .rx-b{flex:1 1 30%;text-align:center}}
 @media print{.rx-sharebar{display:none!important}}
 </style>

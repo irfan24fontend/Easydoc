@@ -56,8 +56,8 @@
             --bar-bg: #0f172a;
             --bar-fg: #e2e8f0;
             --bar-muted: #94a3b8;
-            --accent: #4f46e5;
-            --accent-hover: #4338ca;
+            --accent: #0c8c84;
+            --accent-hover: #0a6b65;
             --stage-bg: #e5e7eb;
             --success-bg: #dcfce7;
             --success-fg: #166534;
@@ -150,6 +150,15 @@
             flex: none;
             position: relative;
         }
+        .rx-verification {
+            position: absolute; right: 5mm; bottom: 5mm; z-index: 5;
+            width: 27mm; padding: 1.5mm; background: #fff; color: #0f172a;
+            border: .25mm solid #cbd5e1; border-radius: 1mm; text-align: center;
+            font: 7pt/1.2 Arial, sans-serif;
+        }
+        .rx-verification-code { width: 22mm; height: 22mm; margin: 0 auto 1mm; }
+        .rx-verification-code img, .rx-verification-code canvas { display: block; width: 100%; height: 100%; }
+        .rx-verification-url { display: block; margin-top: .5mm; color: #334155; font-size: 5.5pt; overflow-wrap: anywhere; }
 
         /* ---------- Toast ---------- */
         .rx-toast {
@@ -172,7 +181,7 @@
         .rx-card .b { padding: 11px 14px; border: 0; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; color: #fff; background: #0f766e; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; font-family: inherit; }
         .rx-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
         .rx-grid .b { width: 100%; }
-        .b-wa { background: #16a34a !important; } .b-sms { background: #7c3aed !important; } .b-nat { background: #0891b2 !important; }
+        .b-wa { background: #16a34a !important; } .b-sms { background: #0c8c84 !important; } .b-nat { background: #0c8c84 !important; }
         .rx-foot { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
         .b-danger { background: #fff !important; color: #b91c1c !important; border: 1px solid #fecaca !important; }
         .b-close { background: #e2e8f0 !important; color: #0f172a !important; }
@@ -290,7 +299,7 @@
 
                     <form method="POST"
                           action="{{ route('doctor.prescriptions.reprint', $prescription->id) }}"
-                          onsubmit="return confirm('Reprint this prescription? Reprint rules/charges may apply.');">
+                          onsubmit="return confirm('Reprint this prescription? Reprinting is free.');">
                         @csrf
                         <button type="submit" class="btn" title="Reprint">
                             <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.1A7 7 0 1117 10a1 1 0 11-2 0 5 5 0 10-1.6 3.7 1 1 0 111.3 1.5A7 7 0 015 12.9V15a1 1 0 11-2 0V3a1 1 0 011-1z" clip-rule="evenodd"/></svg>
@@ -319,6 +328,11 @@
     <main class="rx-stage" id="stage">
         <div class="rx-sheet" id="sheet">
             {!! $html !!}
+            <aside class="rx-verification" aria-label="Prescription authenticity verification">
+                <div id="verificationQr" class="rx-verification-code"></div>
+                <strong>Verify prescription</strong>
+                <a class="rx-verification-url" href="{{ $verificationUrl }}">Scan to verify</a>
+            </aside>
         </div>
     </main>
 
@@ -349,9 +363,19 @@
 
     <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
     (function () {
         var CFG = @json($cfg);
+        var verificationQr = document.getElementById('verificationQr');
+        if (verificationQr && window.QRCode) {
+            new QRCode(verificationQr, {
+                text: @json($verificationUrl),
+                width: 120,
+                height: 120,
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
         var stage = document.getElementById('stage');
         var sheet = document.getElementById('sheet');
         var label = document.getElementById('zoomLabel');

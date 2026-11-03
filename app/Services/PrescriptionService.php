@@ -6,6 +6,7 @@ use App\Models\Doctor;
 use App\Models\Prescription;
 use App\Models\PrescriptionMedicine;
 use App\Models\Medicine;
+use App\Models\Wallet;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
@@ -19,37 +20,7 @@ class PrescriptionService
 
     public function create(Doctor $doctor, array $data): Prescription
     {
-        // Offline-sync idempotency: একই offline_ref আগেই sync হয়ে গিয়ে থাকলে
-        // (যেমন নেট flaky হয়ে একই batch দুইবার POST হলে) নতুন করে আবার তৈরি/চার্জ না করে
-        // আগের prescription-টাই ফেরত দাও।
-        if (!empty($data['offline_ref'])) {
-            $existing = Prescription::where('doctor_id', $doctor->id)
-                ->where('offline_ref', $data['offline_ref'])
-                ->first();
-
-            if ($existing) {
-                return $existing;
-            }
-        }
-
-        $chamber = $doctor->activeChamber();
-
-        if (!$chamber) {
-            throw new Exception('আপনার কোনো Active চেম্বার নেই। প্রেসক্রিপশন তৈরির আগে সুপার এডমিনের সাথে যোগাযোগ করে চেম্বার active করান।');
-        }
-
         $isInvestigation = ($data['type'] ?? 'full') === 'investigation_only';
-
-        $wallet = $doctor->wallet;
-        $charge = $isInvestigation
-            ? (float) config('easydoc.investigation_advice_charge', 2)
-            : $doctor->getPrescriptionCharge();
-
-        if (!$wallet || $wallet->balance < $charge) {
-            throw new Exception('আপনার ব্যালেন্স অপর্যাপ্ত। এটা তৈরি করতে ন্যূনতম ৳' . number_format($charge, 2) . ' ব্যালেন্স প্রয়োজন। সুপার এডমিনের সাথে যোগাযোগ করে রিচার্জ করুন।');
-        }
-
-        // Report দেখে লেখা চূড়ান্ত প্রেসক্রিপশন হলে আগের Investigation Advice এর সাথে লিংক হবে
         $parentId = null;
         if (!$isInvestigation && !empty($data['parent_prescription_id'])) {
             $parentId = Prescription::where('doctor_id', $doctor->id)
@@ -58,7 +29,31 @@ class PrescriptionService
                 ->value('id');
         }
 
-        return DB::transaction(function () use ($doctor, $data, $chamber, $wallet, $charge, $isInvestigation, $parentId) {
+        return DB::transaction(function () use ($doctor, $data, $isInvestigation, $parentId) {
+            // Serialize prescription submissions for this doctor before checking the request token.
+            $wallet = Wallet::where('doctor_id', $doctor->id)->lockForUpdate()->first();
+            if (!$wallet) {
+                throw new Exception('Wallet not found. Please contact the administrator.');
+            }
+
+            if (!empty($data['offline_ref'])) {
+                $existing = Prescription::where('doctor_id', $doctor->id)
+                    ->where('offline_ref', $data['offline_ref'])
+                    ->first();
+                if ($existing) {
+                    return $existing;
+                }
+            }
+
+            $chamber = $doctor->activeChamber();
+            if (!$chamber) {
+                throw new Exception('No active chamber is available for this doctor.');
+            }
+
+            $charge = $doctor->getCharge($isInvestigation ? 'investigation_advice' : 'prescription');
+            if ((float) $wallet->balance < $charge) {
+                throw new Exception('Insufficient wallet balance. Required: ৳' . number_format($charge, 2) . '. Please recharge and try again.');
+            }
 
             $patient = $this->patientService->findOrCreate($doctor->id, [
                 'name' => $data['patient_name'],
@@ -90,11 +85,8 @@ class PrescriptionService
                 'offline_ref' => $data['offline_ref'] ?? null,
             ]);
 
-            $medicines = $isInvestigation ? [] : ($data['medicines'] ?? []);
-
-            foreach ($medicines as $i => $row) {
+            foreach (($isInvestigation ? [] : ($data['medicines'] ?? [])) as $i => $row) {
                 $medicine = !empty($row['medicine_id']) ? Medicine::find($row['medicine_id']) : null;
-
                 PrescriptionMedicine::create([
                     'prescription_id' => $prescription->id,
                     'medicine_id' => $medicine?->id,
@@ -108,19 +100,21 @@ class PrescriptionService
                     'instruction' => $row['instruction'] ?? null,
                     'sort_order' => $i,
                 ]);
-
                 if ($medicine) {
                     $this->suggestionService->recordUsage($doctor->id, $medicine->id);
                 }
             }
+
             if (!empty($data['serial_id'])) {
                 $serial = Serial::where('doctor_id', $doctor->id)->find($data['serial_id']);
                 if ($serial && !in_array($serial->status, ['done', 'cancelled'])) {
                     $serial->update(['status' => 'done', 'prescription_id' => $prescription->id]);
                 }
             }
+
             $label = $isInvestigation ? 'Investigation advice' : 'Prescription';
-            $this->walletService->debit($wallet, $charge, "{$label} #{$prescription->id} charge");
+            $idempotencyKey = 'prescription:' . $doctor->id . ':' . ($data['offline_ref'] ?? $prescription->id);
+            $this->walletService->debit($wallet, $charge, "{$label} #{$prescription->id} charge", $idempotencyKey);
 
             return $prescription;
         });
@@ -152,6 +146,9 @@ class PrescriptionService
                 'followup_date' => $data['followup_date'] ?? null,
             ]);
 
+            // A changed prescription invalidates every QR printed for its old contents.
+            $prescription->forceFill(['verification_token' => null])->save();
+
             $prescription->medicines()->delete();
 
             foreach (($data['medicines'] ?? []) as $i => $row) {
@@ -178,13 +175,7 @@ class PrescriptionService
 
     public function reprint(Doctor $doctor, Prescription $prescription): void
     {
-        $wallet = $doctor->wallet;
-        $charge = (float) config('easydoc.reprint_charge', 5);
-
-        if (!$wallet || $wallet->balance < $charge) {
-            throw new Exception('Reprint করতে ন্যূনতম ৳' . number_format($charge, 2) . ' ব্যালেন্স প্রয়োজন। ব্যালেন্স অপর্যাপ্ত।');
-        }
-
-        $this->walletService->debit($wallet, $charge, "Reprint charge for Prescription #{$prescription->id}");
+        // Reprinting an existing prescription is always free.
     }
+
 }

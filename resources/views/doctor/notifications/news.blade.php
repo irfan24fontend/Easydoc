@@ -8,7 +8,7 @@
     .nw-card { background:#fff; border:1px solid var(--wl-line); border-radius:18px; padding:1.2rem 1.35rem; }
     .nw-card + .nw-card { margin-top:.9rem; }
     .nw-type { display:inline-flex; align-items:center; gap:.35rem; font-size:.7rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; padding:.25rem .65rem; border-radius:999px; }
-    .nw-type.feature { background:#ede9fe; color:#6d28d9; }
+    .nw-type.feature { background:#daf0ed; color:#0a6b65; }
     .nw-type.news { background:#e0f2fe; color:#0369a1; }
     .nw-type.notice { background:#fef3c7; color:#b45309; }
     .nw-title { font-size:1.1rem; font-weight:800; color:var(--wl-ink); margin:.55rem 0 .35rem; }

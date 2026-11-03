@@ -8,8 +8,7 @@ use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\Prescription;
 use App\Services\PatientService;
-use Illuminate\Http\Request;
-
+use Illuminate\Http\Request;
 class PatientController extends Controller
 {
     public function __construct(protected PatientService $service) {}
@@ -90,6 +89,7 @@ class PatientController extends Controller
         $patients = $this->sorted($this->filtered($request, $doctor), $request->query('sort'))
             ->paginate(15)
             ->withQueryString();
+        $patients->getCollection()->each(fn (Patient $patient) => $patient->append('patient_code'));
 
         $base = Patient::where('doctor_id', $doctor->id);
 
@@ -112,6 +112,7 @@ class PatientController extends Controller
     public function show(Patient $patient)
     {
         $this->own($patient);
+        $patient->append('patient_code');
         $today = now()->toDateString();
 
         $prescriptions = $patient->prescriptions()
@@ -230,21 +231,28 @@ class PatientController extends Controller
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF"); // Excel-e Bangla thik dekhanor jonno BOM
 
+            // Patient-controlled values must not be interpreted as spreadsheet formulas.
+            $csvCell = static function ($value): string {
+                $value = (string) ($value ?? '');
+
+                return preg_match('/^[\x00-\x20]*[=+\-@]/', $value) ? "'{$value}" : $value;
+            };
+
             fputcsv($out, ['Patient ID', 'Name', 'Mobile', 'Age', 'Gender', 'Weight (kg)', 'Blood Group', 'Address', 'Visits', 'Last Visit', 'Registered']);
 
             foreach ($rows as $p) {
                 fputcsv($out, [
-                    $p->patient_code,
-                    $p->name,
-                    $p->mobile,
-                    $p->age,
-                    $p->gender,
-                    $p->weight,
-                    $p->blood_group,
-                    $p->address,
-                    $p->visits_count,
-                    $p->last_visit_at ? \Carbon\Carbon::parse($p->last_visit_at)->format('Y-m-d') : '',
-                    $p->created_at?->format('Y-m-d'),
+                    $csvCell($p->patient_code),
+                    $csvCell($p->name),
+                    $csvCell($p->mobile),
+                    $csvCell($p->age),
+                    $csvCell($p->gender),
+                    $csvCell($p->weight),
+                    $csvCell($p->blood_group),
+                    $csvCell($p->address),
+                    $csvCell($p->visits_count),
+                    $csvCell($p->last_visit_at ? \Carbon\Carbon::parse($p->last_visit_at)->format('Y-m-d') : ''),
+                    $csvCell($p->created_at?->format('Y-m-d')),
                 ]);
             }
 

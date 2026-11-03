@@ -3,14 +3,10 @@
 @section('title', 'Create Prescription')
 
 @push('styles')
-    {{-- Tailwind is used by the existing prescription form. Disable its global reset so it does not restyle the dashboard shell. --}}
-    <script>
-        window.tailwind = window.tailwind || {};
-        window.tailwind.config = { corePlugins: { preflight: false } };
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .prescription-builder { width: 100%; color: #1e293b; }
+        .prescription-builder #prescriptionForm { width: 100%; min-width: 0; }
+        .prescription-builder .rx-form-grid { width: 100%; max-width: none; margin-left: 0; margin-right: 0; }
         .prescription-builder *,
         .prescription-builder *::before,
         .prescription-builder *::after { box-sizing: border-box; }
@@ -45,10 +41,10 @@
         .rx-dot { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: 0; padding: 0; position: relative; font-size: 10px; font-weight: 700; color: #94a3b8; line-height: 1.1; }
         .rx-dot::before { content: ''; position: absolute; top: 13px; left: -50%; width: 100%; height: 2px; background: #e2e8f0; z-index: 0; }
         .rx-dot:first-child::before { display: none; }
-        .rx-dot.done::before, .rx-dot.active::before { background: #6366f1; }
+        .rx-dot.done::before, .rx-dot.active::before { background: #0c8c84; }
         .rx-dot-c { position: relative; z-index: 1; width: 28px; height: 28px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: #fff; border: 2px solid #cbd5e1; font-size: 12px; }
-        .rx-dot.active { color: #4338ca; }
-        .rx-dot.active .rx-dot-c { background: #4f46e5; border-color: #4f46e5; color: #fff; box-shadow: 0 0 0 4px #e0e7ff; }
+        .rx-dot.active { color: #0a6b65; }
+        .rx-dot.active .rx-dot-c { background: #0c8c84; border-color: #0c8c84; color: #fff; box-shadow: 0 0 0 4px #cfe9e5; }
         .rx-dot.done { color: #059669; }
         .rx-dot.done .rx-dot-c { background: #10b981; border-color: #10b981; color: #fff; }
         .rx-badge { position: absolute; top: -5px; left: calc(50% + 8px); z-index: 2; background: #f43f5e; color: #fff; font-size: 9px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px; display: flex; align-items: center; justify-content: center; }
@@ -57,7 +53,7 @@
         .rx-nav-btn { border: 0; border-radius: 12px; padding: 11px 16px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
         .rx-nav-back { background: #f1f5f9; color: #475569; }
         .rx-nav-back:disabled { opacity: .4; }
-        .rx-nav-next { background: #4f46e5; color: #fff; box-shadow: 0 4px 10px rgba(79,70,229,.3); }
+        .rx-nav-next { background: #0c8c84; color: #fff; box-shadow: 0 4px 10px rgba(12,140,132,.3); }
         .rx-nav-next.rx-save { background: #059669; box-shadow: 0 4px 10px rgba(5,150,105,.3); }
         @keyframes rxIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
         @media (max-width: 1023px) {
@@ -77,7 +73,7 @@
         .fld-opt { padding: 8px 12px; font-size: 13px; color: #334155; cursor: pointer; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 1px solid #f1f5f9; }
         .fld-opt:last-child { border-bottom: 0; }
         .fld-opt small { font-size: 10px; color: #94a3b8; white-space: nowrap; }
-        .fld-opt.on, .fld-opt:hover { background: #eef2ff; color: #3730a3; }
+        .fld-opt.on, .fld-opt:hover { background: #e3f3f0; color: #075f5a; }
         @media (pointer: coarse) { .fld-opt { padding: 11px 12px; } }
 
         /* ============ MEDICINE TABLE -> CARDS (mobile) ============ */
@@ -116,14 +112,14 @@
         @media (min-width: 640px) { #rxOfflineOutbox { align-items: center; } #rxOfflineOutbox .rxo-panel { border-radius: 20px; margin-bottom: 0; } }
         #rxOfflineOutbox .rxo-panel-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #e2e8f0; font-weight: 800; color: #0f172a; }
         #rxOfflineOutbox .rxo-panel-head .rxo-actions { display: flex; gap: 8px; align-items: center; }
-        #rxOfflineOutbox .rxo-sync-btn { background: #4f46e5; color: #fff; border: 0; border-radius: 10px; padding: 6px 12px; font-size: 12px; font-weight: 700; }
+        #rxOfflineOutbox .rxo-sync-btn { background: #0c8c84; color: #fff; border: 0; border-radius: 10px; padding: 6px 12px; font-size: 12px; font-weight: 700; }
         #rxOfflineOutbox .rxo-close { border: 0; background: #f1f5f9; width: 30px; height: 30px; border-radius: 10px; color: #64748b; font-size: 14px; }
         #rxOfflineOutbox .rxo-list { overflow-y: auto; padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px)); }
         #rxOfflineOutbox .rxo-empty { text-align: center; color: #94a3b8; font-size: 13px; padding: 30px 10px; }
         .rxo-item { border: 1px solid #e2e8f0; border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; }
         .rxo-item .rxo-item-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
         .rxo-item .rxo-name { font-weight: 700; font-size: 13.5px; color: #0f172a; }
-        .rxo-item .rxo-charge { font-size: 12px; font-weight: 700; color: #4f46e5; white-space: nowrap; }
+        .rxo-item .rxo-charge { font-size: 12px; font-weight: 700; color: #0c8c84; white-space: nowrap; }
         .rxo-item .rxo-meta { font-size: 11px; color: #94a3b8; margin-top: 2px; }
         .rxo-item .rxo-err { font-size: 11.5px; color: #e11d48; font-weight: 700; margin-top: 6px; background: #fff1f2; border-radius: 8px; padding: 5px 8px; }
         .rxo-item .rxo-pill { display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: #fef3c7; color: #92400e; margin-top: 6px; }
@@ -131,32 +127,32 @@
         .rxo-item .rxo-print-btn { border: 1px solid #e2e8f0; background: #fff; color: #475569; border-radius: 8px; padding: 3px 10px; font-size: 11px; font-weight: 700; margin-top: 6px; }
 
         /* ============ MODERN SKIN ============ */
-        .rx-hero { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #0ea5e9 100%); border-radius: 22px; padding: 18px 22px; box-shadow: 0 12px 32px rgba(79,70,229,.28); margin-bottom: 12px !important; }
+        .rx-hero { background: linear-gradient(135deg, #0c8c84 0%, #0c8c84 55%, #0ea5e9 100%); border-radius: 22px; padding: 18px 22px; box-shadow: 0 12px 32px rgba(12,140,132,.28); margin-bottom: 12px !important; }
         .rx-hero h1 { color: #fff !important; }
         .rx-hero p { color: rgba(255,255,255,.85) !important; }
         .rx-hero .btn { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.4); color: #fff; border-radius: 12px; }
         .rx-hero .btn:hover { background: rgba(255,255,255,.3); color: #fff; }
         .rx-summary { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; align-items: center; }
         .rx-chip { display: inline-flex; gap: 6px; align-items: center; background: #fff; border: 1px solid #e2e8f0; border-radius: 999px; padding: 6px 12px; font-size: 12px; color: #475569; box-shadow: 0 1px 2px rgba(15,23,42,.04); }
-        .rx-chip i { color: #6366f1; } .rx-chip b { color: #0f172a; }
+        .rx-chip i { color: #0c8c84; } .rx-chip b { color: #0f172a; }
         .rx-chip.bad { background: #fff1f2; border-color: #fecdd3; } .rx-chip.bad i, .rx-chip.bad b { color: #e11d48; }
         .rx-hint { margin-left: auto; font-size: 11px; color: #94a3b8; }
         @media (max-width: 1023px) { .rx-hint { display: none; } }
         .prescription-builder .rounded-2xl.bg-white { border-radius: 20px; border-color: #eef2f7; box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 10px 26px rgba(15,23,42,.05); }
         .prescription-builder input:not([type=checkbox]):not([type=hidden]):not(.border-0), .prescription-builder select, .prescription-builder textarea { border-radius: 12px; transition: border-color .15s, box-shadow .15s; }
-        .prescription-builder input:not(.border-0):focus, .prescription-builder select:focus, .prescription-builder textarea:focus { border-color: #818cf8 !important; box-shadow: 0 0 0 4px rgba(99,102,241,.14) !important; outline: none !important; }
-        #submitBtn { background: linear-gradient(135deg, #4f46e5, #7c3aed) !important; border-radius: 14px !important; box-shadow: 0 8px 20px rgba(79,70,229,.3) !important; }
-        .rx-smart { display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #eef2ff, #f5f3ff); border: 1px dashed #a5b4fc; border-radius: 14px; padding: 8px 10px; margin-bottom: 12px; }
-        .rx-smart i { color: #6366f1; }
+        .prescription-builder input:not(.border-0):focus, .prescription-builder select:focus, .prescription-builder textarea:focus { border-color: #818cf8 !important; box-shadow: 0 0 0 4px rgba(12,140,132,.14) !important; outline: none !important; }
+        #submitBtn { background: linear-gradient(135deg, #0c8c84, #0c8c84) !important; border-radius: 14px !important; box-shadow: 0 8px 20px rgba(12,140,132,.3) !important; }
+        .rx-smart { display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #e3f3f0, #f0f8f7); border: 1px dashed #a8dcd6; border-radius: 14px; padding: 8px 10px; margin-bottom: 12px; }
+        .rx-smart i { color: #0c8c84; }
         .rx-smart input { flex: 1; min-width: 0; background: transparent; border: 0 !important; box-shadow: none !important; font-size: 13px; padding: 6px 4px; outline: none; }
-        .rx-smart button { background: #4f46e5; color: #fff; border: 0; border-radius: 10px; padding: 7px 14px; font-size: 12px; font-weight: 700; }
+        .rx-smart button { background: #0c8c84; color: #fff; border: 0; border-radius: 10px; padding: 7px 14px; font-size: 12px; font-weight: 700; }
         .rx-ib { border: 0; background: #f1f5f9; border-radius: 8px; width: 28px; height: 28px; color: #64748b; margin-left: 4px; }
-        .rx-ib:hover { background: #e0e7ff; color: #4338ca; } .rx-ib.del { color: #e11d48; } .rx-ib.del:hover { background: #ffe4e6; }
+        .rx-ib:hover { background: #cfe9e5; color: #0a6b65; } .rx-ib.del { color: #e11d48; } .rx-ib.del:hover { background: #ffe4e6; }
         .rx-v-high { border-color: #fda4af !important; background: #fff1f2 !important; } .rx-v-low { border-color: #fcd34d !important; background: #fffbeb !important; } .rx-v-ok { border-color: #86efac !important; background: #f0fdf4 !important; }
         .rx-v-high > span::after { content: ' ▲ উচ্চ'; color: #e11d48; } .rx-v-low > span::after { content: ' ▼ কম'; color: #d97706; } .rx-v-ok > span::after { content: ' ✓'; color: #059669; } .rx-v-fever > span::after { content: ' 🔥 জ্বর'; color: #e11d48; }
         .rx-fu { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; align-items: center; }
         .rx-fu button { border: 1px solid #e2e8f0; background: #fff; border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 600; color: #475569; }
-        .rx-fu button:hover { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+        .rx-fu button:hover { background: #e3f3f0; color: #0a6b65; border-color: #9bd2cc; }
         .rx-fu span { font-size: 11px; color: #059669; font-weight: 600; width: 100%; }
         .rx-draft { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 14px; padding: 10px 14px; font-size: 13px; margin-bottom: 12px; }
         .rx-draft button { border: 0; border-radius: 10px; padding: 5px 12px; font-size: 12px; font-weight: 700; }
@@ -164,37 +160,37 @@
 
         /* ================= WEB 3.0 THEME (aurora glass + neon, light / dark) ================= */
         @keyframes rxFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        .prescription-builder { position: relative; isolation: isolate; --p1: #7c3aed; --p2: #06b6d4; --p3: #ec4899; --glass: rgba(255,255,255,.62); --glass-b: rgba(255,255,255,.75); --field: rgba(255,255,255,.72); --fline: rgba(124,58,237,.16); }
-        .prescription-builder::before { content: ''; position: absolute; inset: -18px -12px; z-index: -1; border-radius: 34px; background: radial-gradient(620px 320px at 6% 0%, rgba(124,58,237,.20), transparent 62%), radial-gradient(520px 320px at 96% 8%, rgba(6,182,212,.20), transparent 62%), radial-gradient(560px 420px at 50% 100%, rgba(236,72,153,.13), transparent 62%); }
-        .rx-hero { background: linear-gradient(120deg, #4c1d95, #7c3aed, #2563eb, #06b6d4); background-size: 220% 220%; animation: rxFlow 14s ease infinite; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,.25); box-shadow: 0 18px 50px rgba(124,58,237,.35), inset 0 1px 0 rgba(255,255,255,.35); }
+        .prescription-builder { position: relative; isolation: isolate; --p1: #0c8c84; --p2: #06b6d4; --p3: #ec4899; --glass: rgba(255,255,255,.62); --glass-b: rgba(255,255,255,.75); --field: rgba(255,255,255,.72); --fline: rgba(12,140,132,.16); }
+        .prescription-builder::before { content: ''; position: absolute; inset: -18px -12px; z-index: -1; border-radius: 34px; background: radial-gradient(620px 320px at 6% 0%, rgba(12,140,132,.20), transparent 62%), radial-gradient(520px 320px at 96% 8%, rgba(6,182,212,.20), transparent 62%), radial-gradient(560px 420px at 50% 100%, rgba(236,72,153,.13), transparent 62%); }
+        .rx-hero { background: linear-gradient(120deg, #4c1d95, #0c8c84, #2563eb, #06b6d4); background-size: 220% 220%; animation: rxFlow 14s ease infinite; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,.25); box-shadow: 0 18px 50px rgba(12,140,132,.35), inset 0 1px 0 rgba(255,255,255,.35); }
         .rx-hero::after { content: ''; position: absolute; width: 260px; height: 260px; right: -60px; top: -120px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.35), transparent 65%); pointer-events: none; }
         .rx-hero h1 { letter-spacing: -.01em; text-shadow: 0 2px 18px rgba(0,0,0,.25); }
         .rx-theme-btn { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.4); color: #fff; border-radius: 12px; padding: 5px 11px; font-size: 14px; margin-right: 8px; backdrop-filter: blur(8px); }
         .rx-theme-btn:hover { background: rgba(255,255,255,.3); }
         .prescription-builder .rounded-2xl.bg-white { background: var(--glass) !important; -webkit-backdrop-filter: blur(18px) saturate(165%); backdrop-filter: blur(18px) saturate(165%); border: 1px solid var(--glass-b) !important; border-radius: 26px; box-shadow: 0 10px 40px rgba(76,29,149,.10), inset 0 1px 0 rgba(255,255,255,.85); transition: box-shadow .25s, transform .25s; }
-        .prescription-builder .rounded-2xl.bg-white:hover { box-shadow: 0 14px 48px rgba(124,58,237,.16), inset 0 1px 0 rgba(255,255,255,.9); }
+        .prescription-builder .rounded-2xl.bg-white:hover { box-shadow: 0 14px 48px rgba(12,140,132,.16), inset 0 1px 0 rgba(255,255,255,.9); }
         #appDialog .rounded-2xl { background: #fff !important; }
         .prescription-builder h3 { letter-spacing: -.01em; }
         .prescription-builder h3 > i, .prescription-builder h3 > span.font-serif { background: linear-gradient(135deg, var(--p1), var(--p2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent !important; }
         .prescription-builder input:not([type=checkbox]):not([type=hidden]):not(.border-0), .prescription-builder select, .prescription-builder textarea { background: var(--field) !important; border: 1px solid var(--fline) !important; }
-        .prescription-builder input:not(.border-0):focus, .prescription-builder select:focus, .prescription-builder textarea:focus { border-color: var(--p1) !important; box-shadow: 0 0 0 4px rgba(124,58,237,.14), 0 0 28px rgba(6,182,212,.28) !important; }
+        .prescription-builder input:not(.border-0):focus, .prescription-builder select:focus, .prescription-builder textarea:focus { border-color: var(--p1) !important; box-shadow: 0 0 0 4px rgba(12,140,132,.14), 0 0 28px rgba(6,182,212,.28) !important; }
         .prescription-builder .bg-slate-50 { background: rgba(248,250,252,.55) !important; border-color: var(--fline) !important; }
-        .prescription-builder .bg-indigo-600 { background-image: linear-gradient(135deg, #6d28d9, #4f46e5 55%, #0891b2); box-shadow: 0 6px 22px rgba(99,102,241,.38); border-color: transparent !important; }
-        .prescription-builder .bg-indigo-600:hover { filter: brightness(1.08); transform: translateY(-1px); }
+        .prescription-builder .bg-teal-700 { background-image: linear-gradient(135deg, #0a6b65, #0c8c84 55%, #0c8c84); box-shadow: 0 6px 22px rgba(12,140,132,.38); border-color: transparent !important; }
+        .prescription-builder .bg-teal-700:hover { filter: brightness(1.08); transform: translateY(-1px); }
         #btnFull, #btnInv { border-radius: 999px !important; padding: 9px 18px !important; backdrop-filter: blur(10px); }
-        #btnFull:not(.bg-indigo-600), #btnInv:not(.bg-indigo-600) { background: var(--glass) !important; border-color: var(--fline) !important; }
+        #btnFull:not(.bg-teal-700), #btnInv:not(.bg-teal-700) { background: var(--glass) !important; border-color: var(--fline) !important; }
         .rx-chip { background: var(--glass); border-color: var(--glass-b); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 4px 16px rgba(76,29,149,.07); }
         .rx-chip i { background: linear-gradient(135deg, var(--p1), var(--p2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         .rx-chip.bad i { -webkit-text-fill-color: #e11d48; }
-        .rx-dot.active .rx-dot-c { background: linear-gradient(135deg, var(--p1), var(--p2)); border-color: transparent; box-shadow: 0 0 0 4px rgba(124,58,237,.18), 0 0 22px rgba(6,182,212,.5); }
+        .rx-dot.active .rx-dot-c { background: linear-gradient(135deg, var(--p1), var(--p2)); border-color: transparent; box-shadow: 0 0 0 4px rgba(12,140,132,.18), 0 0 22px rgba(6,182,212,.5); }
         .rx-nav { background: rgba(255,255,255,.78); -webkit-backdrop-filter: blur(18px) saturate(170%); backdrop-filter: blur(18px) saturate(170%); }
-        .rx-nav-next { background: linear-gradient(135deg, #6d28d9, #4f46e5 55%, #0891b2); box-shadow: 0 8px 22px rgba(99,102,241,.4); }
+        .rx-nav-next { background: linear-gradient(135deg, #0a6b65, #0c8c84 55%, #0c8c84); box-shadow: 0 8px 22px rgba(12,140,132,.4); }
         .rx-nav-next.rx-save { background: linear-gradient(135deg, #059669, #06b6d4); }
         .fld-sug { background: rgba(255,255,255,.94); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-color: var(--fline); box-shadow: 0 18px 44px rgba(76,29,149,.22); }
-        .fld-opt.on, .fld-opt:hover { background: linear-gradient(90deg, rgba(124,58,237,.12), rgba(6,182,212,.10)); }
-        .rx-smart { background: linear-gradient(135deg, rgba(124,58,237,.10), rgba(6,182,212,.10)); border: 1px solid var(--fline); box-shadow: 0 0 0 1px rgba(255,255,255,.6) inset; }
-        .rx-smart button { background: linear-gradient(135deg, #6d28d9, #0891b2); box-shadow: 0 6px 18px rgba(99,102,241,.35); }
-        #prescription-list tr:hover { background: rgba(124,58,237,.05); }
+        .fld-opt.on, .fld-opt:hover { background: linear-gradient(90deg, rgba(12,140,132,.12), rgba(6,182,212,.10)); }
+        .rx-smart { background: linear-gradient(135deg, rgba(12,140,132,.10), rgba(6,182,212,.10)); border: 1px solid var(--fline); box-shadow: 0 0 0 1px rgba(255,255,255,.6) inset; }
+        .rx-smart button { background: linear-gradient(135deg, #0a6b65, #0c8c84); box-shadow: 0 6px 18px rgba(12,140,132,.35); }
+        #prescription-list tr:hover { background: rgba(12,140,132,.05); }
         #advCard textarea, #advCard input[type=date] { min-height: 44px; }
         .prescription-builder ::-webkit-scrollbar { width: 8px; height: 8px; }
         .prescription-builder ::-webkit-scrollbar-thumb { background: linear-gradient(var(--p1), var(--p2)); border-radius: 8px; }
@@ -202,7 +198,7 @@
 
         /* ---------- Dark neon mode ---------- */
         .prescription-builder.rx-dark { --glass: rgba(15,23,42,.62); --glass-b: rgba(148,163,184,.16); --field: rgba(30,41,59,.72); --fline: rgba(148,163,184,.22); color: #e2e8f0; }
-        .rx-dark::before { background: #050816; background-image: radial-gradient(620px 320px at 6% 0%, rgba(124,58,237,.38), transparent 62%), radial-gradient(520px 320px at 96% 8%, rgba(6,182,212,.30), transparent 62%), radial-gradient(560px 420px at 50% 100%, rgba(236,72,153,.22), transparent 62%); }
+        .rx-dark::before { background: #050816; background-image: radial-gradient(620px 320px at 6% 0%, rgba(12,140,132,.38), transparent 62%), radial-gradient(520px 320px at 96% 8%, rgba(6,182,212,.30), transparent 62%), radial-gradient(560px 420px at 50% 100%, rgba(236,72,153,.22), transparent 62%); }
         .rx-dark .rounded-2xl.bg-white { box-shadow: 0 10px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06); }
         .rx-dark .text-slate-900, .rx-dark .text-slate-800, .rx-dark .text-slate-700, .rx-dark .text-dark, .rx-dark .fw-bold { color: #f1f5f9 !important; }
         .rx-dark .text-slate-600, .rx-dark .text-slate-500, .rx-dark .text-secondary { color: #cbd5e1 !important; }
@@ -213,10 +209,10 @@
         .rx-dark .bg-slate-50, .rx-dark .bg-slate-100 { background: rgba(30,41,59,.55) !important; border-color: rgba(148,163,184,.18) !important; }
         .rx-dark .border-slate-100, .rx-dark .border-slate-200, .rx-dark .divide-slate-50 > * { border-color: rgba(148,163,184,.16) !important; }
         .rx-dark .bg-white:not(.rounded-2xl) { background: rgba(30,41,59,.7) !important; }
-        .rx-dark .bg-indigo-50 { background: rgba(99,102,241,.16) !important; border-color: rgba(129,140,248,.3) !important; }
+        .rx-dark .bg-teal-50 { background: rgba(12,140,132,.16) !important; border-color: rgba(129,140,248,.3) !important; }
         .rx-dark .bg-emerald-50 { background: rgba(16,185,129,.14) !important; border-color: rgba(52,211,153,.3) !important; }
         .rx-dark .bg-teal-50 { background: rgba(20,184,166,.14) !important; border-color: rgba(45,212,191,.3) !important; }
-        .rx-dark .bg-purple-50 { background: rgba(168,85,247,.14) !important; border-color: rgba(192,132,252,.3) !important; }
+        .rx-dark .bg-teal-50 { background: rgba(168,85,247,.14) !important; border-color: rgba(192,132,252,.3) !important; }
         .rx-dark .bg-amber-50 { background: rgba(245,158,11,.14) !important; border-color: rgba(251,191,36,.3) !important; }
         .rx-dark .bg-rose-50 { background: rgba(244,63,94,.14) !important; border-color: rgba(251,113,133,.3) !important; }
         .rx-dark [class*="text-indigo-"], .rx-dark [class*="text-emerald-"], .rx-dark [class*="text-teal-"], .rx-dark [class*="text-purple-"], .rx-dark [class*="text-amber-"], .rx-dark [class*="text-rose-"] { filter: brightness(1.45); }
@@ -234,8 +230,28 @@
         .rx-dark .fld-opt { color: #e2e8f0; border-color: rgba(148,163,184,.12); }
         .rx-dark .rx-smart input { color: #f1f5f9 !important; }
         .rx-dark .rx-v-high, .rx-dark .rx-v-low, .rx-dark .rx-v-ok { background: rgba(30,41,59,.7) !important; }
-        .rx-dark #prescription-list tr:hover { background: rgba(124,58,237,.12); }
+        .rx-dark #prescription-list tr:hover { background: rgba(12,140,132,.12); }
         .rx-dark .rx-draft { background: rgba(245,158,11,.14); border-color: rgba(251,191,36,.35); color: #fde68a; }
+
+        /* Keep the large prescription workspace responsive while avoiding costly full-card blur/gradient animation. */
+        .prescription-builder .rx-hero { animation: none; background-size: 100% 100%; }
+        .prescription-builder .rounded-2xl.bg-white {
+            -webkit-backdrop-filter: none;
+            backdrop-filter: none;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, .055);
+            transition: box-shadow .16s ease;
+        }
+        .prescription-builder .rounded-2xl.bg-white:hover { box-shadow: 0 7px 22px rgba(15, 23, 42, .075); }
+        .prescription-builder .rx-chip,
+        .prescription-builder .rx-nav,
+        .prescription-builder .fld-sug { -webkit-backdrop-filter: none; backdrop-filter: none; }
+        @media (prefers-reduced-motion: reduce) {
+            .prescription-builder *, .prescription-builder *::before, .prescription-builder *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+        }
     </style>
 @endpush
 
@@ -256,7 +272,10 @@
     $initPatient = $selPatient
         ? ['id' => $selPatient->id, 'code' => $selPatient->patient_code, 'name' => $selPatient->name]
         : null;
-    $invCharge = (float) config('easydoc.investigation_advice_charge', 2);
+    $invCharge = (float) ($doctor?->getCharge('investigation_advice') ?? config('easydoc.investigation_advice_charge', 2));
+    $aiDiagnosisCharge = (float) ($doctor?->getCharge('ai_diagnosis') ?? config('easydoc.ai_diagnosis_charge', 2));
+    $aiMedicineCharge = (float) ($doctor?->getCharge('ai_medicine') ?? config('easydoc.ai_medicine_charge', 2));
+    $aiInteractionCharge = (float) ($doctor?->getCharge('ai_interaction') ?? config('easydoc.ai_interaction_charge', 2));
     $fullCharge = (float) ($doctor?->getPrescriptionCharge() ?? 0);
     $balance = (float) ($doctor?->wallet?->balance ?? 0);
     // Controller theke $activeChamber (status = true AND doctor_active = true) na ashle Save block hobe
@@ -304,13 +323,19 @@
         </a>
     </div>
 
-    <div class="rx-summary" id="rxSummary">
-        <span class="rx-chip"><i class="fa-solid fa-user"></i> <b id="sumPatient">রোগী নির্বাচন হয়নি</b></span>
-        <span class="rx-chip"><i class="fa-solid fa-pills"></i> ঔষধ <b id="sumMeds">0</b></span>
-        <span class="rx-chip"><i class="fa-solid fa-receipt"></i> চার্জ <b id="sumCharge"></b></span>
-        <span class="rx-chip" id="sumBalWrap"><i class="fa-solid fa-wallet"></i> ব্যালেন্স <b id="sumBal"></b></span>
-        <span class="rx-hint"><b>Ctrl+S</b> সেভ · <b>Alt+P</b> রোগী · <b>Alt+X</b> Diagnosis · <b>Alt+T</b> Test · <b>Alt+M</b> ঔষধ</span>
-    </div>
+    @php
+        $summaryMode = old('type', 'full');
+        $summaryName = old('patient_name', $pp?->name ?? '');
+        $summaryAge = old('patient_age', $pp?->age ?? '');
+        $summaryMedicineCount = count((array) old('medicines', []));
+        $summaryCharge = $summaryMode === 'investigation_only' ? $invCharge : $fullCharge;
+    @endphp
+    <div id="rxSummary"
+         data-patient="{{ $summaryName }}"
+         data-age="{{ $summaryAge }}"
+         data-medicines="{{ $summaryMedicineCount }}"
+         data-charge="{{ $summaryCharge }}"
+         data-balance="{{ $balance }}"></div>
 
     <form action="{{ route('doctor.prescriptions.store') }}" method="POST" id="prescriptionForm" autocomplete="off" novalidate>
             @csrf
@@ -318,21 +343,22 @@
             <input type="hidden" name="parent_prescription_id" value="{{ $parent->id ?? old('parent_prescription_id') }}">
             <input type="hidden" name="serial_id" id="serialIdInput" value="{{ old('serial_id', $serial->id ?? '') }}">
             <input type="hidden" name="patient_id" id="patientIdInput" value="{{ old('patient_id', $parent->patient_id ?? $serial->patient_id ?? '') }}">
+            <input type="hidden" name="offline_ref" value="{{ old('offline_ref', (string) \Illuminate\Support\Str::uuid()) }}">
 
             @if($errors->any())
-                <div class="max-w-[1400px] mx-auto mb-4 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl text-sm">
+                <div class="rx-error-summary mb-4 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl text-sm">
                     <ul class="list-disc pl-5">
                         @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
                     </ul>
                 </div>
             @endif
 
-            <main class="max-w-[1400px] mx-auto grid grid-cols-12 gap-6">
+            <main class="rx-form-grid grid grid-cols-12 gap-6">
 
                 <!-- MODE TOGGLE + REPORT / SERIAL BANNER -->
                 <div class="col-span-12 space-y-3">
                     @if($parent)
-                        <div class="bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl px-4 py-3 text-sm flex items-start gap-3">
+                        <div class="bg-teal-50 border border-teal-200 text-teal-900 rounded-xl px-4 py-3 text-sm flex items-start gap-3">
                             <i class="fa-solid fa-flask-vial mt-0.5"></i>
                             <div>
                                 <p class="font-bold">Report দেখে চূড়ান্ত প্রেসক্রিপশন লিখছেন</p>
@@ -371,9 +397,9 @@
                     <!-- Serial queue (shudhu $serials thakle) -->
                     @if(!$parent && count($queue))
                     <div id="queueCard" data-step="1" class="rx-step is-active bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        <div class="px-5 py-3 bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-slate-100 flex items-center justify-between gap-2">
-                            <h3 class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-list-ol text-indigo-600 mr-2"></i> আজকের সিরিয়াল</h3>
-                            <span id="queueCount" class="text-[11px] font-bold bg-indigo-600 text-white px-2.5 py-0.5 rounded-full">0</span>
+                        <div class="px-5 py-3 bg-gradient-to-r from-teal-50 to-teal-50 border-b border-slate-100 flex items-center justify-between gap-2">
+                            <h3 class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-list-ol text-teal-700 mr-2"></i> আজকের সিরিয়াল</h3>
+                            <span id="queueCount" class="text-[11px] font-bold bg-teal-700 text-white px-2.5 py-0.5 rounded-full">0</span>
                         </div>
                         <div id="queueList" class="p-3 space-y-2"></div>
                     </div>
@@ -382,7 +408,7 @@
                     <!-- Patient Info -->
                     <div id="stepPatient" data-step="1" class="rx-step is-active bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-circle-user text-indigo-600 mr-2 text-lg"></i> Patient Information</h3>
+                            <h3 class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-circle-user text-teal-700 mr-2 text-lg"></i> Patient Information</h3>
                             <span id="patientStatus" class="text-[10px] font-bold px-2 py-0.5 rounded-full hidden"></span>
                         </div>
                         <!-- Selected patient banner (Patient ID) -->
@@ -392,8 +418,8 @@
                         <div id="patientSearchWrap" class="mb-3">
                             <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Find Existing Patient</label>
                             <div class="flex gap-1">
-                                <input type="text" id="patientSearch" placeholder="Mobile or Patient ID (e.g., PT-0007)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <button type="button" id="patientSearchBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 rounded-lg">Search</button>
+                                <input type="text" id="patientSearch" placeholder="Mobile or Patient ID (e.g., PT-0007)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
+                                <button type="button" id="patientSearchBtn" class="bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-3 rounded-lg">Search</button>
                             </div>
                             <p class="text-[11px] text-slate-400 mt-1">একই মোবাইল নম্বরে একাধিক রোগী থাকতে পারে — তাই Patient ID দিয়েও খুঁজতে পারেন।</p>
                         </div>
@@ -404,29 +430,29 @@
                                 <div>
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Mobile *</label>
                                     <div class="flex gap-1">
-                                        <input type="text" name="patient_mobile" id="patientMobile" value="{{ old('patient_mobile', $pp->mobile ?? '') }}" placeholder="017XXXXXXXX" inputmode="numeric" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                        <button type="button" id="lookupBtn" class="bg-indigo-50 border border-indigo-100 text-indigo-600 px-2.5 rounded-lg hover:bg-indigo-100"><i class="fa-solid fa-magnifying-glass text-xs"></i></button>
+                                        <input type="text" name="patient_mobile" id="patientMobile" value="{{ old('patient_mobile', $pp->mobile ?? '') }}" placeholder="017XXXXXXXX" inputmode="numeric" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
+                                        <button type="button" id="lookupBtn" class="bg-teal-50 border border-teal-100 text-teal-700 px-2.5 rounded-lg hover:bg-teal-100"><i class="fa-solid fa-magnifying-glass text-xs"></i></button>
                                     </div>
                                 </div>
                                 <div>
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Name *</label>
-                                    <input type="text" name="patient_name" id="patientName" value="{{ old('patient_name', $pp->name ?? '') }}" placeholder="Full Name" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="text" name="patient_name" id="patientName" value="{{ old('patient_name', $pp->name ?? '') }}" placeholder="Full Name" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-3 gap-2">
                                 <div>
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Age</label>
-                                    <input type="number" min="0" name="patient_age" id="patientAge" value="{{ old('patient_age', $pp->age ?? '') }}" placeholder="Years" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="number" min="0" name="patient_age" id="patientAge" value="{{ old('patient_age', $pp->age ?? '') }}" placeholder="Years" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
                                 </div>
                                 <div>
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Weight</label>
-                                    <input type="text" name="patient_weight" id="patientWeight" value="{{ old('patient_weight', data_get($serial, 'weight', $pp->weight ?? '')) }}" placeholder="KG" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="text" name="patient_weight" id="patientWeight" value="{{ old('patient_weight', data_get($serial, 'weight', $pp->weight ?? '')) }}" placeholder="KG" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
                                 </div>
                                 <div>
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Gender</label>
                                     @php $g = old('patient_gender', $pp->gender ?? ''); @endphp
-                                    <select name="patient_gender" id="patientGender" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <select name="patient_gender" id="patientGender" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-600">
                                         <option value="">--</option>
                                         <option value="Male" {{ strcasecmp($g, 'Male') == 0 ? 'selected' : '' }}>Male</option>
                                         <option value="Female" {{ strcasecmp($g, 'Female') == 0 ? 'selected' : '' }}>Female</option>
@@ -437,11 +463,11 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Blood Group</label>
-                                    <input type="text" name="blood_group" id="patientBlood" value="{{ old('blood_group', $pp->blood_group ?? '') }}" placeholder="B+" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="text" name="blood_group" id="patientBlood" value="{{ old('blood_group', $pp->blood_group ?? '') }}" placeholder="B+" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
                                 </div>
                                 <div>
                                     <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Address</label>
-                                    <input type="text" name="patient_address" id="patientAddress" value="{{ old('patient_address', $pp->address ?? '') }}" placeholder="Optional" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="text" name="patient_address" id="patientAddress" value="{{ old('patient_address', $pp->address ?? '') }}" placeholder="Optional" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
                                 </div>
                             </div>
                         </div>
@@ -466,16 +492,16 @@
                         </div>
                         <div>
                             <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Clinical Complaints</label>
-                            <textarea name="clinical_complaints" id="symptomsInput" rows="2" placeholder="e.g., Fever with chest pain..." class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('clinical_complaints', $parent->clinical_complaints ?? $serial->reason ?? '') }}</textarea>
+                            <textarea name="clinical_complaints" id="symptomsInput" rows="2" placeholder="e.g., Fever with chest pain..." class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">{{ old('clinical_complaints', $parent->clinical_complaints ?? $serial->reason ?? '') }}</textarea>
 
-                            <button type="button" onclick="suggestDiagnosis()" id="diagBtn" class="mt-2 text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1.5 rounded-lg flex items-center gap-1 hover:opacity-90">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i> Suggest Diagnosis (AI)
+                            <button type="button" onclick="suggestDiagnosis()" id="diagBtn" class="mt-2 text-xs font-bold bg-gradient-to-r from-teal-700 to-teal-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-1 hover:opacity-90">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Suggest Diagnosis (AI) <span>(৳{{ number_format($aiDiagnosisCharge, 2) }})</span>
                             </button>
                             <div id="diagSuggestions" class="flex flex-wrap gap-1.5 mt-2"></div>
                         </div>
                         <div>
                             <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Risk Factors</label>
-                            <textarea name="risk_factors" id="riskInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('risk_factors', $parent->risk_factors ?? '') }}</textarea>
+                            <textarea name="risk_factors" id="riskInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">{{ old('risk_factors', $parent->risk_factors ?? '') }}</textarea>
                         </div>
                     </div>
                     <!-- Diagnosis & Investigations -->
@@ -484,7 +510,7 @@
 
                         <div>
                             <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Diagnosis <span id="dxHint" class="normal-case font-normal text-slate-400"></span></label>
-                            <textarea name="diagnosis" id="diagnosisInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('diagnosis', $parent->diagnosis ?? '') }}</textarea>
+                            <textarea name="diagnosis" id="diagnosisInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">{{ old('diagnosis', $parent->diagnosis ?? '') }}</textarea>
 
                             <div id="patternPanel" class="hidden mt-3 bg-emerald-50 border border-emerald-200 rounded-xl p-3">
                                 <p class="text-xs font-bold text-emerald-800 flex items-center mb-2">
@@ -522,29 +548,29 @@
                     <!-- Medicine card -->
                     <div id="medicineCard" data-step="4" class="rx-step bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 flex flex-col lg:min-h-[420px]">
                         <div class="flex justify-between items-center pb-4 border-b border-slate-100 mb-4 flex-wrap gap-2">
-                            <h3 class="font-bold text-lg text-slate-900 flex items-center"><span class="text-indigo-600 font-serif italic text-2xl mr-2">Rx</span> Medicine Prescription</h3>
+                            <h3 class="font-bold text-lg text-slate-900 flex items-center"><span class="text-teal-700 font-serif italic text-2xl mr-2">Rx</span> Medicine Prescription</h3>
                             <div class="flex items-center gap-2 flex-wrap">
                                 <button type="button" onclick="checkConflicts()" id="conflictBtn" class="bg-gradient-to-r from-rose-500 to-orange-500 hover:opacity-90 text-white text-xs font-bold py-2 px-3 rounded-lg shadow-sm flex items-center gap-1">
-                                    <i class="fa-solid fa-triangle-exclamation"></i> AI Conflict Check
+                                    <i class="fa-solid fa-triangle-exclamation"></i> AI Conflict Check <span>(৳{{ number_format($aiInteractionCharge, 2) }})</span>
                                 </button>
-                                <button type="button" onclick="generateAiMedicines()" id="aiMedBtn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white text-xs font-bold py-2 px-3 rounded-lg shadow-sm flex items-center gap-1">
-                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate with AI
+                                <button type="button" onclick="generateAiMedicines()" id="aiMedBtn" class="bg-gradient-to-r from-teal-700 to-teal-700 hover:opacity-90 text-white text-xs font-bold py-2 px-3 rounded-lg shadow-sm flex items-center gap-1">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate with AI <span>(৳{{ number_format($aiMedicineCharge, 2) }})</span>
                                 </button>
                             </div>
                         </div>
 
                         <!-- AI Suggestion Panel -->
-                        <div id="aiMedPanel" class="hidden mb-4 bg-purple-50 border border-purple-200 rounded-xl p-4">
+                        <div id="aiMedPanel" class="hidden mb-4 bg-teal-50 border border-teal-200 rounded-xl p-4">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-bold text-purple-800 flex items-center"><i class="fa-solid fa-robot mr-1.5"></i> AI Suggested Treatment — রিভিউ করে Add করুন</span>
-                                <button type="button" onclick="document.getElementById('aiMedPanel').classList.add('hidden')" class="text-purple-400 hover:text-purple-600 text-xs"><i class="fa-solid fa-xmark"></i></button>
+                                <span class="text-xs font-bold text-teal-900 flex items-center"><i class="fa-solid fa-robot mr-1.5"></i> AI Suggested Treatment — রিভিউ করে Add করুন</span>
+                                <button type="button" onclick="document.getElementById('aiMedPanel').classList.add('hidden')" class="text-teal-500 hover:text-teal-700 text-xs"><i class="fa-solid fa-xmark"></i></button>
                             </div>
-                            <p class="text-[11px] text-purple-700 mb-3 italic">⚠ AI suggestions শুধুমাত্র সহায়ক — প্রেসক্রাইব করার আগে অবশ্যই ক্লিনিক্যালি যাচাই করুন।</p>
+                            <p class="text-[11px] text-teal-800 mb-3 italic">⚠ AI suggestions শুধুমাত্র সহায়ক — প্রেসক্রাইব করার আগে অবশ্যই ক্লিনিক্যালি যাচাই করুন।</p>
                             <div id="aiMedList" class="space-y-2"></div>
-                            <div id="aiAdviceBox" class="hidden mt-3 bg-white border border-purple-100 rounded-lg p-3">
-                                <p class="text-xs font-bold text-purple-700 mb-1">Suggested Advice:</p>
+                            <div id="aiAdviceBox" class="hidden mt-3 bg-white border border-teal-100 rounded-lg p-3">
+                                <p class="text-xs font-bold text-teal-800 mb-1">Suggested Advice:</p>
                                 <p id="aiAdviceText" class="text-xs text-slate-600 mb-2"></p>
-                                <button type="button" onclick="useAiAdvice()" class="text-xs font-bold text-purple-600 hover:underline">+ Use this advice</button>
+                                <button type="button" onclick="useAiAdvice()" class="text-xs font-bold text-teal-700 hover:underline">+ Use this advice</button>
                             </div>
                         </div>
 
@@ -564,14 +590,14 @@
                                 <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Search Medicine</label>
                                 <div class="relative">
                                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
-                                    <input type="text" id="med-search" placeholder="Type sec, napa, pcm..." autocomplete="off" class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="text" id="med-search" placeholder="Type sec, napa, pcm..." autocomplete="off" class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
                                     <input type="hidden" id="med-id">
                                 </div>
                                 <div id="search-results" class="hidden absolute left-0 right-0 md:right-4 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-52 overflow-y-auto text-sm"></div>
                             </div>
                             <div class="col-span-1 md:col-span-2 relative">
                                 <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Type</label>
-                                <select id="med-type" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <select id="med-type" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
                                     <option value="Tablet">Tablet</option>
                                     <option value="Capsule">Capsule</option>
                                     <option value="Syrup">Syrup</option>
@@ -584,21 +610,21 @@
                             </div>
                             <div class="col-span-1 md:col-span-2 relative">
                                 <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1" id="med-dose-label">Dose (M+A+N)</label>
-                                <input type="text" id="med-dose" placeholder="e.g., 1+0+1" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <input type="text" id="med-dose-text" placeholder="২ চামচ" class="hidden w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="med-dose" placeholder="e.g., 1+0+1" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
+                                <input type="text" id="med-dose-text" placeholder="২ চামচ" class="hidden w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
                             </div>
                             <div class="col-span-1 md:col-span-2 relative">
                                 <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Duration</label>
-                                <input type="text" id="med-duration" placeholder="৭ দিন" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="med-duration" placeholder="৭ দিন" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
                             </div>
                             <div class="col-span-2 md:col-span-2 flex items-end order-last md:order-none">
-                                <button type="button" onclick="addMedicineRow()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-sm shadow-sm">
+                                <button type="button" onclick="addMedicineRow()" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-lg text-sm shadow-sm">
                                     <i class="fa-solid fa-plus mr-1"></i> Add
                                 </button>
                             </div>
                             <div class="col-span-2 md:col-span-12 relative">
                                 <label class="text-[11px] font-bold text-slate-400 uppercase block mb-1">Instruction (optional)</label>
-                                <input type="text" id="med-instruction" placeholder="খাবার পরে" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="med-instruction" placeholder="খাবার পরে" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
                             </div>
                         </div>
 
@@ -633,10 +659,10 @@
 
                     <!-- Advice + Follow-up + Submit (দুই মোডেই দেখা যাবে) -->
                     <div id="advCard" data-step="5" class="rx-step lg:flex-1 flex flex-col bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 space-y-3">
-                        <h3 class="font-bold text-lg text-slate-900 flex items-center"><i class="fa-solid fa-notes-medical text-indigo-600 mr-2"></i> Advice &amp; Follow-up</h3>
+                        <h3 class="font-bold text-lg text-slate-900 flex items-center"><i class="fa-solid fa-notes-medical text-teal-700 mr-2"></i> Advice &amp; Follow-up</h3>
                         <div>
                             <label class="text-xs font-semibold text-slate-500 block mb-1">Advice</label>
-                            <textarea name="advice" id="adviceInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('advice') }}</textarea>
+                            <textarea name="advice" id="adviceInput" rows="2" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">{{ old('advice') }}</textarea>
 
                             <!-- Quick Advice presets (JS diye render hoy, ADVICE_PRESETS array te notun advice jog korun) -->
                             <div class="mt-3">
@@ -644,17 +670,17 @@
                                 <div id="adviceTabs" class="flex flex-wrap gap-1.5 mb-2"></div>
                                 <div class="bg-slate-50 border border-slate-100 rounded-xl p-3">
                                     <div id="adviceChips" class="flex flex-wrap gap-1.5"></div>
-                                    <button type="button" id="adviceAddAll" class="mt-2 text-[11px] font-bold text-indigo-600 hover:underline">+ এই গ্রুপের সবগুলো যোগ করুন</button>
+                                    <button type="button" id="adviceAddAll" class="mt-2 text-[11px] font-bold text-teal-700 hover:underline">+ এই গ্রুপের সবগুলো যোগ করুন</button>
                                 </div>
                             </div>
                         </div>
                         <div class="rx-submit-row grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div>
                                 <label class="text-xs font-semibold text-slate-500 block mb-1" id="followupLabel">Follow-up Date</label>
-                                <input type="date" name="followup_date" id="followupDate" value="{{ old('followup_date') }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="date" name="followup_date" id="followupDate" value="{{ old('followup_date') }}" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-600">
                             </div>
                             <div class="flex items-end md:col-span-2">
-                                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm shadow-md flex items-center justify-center transition-colors">
+                                <button type="submit" id="submitBtn" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-2.5 px-4 rounded-xl text-sm shadow-md flex items-center justify-center transition-colors">
                                     <i class="fa-solid fa-print mr-2"></i> <span id="submitLabel">Save & Print Prescription</span>
                                 </button>
                             </div>
@@ -681,8 +707,8 @@
         <ul id="dlgItems" class="hidden mt-3 space-y-1.5 text-left"></ul>
         <div class="flex flex-wrap gap-2 mt-5">
             <button type="button" id="dlgCancel" class="hidden flex-1 min-w-[110px] px-4 py-2.5 rounded-xl text-sm font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"></button>
-            <button type="button" id="dlgExtra" class="hidden flex-1 min-w-[110px] px-4 py-2.5 rounded-xl text-sm font-semibold border border-indigo-200 bg-white text-indigo-700 hover:bg-indigo-50"></button>
-            <button type="button" id="dlgConfirm" class="flex-1 min-w-[110px] px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700"></button>
+            <button type="button" id="dlgExtra" class="hidden flex-1 min-w-[110px] px-4 py-2.5 rounded-xl text-sm font-semibold border border-teal-200 bg-white text-teal-800 hover:bg-teal-50"></button>
+            <button type="button" id="dlgConfirm" class="flex-1 min-w-[110px] px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-teal-700 hover:bg-teal-800"></button>
         </div>
     </div>
 </div>
@@ -742,6 +768,11 @@
         const PATTERN_URL = "{{ route('doctor.prescriptions.pattern-suggest') }}";
         const CHECK_URL = "{{ route('doctor.prescriptions.check-interactions') }}";
         const CSRF_TOKEN = "{{ csrf_token() }}";
+        const AI_CHARGES = {
+            diagnosis: {{ $aiDiagnosisCharge }},
+            medicine: {{ $aiMedicineCharge }},
+            interaction: {{ $aiInteractionCharge }},
+        };
 
         // ===== অফলাইন মোডের জন্য দরকারি তথ্য (rx-offline.js এটা পড়ে) =====
         // বিদ্যুৎ/নেট চলে গেলেও যাতে প্রেসক্রিপশন তৈরি ও প্রিন্ট করা যায়, তার জন্য।
@@ -756,6 +787,7 @@
         const FULL_CHARGE = {{ $fullCharge }};
         const INV_CHARGE = {{ $invCharge }};
         const BALANCE = {{ $balance }};
+        let balanceNow = BALANCE;
         const HAS_CHAMBER = @json($hasChamber);
         const CHAMBERS_URL = "{{ route('doctor.chambers.index') }}";
         const START_URL = "{{ route('doctor.queue.start', ['serial' => '__ID__']) }}";
@@ -768,6 +800,15 @@
         let lastAiAdvice = '';
         let dirty = false;
         let submitting = false;
+        function newIdempotencyKey() {
+            return window.crypto?.randomUUID
+                ? window.crypto.randomUUID()
+                : 'ai-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+        }
+        function applyAiWallet(data) {
+            if (Number.isFinite(Number(data?.balance))) balanceNow = Number(data.balance);
+            publishPrescriptionSummary();
+        }
 
         const byId = (id) => document.getElementById(id);
         const val = (id) => { const e = byId(id); return e ? e.value.trim() : ''; };
@@ -795,7 +836,7 @@
         const DLG_ICONS = {
             warning: ['fa-triangle-exclamation', 'bg-amber-100 text-amber-600'],
             danger:  ['fa-circle-xmark',         'bg-rose-100 text-rose-600'],
-            info:    ['fa-circle-info',          'bg-indigo-100 text-indigo-600'],
+            info:    ['fa-circle-info',          'bg-teal-100 text-teal-700'],
             success: ['fa-circle-check',         'bg-emerald-100 text-emerald-600'],
         };
 
@@ -818,7 +859,7 @@
                 const bC = byId('dlgConfirm'), bX = byId('dlgCancel'), bE = byId('dlgExtra');
                 bC.textContent = o.confirmText;
                 bC.className = 'flex-1 min-w-[110px] px-4 py-2.5 rounded-xl text-sm font-bold text-white ' +
-                    (o.type === 'danger' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-indigo-600 hover:bg-indigo-700');
+                    (o.type === 'danger' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-teal-700 hover:bg-teal-800');
                 bX.classList.toggle('hidden', !o.cancelText); if (o.cancelText) bX.textContent = o.cancelText;
                 bE.classList.toggle('hidden', !o.extraText);  if (o.extraText) bE.textContent = o.extraText;
 
@@ -863,7 +904,7 @@
         }
 
         /* ================= MODE: Full / Investigation Advice ================= */
-        const ACTIVE_CLS = ['bg-indigo-600', 'text-white', 'border-indigo-600', 'shadow-md'];
+        const ACTIVE_CLS = ['bg-teal-700', 'text-white', 'border-teal-700', 'shadow-md'];
         const INACTIVE_CLS = ['bg-white', 'text-slate-600', 'border-slate-200'];
         const fmtCharge = (n) => String(Number(n));
 
@@ -951,7 +992,7 @@
                         const list = Array.isArray(data) ? data : (data.data || []);
                         if (!list.length) { searchResults.classList.add('hidden'); return; }
                         searchResults.innerHTML = list.map(item => `
-                            <div class="px-4 py-2 hover:bg-indigo-50 cursor-pointer flex justify-between items-center gap-2" data-id="${escHtml(item.id)}" data-label="${escHtml(item.label)}" data-generic="${escHtml(item.generic_name || '')}" data-type="${escHtml(item.dosage_form || '')}">
+                            <div class="px-4 py-2 hover:bg-teal-50 cursor-pointer flex justify-between items-center gap-2" data-id="${escHtml(item.id)}" data-label="${escHtml(item.label)}" data-generic="${escHtml(item.generic_name || '')}" data-type="${escHtml(item.dosage_form || '')}">
                                 <div>
                                     <div class="font-semibold text-slate-700">${escHtml(item.label)}</div>
                                     <div class="text-[11px] text-slate-400">${escHtml(item.generic_name || '')}${item.company ? ' · ' + escHtml(item.company) : ''}</div>
@@ -1447,11 +1488,11 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                     '<div class="flex items-start justify-between gap-2">' +
                         '<div class="min-w-0">' +
                             '<p class="text-sm font-bold text-slate-800">' + escHtml(p.name) +
-                                ' <span class="ml-1 text-[10px] font-bold bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded">' + escHtml(p.code || '') + '</span></p>' +
+                                ' <span class="ml-1 text-[10px] font-bold bg-teal-50 text-teal-800 px-1.5 py-0.5 rounded">' + escHtml(p.code || '') + '</span></p>' +
                             '<p class="text-[11px] text-slate-500">' + escHtml(meta) + (p.mobile ? ' · ' + escHtml(p.mobile) : '') + '</p>' +
                             '<p class="text-[11px] text-slate-400">' + (p.last_visit ? 'শেষ ভিজিট: ' + escHtml(p.last_visit) + ' · ' : '') + escHtml(p.visits) + ' টি ভিজিট</p>' +
                         '</div>' +
-                        '<button type="button" class="pick-patient shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg" data-idx="' + idx + '">Select</button>' +
+                        '<button type="button" class="pick-patient shrink-0 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg" data-idx="' + idx + '">Select</button>' +
                     '</div>';
 
                 (p.pending || []).forEach(function (x) {
@@ -1471,7 +1512,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
 
             const newBtn = document.createElement('button');
             newBtn.type = 'button';
-            newBtn.className = 'w-full border-2 border-dashed border-slate-300 hover:border-indigo-400 hover:bg-indigo-50 text-slate-600 text-xs font-bold rounded-xl py-2.5';
+            newBtn.className = 'w-full border-2 border-dashed border-slate-300 hover:border-teal-500 hover:bg-teal-50 text-slate-600 text-xs font-bold rounded-xl py-2.5';
             newBtn.innerHTML = '<i class="fa-solid fa-user-plus mr-1"></i> ' +
                 (data.type === 'mobile' ? 'এটি অন্য একজন — নতুন রোগী হিসেবে যোগ করুন' : 'নতুন রোগী যোগ করুন');
             newBtn.addEventListener('click', startNewPatient);
@@ -1547,16 +1588,16 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                 const meta = [s.age != null && s.age !== '' ? s.age + ' বছর' : '', s.gender || '', s.mobile || ''].filter(Boolean).join(' · ');
                 const vit = [s.bp ? 'BP ' + s.bp : '', s.pulse ? 'P ' + s.pulse : '', s.temperature ? s.temperature + '°F' : '', s.weight ? s.weight + 'kg' : ''].filter(Boolean).join(' · ');
                 return '<div class="flex items-center gap-3 rounded-xl border px-3 py-2 ' +
-                        (active ? 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-100' : 'border-slate-100 bg-white hover:border-indigo-200') + (done ? ' opacity-60' : '') + '">' +
-                    '<div class="w-9 h-9 shrink-0 rounded-lg flex items-center justify-center text-sm font-bold ' + (active ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-700') + '">' + escHtml(s.no != null ? s.no : '#') + '</div>' +
+                        (active ? 'border-teal-600 bg-teal-50 ring-2 ring-teal-100' : 'border-slate-100 bg-white hover:border-teal-200') + (done ? ' opacity-60' : '') + '">' +
+                    '<div class="w-9 h-9 shrink-0 rounded-lg flex items-center justify-center text-sm font-bold ' + (active ? 'bg-teal-700 text-white' : 'bg-teal-50 text-teal-800') + '">' + escHtml(s.no != null ? s.no : '#') + '</div>' +
                     '<div class="min-w-0 flex-1">' +
                         '<p class="text-sm font-bold text-slate-800 truncate">' + escHtml(s.name || 'নামহীন রোগী') +
-                            (s.code ? ' <span class="ml-1 text-[10px] font-bold bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded">' + escHtml(s.code) + '</span>' : '') + '</p>' +
+                            (s.code ? ' <span class="ml-1 text-[10px] font-bold bg-teal-50 text-teal-800 px-1.5 py-0.5 rounded">' + escHtml(s.code) + '</span>' : '') + '</p>' +
                         '<p class="text-[11px] text-slate-400 truncate">' + escHtml(meta) + '</p>' +
                         (vit ? '<p class="text-[11px] font-semibold text-teal-700 truncate">' + escHtml(vit) + '</p>' : '') +
                     '</div>' +
                     (done ? '<span class="shrink-0 text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">সম্পন্ন</span>'
-                          : '<button type="button" class="q-start shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg" data-id="' + escHtml(s.id) + '"><i class="fa-solid fa-play mr-1"></i>' + (active ? 'চলছে' : 'Start') + '</button>') +
+                          : '<button type="button" class="q-start shrink-0 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg" data-id="' + escHtml(s.id) + '"><i class="fa-solid fa-play mr-1"></i>' + (active ? 'চলছে' : 'Start') + '</button>') +
                 '</div>';
             }).join('');
         }
@@ -1639,7 +1680,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                 if (!Array.isArray(data) || !data.length) return;
                 byId('favWrap').style.display = 'block';
                 byId('favChips').innerHTML = data.map(m => `
-                    <span data-id="${escHtml(m.id)}" data-label="${escHtml(m.label)}" data-generic="${escHtml(m.generic_name || '')}" data-type="${escHtml(m.dosage_form || '')}" class="fav-chip bg-indigo-50 text-indigo-700 border border-indigo-100 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer hover:bg-indigo-100">💊 ${escHtml(m.label)}</span>
+                    <span data-id="${escHtml(m.id)}" data-label="${escHtml(m.label)}" data-generic="${escHtml(m.generic_name || '')}" data-type="${escHtml(m.dosage_form || '')}" class="fav-chip bg-teal-50 text-teal-800 border border-teal-100 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer hover:bg-teal-100">💊 ${escHtml(m.label)}</span>
                 `).join('');
                 document.querySelectorAll('.fav-chip').forEach(chip => {
                     chip.addEventListener('click', function () {
@@ -1920,6 +1961,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
                         'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Idempotency-Key': newIdempotencyKey(),
                     },
                     body: JSON.stringify({
                         medicine_ids: ids,
@@ -1931,6 +1973,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                 });
                 const data = await res.json().catch(() => ({}));
                 if (!res.ok) throw new Error(data.error || data.message || ('Request failed (status ' + res.status + ')'));
+                applyAiWallet(data);
                 conflictSignature = medSignature(ids);
                 conflictResult = data;
                 renderConflicts(data, totalRows - ids.length);
@@ -1972,6 +2015,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
                         'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Idempotency-Key': newIdempotencyKey(),
                     },
                     body: JSON.stringify({
                         symptoms,
@@ -1989,11 +2033,12 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                 catch (e) { throw new Error(`Server didn't return JSON (status ${res.status}). ` + text.slice(0, 200)); }
                 if (!res.ok && !data.error) throw new Error(`Request failed (status ${res.status}).`);
                 if (data.error) throw new Error(data.error);
+                applyAiWallet(data);
 
                 const list = data.diagnoses || [];
                 const wrap = byId('diagSuggestions');
                 wrap.innerHTML = list.map(d => `
-                    <span class="ai-diag-chip bg-purple-50 text-purple-700 border border-purple-200 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer hover:bg-purple-100" data-val="${escHtml(d)}">✨ ${escHtml(d)}</span>
+                    <span class="ai-diag-chip bg-teal-50 text-teal-800 border border-teal-200 px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer hover:bg-teal-100" data-val="${escHtml(d)}">✨ ${escHtml(d)}</span>
                 `).join('');
                 wrap.querySelectorAll('.ai-diag-chip').forEach(chip => {
                     chip.addEventListener('click', function () {
@@ -2028,7 +2073,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
             try {
                 const res = await fetch(AI_MED_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Idempotency-Key': newIdempotencyKey() },
                     body: JSON.stringify({
                         diagnosis,
                         symptoms,
@@ -2039,6 +2084,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
                 });
                 const data = await res.json().catch(() => ({}));
                 if (!res.ok || data.error) throw new Error(data.error || data.message || ('Request failed (status ' + res.status + ')'));
+                applyAiWallet(data);
 
                 const meds = data.medicines || [];
                 if (!meds.length) {
@@ -2048,12 +2094,12 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
 
                 const list = byId('aiMedList');
                 list.innerHTML = meds.map((m) => `
-                    <div class="bg-white border border-purple-100 rounded-lg p-3 flex justify-between items-center gap-3">
+                    <div class="bg-white border border-teal-100 rounded-lg p-3 flex justify-between items-center gap-3">
                         <div class="min-w-0">
                             <p class="text-sm font-semibold text-slate-800">${escHtml(m.label)} ${m.is_sponsored ? '<span class="text-[9px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full ml-1"><i class="fa-solid fa-star"></i> Sponsored</span>' : ''}</p>
                             <p class="text-[11px] text-slate-400">${escHtml(m.generic_name)} • ${escHtml(m.dose)} • ${escHtml(m.duration)} • ${escHtml(m.instruction)}</p>
                         </div>
-                        <button type="button" class="ai-add-btn shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg"
+                        <button type="button" class="ai-add-btn shrink-0 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg"
                             data-id="${escHtml(m.medicine_id || '')}" data-label="${escHtml(m.label)}" data-generic="${escHtml(m.generic_name || '')}" data-dose="${escHtml(m.dose)}" data-duration="${escHtml(m.duration)}" data-instruction="${escHtml(m.instruction)}">
                             + Add
                         </button>
@@ -2132,10 +2178,10 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
             }
 
             const charge = currentCharge();
-            if (BALANCE < charge) {
+            if (balanceNow < charge) {
                 await appDialog({
                     type: 'danger', title: 'Wallet ব্যালেন্স যথেষ্ট নয়',
-                    message: 'এই Save-এর জন্য ' + money(charge) + ' লাগবে, কিন্তু আপনার ব্যালেন্স ' + money(BALANCE) + '। Super Admin দিয়ে Wallet রিচার্জ করান।',
+                    message: 'এই Save-এর জন্য ' + money(charge) + ' লাগবে, কিন্তু আপনার ব্যালেন্স ' + money(balanceNow) + '। Super Admin দিয়ে Wallet রিচার্জ করান।',
                 });
                 return false;
             }
@@ -2176,7 +2222,7 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
             if (CONFIRM_BEFORE_SAVE) {
                 const r = await appDialog({
                     type: 'info', title: 'Save করে প্রিন্ট করবেন?',
-                    message: 'Wallet থেকে ' + money(charge) + ' কাটা হবে। Save-এর পর ব্যালেন্স হবে ' + money(BALANCE - charge) + '।',
+                    message: 'Wallet থেকে ' + money(charge) + ' কাটা হবে। Save-এর পর ব্যালেন্স হবে ' + money(balanceNow - charge) + '।',
                     confirmText: 'Save & Print', cancelText: 'ফিরে যাই',
                 });
                 if (r !== 'confirm') return false;
@@ -2321,13 +2367,13 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
         function renderAdvicePresets() {
             byId('adviceTabs').innerHTML = ADVICE_PRESETS.map(g => {
                 const on = g.key === adviceGroup;
-                return `<button type="button" data-group="${escHtml(g.key)}" class="advice-tab px-2.5 py-1 rounded-full text-xs font-bold border ${on ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-indigo-50'}">${g.icon} ${escHtml(g.label)}</button>`;
+                return `<button type="button" data-group="${escHtml(g.key)}" class="advice-tab px-2.5 py-1 rounded-full text-xs font-bold border ${on ? 'bg-teal-700 text-white border-teal-700' : 'bg-white text-slate-600 border-slate-200 hover:bg-teal-50'}">${g.icon} ${escHtml(g.label)}</button>`;
             }).join('');
 
             const ta = byId('adviceInput').value;
             byId('adviceChips').innerHTML = currentAdviceItems().map((txt, i) => {
                 const used = ta.indexOf(txt) !== -1;
-                return `<span data-i="${i}" class="advice-chip ${used ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white text-slate-700 border-slate-200 hover:bg-indigo-50 hover:border-indigo-200'} border px-2.5 py-1 rounded-lg text-xs cursor-pointer" title="ক্লিক করে Advice-এ যোগ করুন">${used ? '✓ ' : '+ '}${escHtml(txt)}</span>`;
+                return `<span data-i="${i}" class="advice-chip ${used ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white text-slate-700 border-slate-200 hover:bg-teal-50 hover:border-teal-200'} border px-2.5 py-1 rounded-lg text-xs cursor-pointer" title="ক্লিক করে Advice-এ যোগ করুন">${used ? '✓ ' : '+ '}${escHtml(txt)}</span>`;
             }).join('');
         }
 
@@ -2701,14 +2747,16 @@ byId('prescriptionForm').addEventListener('submit', cleanInvText);
 
         /* ================= Lazy tools ================= */
         // ---- Summary strip ----
-        function refreshSummary() {
-            const n = val('patientName'), age = val('patientAge');
-            byId('sumPatient').textContent = n ? n + (age ? ' · ' + age + ' বছর' : '') : 'রোগী নির্বাচন হয়নি';
-            byId('sumMeds').textContent = currentMode() === 'investigation_only' ? '—' : medRowCount();
-            byId('sumCharge').textContent = money(currentCharge());
-            byId('sumBal').textContent = money(BALANCE);
-            byId('sumBalWrap').classList.toggle('bad', BALANCE < currentCharge());
+        function publishPrescriptionSummary() {
+            window.dispatchEvent(new CustomEvent('rx:summary:update', { detail: {
+                patient: val('patientName'),
+                age: val('patientAge'),
+                medicines: currentMode() === 'investigation_only' ? '?' : medRowCount(),
+                charge: currentCharge(),
+                balance: balanceNow,
+            }}));
         }
+        function refreshSummary() { publishPrescriptionSummary(); }
         byId('prescriptionForm').addEventListener('input', refreshSummary);
         byId('prescriptionForm').addEventListener('change', refreshSummary);
         new MutationObserver(refreshSummary).observe(prescriptionList, { childList: true });

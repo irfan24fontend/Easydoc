@@ -40,7 +40,7 @@
                     var tag = document.createElement('span');
                     tag.textContent = 'ডিফল্ট';
                     tag.title = 'Favorite Medicines থেকে স্বয়ংক্রিয়ভাবে যোগ হয়েছে';
-                    tag.style.cssText = 'margin-left:6px;font-size:10px;font-weight:700;background:#e0e7ff;color:#3730a3;padding:1px 7px;border-radius:999px;vertical-align:middle;';
+                    tag.style.cssText = 'margin-left:6px;font-size:10px;font-weight:700;background:#cfe9e5;color:#075f5a;padding:1px 7px;border-radius:999px;vertical-align:middle;';
                     first.insertBefore(tag, first.querySelector('input'));
                 }
             }

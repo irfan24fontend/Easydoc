@@ -1,4 +1,4 @@
-{{-- Stethoscope preloader. Layout e <body> er thik porei: @include('partials.preloader') --}}
+{{-- Stethoscope preloader injected into HTML responses by EasyDocInject middleware. --}}
 <style>
 #ed-preloader{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#ecfeff,#f0fdf4);transition:opacity .45s ease,visibility .45s ease}
 #ed-preloader.ed-hide{opacity:0;visibility:hidden}

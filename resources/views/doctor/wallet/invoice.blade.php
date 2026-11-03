@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --brand:#4f46e5; --paid:#15803d; }
+        :root { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --brand:#0c8c84; --paid:#15803d; }
         * { box-sizing: border-box; }
         body { margin:0; font-family:'Inter',system-ui,sans-serif; background:#eef1f6; color:var(--ink); font-size:14px; -webkit-font-smoothing:antialiased; }
 

@@ -1,10 +1,14 @@
 <?php
 
 return [
-        'default_prescription_charge' => 10,
+    'default_prescription_charge' => 10,
+    'registration_bonus' => 100,
+    'ai_diagnosis_charge' => 2,
+    'ai_medicine_charge' => 2,
+    'ai_interaction_charge' => 2,
     'minimum_recharge_amount' => 1000,
-    'reprint_charge' => 5,
     'investigation_advice_charge' => 2,
+    'chamber_request_charge' => 500,
     'timezone' => 'Asia/Dhaka',
     'company' => [
     'name'    => 'EasyDoc',

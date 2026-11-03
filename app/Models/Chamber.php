@@ -30,6 +30,7 @@ class Chamber extends Model
         'reviewed_by',
         'reject_reason',
         'fee_charged',
+        'request_token',
     ];
 
     protected $casts = [

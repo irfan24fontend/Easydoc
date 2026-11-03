@@ -14,7 +14,7 @@
         font-size: 0.875rem; transition: all 0.2s ease; color: #334155;
     }
     .modern-input:focus, .modern-textarea:focus {
-        border-color: #4f46e5; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); outline: none;
+        border-color: #0c8c84; box-shadow: 0 0 0 4px rgba(12, 140, 132, 0.1); outline: none;
     }
     .form-label-custom {
         font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
@@ -26,7 +26,7 @@
         display: flex; align-items: center; gap: 10px;
     }
     .section-title .ico {
-        width: 28px; height: 28px; border-radius: 8px; background: #eef2ff; color: #4f46e5;
+        width: 28px; height: 28px; border-radius: 8px; background: #e3f3f0; color: #0c8c84;
         display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem;
     }
 
@@ -38,7 +38,7 @@
         border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; font-weight: 600; font-size: 0.82rem;
         border-radius: 999px; padding: 0.35rem 0.95rem; transition: all .15s ease;
     }
-    .quick-amt:hover { background: #eef2ff; border-color: #c7d2fe; color: #4338ca; }
+    .quick-amt:hover { background: #e3f3f0; border-color: #9bd2cc; color: #0a6b65; }
 
     .pay-option { position: relative; margin: 0; }
     .pay-option input { position: absolute; opacity: 0; pointer-events: none; }
@@ -52,11 +52,11 @@
         font-size: 0.85rem; flex-shrink: 0;
     }
     .pay-card .pn { font-size: 0.85rem; font-weight: 600; color: #334155; }
-    .pay-option input:checked + .pay-card { border-color: #4f46e5; background: #eef2ff; box-shadow: 0 2px 8px rgba(79,70,229,.12); }
+    .pay-option input:checked + .pay-card { border-color: #0c8c84; background: #e3f3f0; box-shadow: 0 2px 8px rgba(12,140,132,.12); }
 
-    .doc-banner { height: 64px; border-radius: 12px 12px 0 0; background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    .doc-banner { height: 64px; border-radius: 12px 12px 0 0; background: linear-gradient(135deg, #0c8c84, #0c8c84); }
     .doc-avatar {
-        width: 62px; height: 62px; border-radius: 16px; background: #4f46e5; color: #fff; font-weight: 800;
+        width: 62px; height: 62px; border-radius: 16px; background: #0c8c84; color: #fff; font-weight: 800;
         font-size: 1.25rem; display: flex; align-items: center; justify-content: center;
         border: 4px solid #fff; margin-top: -32px; box-shadow: 0 4px 10px rgba(0,0,0,.1);
     }
@@ -181,7 +181,7 @@
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="button" id="reviewBtn" class="btn btn-primary px-4 py-2 fw-semibold shadow-sm" style="background-color: #4f46e5; border-color: #4f46e5;">
+                        <button type="button" id="reviewBtn" class="btn btn-primary px-4 py-2 fw-semibold shadow-sm" style="background-color: #0c8c84; border-color: #0c8c84;">
                             <i class="fa-solid fa-bolt me-1"></i> Review &amp; Recharge
                         </button>
                         <a href="{{ route('admin.wallets.index') }}" class="btn btn-light border px-4 py-2 text-secondary fw-medium">Cancel</a>
@@ -244,7 +244,7 @@
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
             <div class="modal-body p-4 text-center">
-                <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle" style="width:56px;height:56px;background:#eef2ff;color:#4f46e5;font-size:1.4rem;">
+                <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle" style="width:56px;height:56px;background:#e3f3f0;color:#0c8c84;font-size:1.4rem;">
                     <i class="fa-solid fa-wallet"></i>
                 </div>
                 <h5 class="fw-bold mt-3 mb-1">Recharge নিশ্চিত করুন</h5>

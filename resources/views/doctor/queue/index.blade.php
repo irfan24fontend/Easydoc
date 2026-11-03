@@ -12,16 +12,16 @@
     .page-head h1 { font-size: 1.4rem; font-weight: 800; color: #0f172a; margin: 0; }
     .page-head p { color: #64748b; font-size: .85rem; margin: .2rem 0 0; }
     .cardx { background: #fff; border: 1px solid #eef0f4; border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
-    .serial-no { width: 40px; height: 40px; border-radius: 12px; background: #eef2ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+    .serial-no { width: 40px; height: 40px; border-radius: 12px; background: #e3f3f0; color: #0a6b65; display: flex; align-items: center; justify-content: center; font-weight: 800; }
     .count-box { border-radius: 12px; padding: .7rem .9rem; background: #fff; border: 1px solid #eef0f4; text-align: center; }
     .count-box .n { font-size: 1.4rem; font-weight: 800; color: #0f172a; line-height: 1; }
     .count-box .l { font-size: .72rem; color: #64748b; font-weight: 600; }
-    .now-card { background: linear-gradient(135deg,#4f46e5,#4338ca); color: #fff; border-radius: 16px; }
+    .now-card { background: linear-gradient(135deg,#0c8c84,#0a6b65); color: #fff; border-radius: 16px; }
     .table > :not(caption) > * > * { vertical-align: middle; }
     .date-chip { display: inline-flex; align-items: center; gap: 6px; padding: .3rem .7rem; border-radius: 999px; font-size: .78rem; font-weight: 700; border: 1px solid #e2e8f0; background: #fff; color: #475569; text-decoration: none; }
-    .date-chip:hover { background: #eef2ff; border-color: #c7d2fe; color: #4338ca; }
-    .date-chip.active { background: #4f46e5; border-color: #4f46e5; color: #fff; }
-    .date-chip .cnt { background: rgba(79,70,229,.12); color: #4338ca; border-radius: 999px; padding: 0 .45rem; font-size: .7rem; }
+    .date-chip:hover { background: #e3f3f0; border-color: #9bd2cc; color: #0a6b65; }
+    .date-chip.active { background: #0c8c84; border-color: #0c8c84; color: #fff; }
+    .date-chip .cnt { background: rgba(12,140,132,.12); color: #0a6b65; border-radius: 999px; padding: 0 .45rem; font-size: .7rem; }
     .date-chip.active .cnt { background: rgba(255,255,255,.25); color: #fff; }
 </style>
 

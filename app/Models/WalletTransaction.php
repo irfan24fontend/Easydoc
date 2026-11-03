@@ -13,7 +13,8 @@ class WalletTransaction extends Model
         'wallet_id',
         'type',
         'amount',
-        'description'
+        'description',
+        'idempotency_key',
 
     ];
 

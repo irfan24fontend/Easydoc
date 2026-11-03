@@ -19,7 +19,7 @@
 
 <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 page-head mb-4">
     <div>
-        <a href="{{ route('doctor.prescriptions.index') }}" class="small text-decoration-none" style="color:#4f46e5; font-weight:700;">
+        <a href="{{ route('doctor.prescriptions.index') }}" class="small text-decoration-none" style="color:#0c8c84; font-weight:700;">
             <i class="fa-solid fa-arrow-left me-1"></i> Prescription List
         </a>
         <h1 class="mt-2">Prescription #{{ $prescription->id }}</h1>
@@ -29,7 +29,7 @@
         <a href="{{ route('doctor.prescriptions.edit', $prescription->id) }}" class="btn d-inline-flex align-items-center gap-2" style="background:#fff7ed; color:#c2410c; border:1px solid #fed7aa; border-radius:10px; font-weight:700; font-size:0.85rem; padding:0.55rem 1rem;">
             <i class="fa-solid fa-pen"></i> Edit
         </a>
-        <a href="{{ route('doctor.prescriptions.print', $prescription->id) }}" target="_blank" class="btn d-inline-flex align-items-center gap-2" style="background:#4f46e5; color:#fff; border-radius:10px; font-weight:700; font-size:0.85rem; padding:0.55rem 1rem;">
+        <a href="{{ route('doctor.prescriptions.print', $prescription->id) }}" target="_blank" class="btn d-inline-flex align-items-center gap-2" style="background:#0c8c84; color:#fff; border-radius:10px; font-weight:700; font-size:0.85rem; padding:0.55rem 1rem;">
             <i class="fa-solid fa-print"></i> Print
         </a>
     </div>

@@ -65,7 +65,7 @@
     </div>
 
     <div class="d-flex gap-2 mt-4">
-        <button class="btn btn-primary fw-bold px-4" style="background:#4f46e5;border-color:#4f46e5;">
+        <button class="btn btn-primary fw-bold px-4" style="background:#0c8c84;border-color:#0c8c84;">
             <i class="fa-solid fa-floppy-disk me-1"></i> {{ $isEdit ? 'আপডেট করুন' : 'রোগী যোগ করুন' }}
         </button>
         <a href="{{ $isEdit ? route('doctor.patients.show', $patient) : route('doctor.patients.index') }}" class="btn btn-outline-secondary fw-semibold">বাতিল</a>

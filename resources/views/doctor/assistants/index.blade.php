@@ -8,7 +8,7 @@
     .page-head p { color: #64748b; font-size: .85rem; margin: .2rem 0 0; }
     .cardx { background: #fff; border: 1px solid #eef0f4; border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
     .field-label { font-size: .72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .03em; }
-    .avatar-circle { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg,#eef2ff,#e0e7ff); color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .8rem; }
+    .avatar-circle { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg,#e3f3f0,#cfe9e5); color: #0a6b65; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .8rem; }
 </style>
 
 <div class="page-head mb-4">
@@ -49,7 +49,18 @@
                     <label class="field-label">পাসওয়ার্ড * (কমপক্ষে ৬ অক্ষর)</label>
                     <input type="text" name="password" class="form-control" required minlength="6" autocomplete="off">
                 </div>
-                <button class="btn btn-primary w-100 fw-bold"><i class="fa-solid fa-plus me-1"></i> সহকারী যোগ করুন</button>
+                <div class="mb-3">
+                    <label class="field-label">Assigned chambers *</label>
+                    @forelse($chambers as $chamber)
+                        <label class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox" name="chamber_ids[]" value="{{ $chamber->id }}" {{ in_array($chamber->id, old('chamber_ids', [])) ? 'checked' : '' }}>
+                            <span class="form-check-label">{{ $chamber->chamber_name }}</span>
+                        </label>
+                    @empty
+                        <div class="form-text">Add an approved chamber before creating an assistant.</div>
+                    @endforelse
+                </div>
+                <button class="btn btn-primary w-100 fw-bold" {{ $chambers->isEmpty() ? 'disabled' : '' }}><i class="fa-solid fa-plus me-1"></i> সহকারী যোগ করুন</button>
             </form>
         </div>
     </div>
@@ -60,7 +71,7 @@
                 <table class="table align-middle mb-0">
                     <thead>
                         <tr class="small text-muted text-uppercase">
-                            <th>সহকারী</th><th>লগইন ইমেইল</th><th>মোবাইল</th><th>অবস্থা</th><th class="text-end">অ্যাকশন</th>
+                            <th>সহকারী</th><th>লগইন ইমেইল</th><th>মোবাইল</th><th>Chambers</th><th>অবস্থা</th><th class="text-end">অ্যাকশন</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -74,6 +85,7 @@
                                 </td>
                                 <td class="small">{{ $a->user->email }}</td>
                                 <td class="small text-muted">{{ $a->user->phone ?: '—' }}</td>
+                                <td class="small">{{ $a->chambers->pluck('chamber_name')->join(', ') ?: '—' }}</td>
                                 <td>
                                     @if($a->user->status === 'inactive')
                                         <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis">নিষ্ক্রিয়</span>
@@ -94,7 +106,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="text-center text-muted py-5">এখনো কোনো সহকারী যোগ করা হয়নি।</td></tr>
+                            <tr><td colspan="6" class="text-center text-muted py-5">এখনো কোনো সহকারী যোগ করা হয়নি।</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -135,6 +147,15 @@
                             <option value="active" {{ $a->user->status !== 'inactive' ? 'selected' : '' }}>সক্রিয়</option>
                             <option value="inactive" {{ $a->user->status === 'inactive' ? 'selected' : '' }}>নিষ্ক্রিয় (লগইন বন্ধ)</option>
                         </select>
+                    </div>
+                    <div class="mt-3">
+                        <label class="field-label">Assigned chambers *</label>
+                        @foreach($chambers as $chamber)
+                            <label class="form-check mb-1">
+                                <input class="form-check-input" type="checkbox" name="chamber_ids[]" value="{{ $chamber->id }}" {{ $a->chambers->contains('id', $chamber->id) ? 'checked' : '' }}>
+                                <span class="form-check-label">{{ $chamber->chamber_name }}</span>
+                            </label>
+                        @endforeach
                     </div>
                 </div>
                 <div class="modal-footer">

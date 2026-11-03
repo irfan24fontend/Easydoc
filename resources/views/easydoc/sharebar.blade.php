@@ -8,8 +8,8 @@
     <button type="button" class="edx-b" style="background:#475569" onclick="window.print()">Print</button>
     @unless($isPublic)
       <a class="edx-b" style="background:#16a34a" target="_blank" rel="noopener" href="https://wa.me/?text={{ urlencode('Apnar prescription: '.$shareUrl) }}">WhatsApp</a>
-      <a class="edx-b" style="background:#7c3aed" href="sms:?&body={{ urlencode('Apnar prescription: '.$shareUrl) }}">SMS</a>
-      <button type="button" class="edx-b" id="edx-native" style="background:#0891b2;display:none">Share</button>
+      <a class="edx-b" style="background:#0c8c84" href="sms:?&body={{ urlencode('Apnar prescription: '.$shareUrl) }}">SMS</a>
+      <button type="button" class="edx-b" id="edx-native" style="background:#0c8c84;display:none">Share</button>
       <form method="POST" action="{{ $revokeUrl }}" onsubmit="return confirm('Link bondho korle ager link kaj korbe na. Nishchit?')" style="display:inline">
         @csrf
         <button type="submit" class="edx-b" style="background:#fff;color:#b91c1c;border:1px solid #fecaca">Link bondho</button>

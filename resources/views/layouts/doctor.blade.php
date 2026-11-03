@@ -20,12 +20,13 @@
     @vite(['resources/css/app.css','resources/js/app.js'])
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    @vite(['resources/css/theme.css'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--ed-mist); }
 
         /* Tailwind (compiled into app.css) has a ".collapse { visibility: collapse }" utility.
            It hides Bootstrap's dropdown/collapse menus even when they are open, so undo it. */

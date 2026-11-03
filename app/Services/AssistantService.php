@@ -23,10 +23,14 @@ class AssistantService
                 'status' => 'active',
             ]);
 
-            return DoctorAssistant::create([
+            $assistant = DoctorAssistant::create([
                 'user_id' => $user->id,
                 'doctor_id' => $doctor->id,
             ]);
+
+            $assistant->chambers()->sync($data['chamber_ids']);
+
+            return $assistant;
         });
     }
 
@@ -44,6 +48,7 @@ class AssistantService
         }
 
         $assistant->user->update($payload);
+        $assistant->chambers()->sync($data['chamber_ids']);
     }
 
     public function delete(DoctorAssistant $assistant): void

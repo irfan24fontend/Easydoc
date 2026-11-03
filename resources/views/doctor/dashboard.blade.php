@@ -4,14 +4,14 @@
 
 @push('styles')
 <style>
-    :root { --dx-brand: #4f46e5; --dx-ink: #0f172a; --dx-muted: #64748b; --dx-line: #e8ebf1; }
+    :root { --dx-brand: #0c8c84; --dx-ink: #0f172a; --dx-muted: #64748b; --dx-line: #e8ebf1; }
 
     /* ---------- Hero ---------- */
     .dx-hero {
         position: relative; overflow: hidden; border-radius: 22px; padding: 1.7rem 1.9rem; color: #fff;
         background: radial-gradient(1200px 320px at 92% -25%, rgba(255,255,255,.2), transparent 60%),
-                    linear-gradient(135deg, #4f46e5 0%, #6d28d9 55%, #7c3aed 100%);
-        box-shadow: 0 14px 34px rgba(79,70,229,.28);
+                    linear-gradient(135deg, #0c8c84 0%, #0a6b65 55%, #0c8c84 100%);
+        box-shadow: 0 14px 34px rgba(12,140,132,.28);
     }
     .dx-hero::after { content: ""; position: absolute; right: -70px; bottom: -90px; width: 260px; height: 260px; border-radius: 50%; background: rgba(255,255,255,.07); }
     .dx-hero-inner { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.2rem; }
@@ -20,8 +20,8 @@
     .dx-hero p { margin: .3rem 0 0; opacity: .85; font-size: .9rem; }
     .dx-cta { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.1rem; }
     .dx-btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 12px; padding: .6rem 1.1rem; font-size: .85rem; font-weight: 800; text-decoration: none; transition: transform .15s, box-shadow .15s, background .15s; }
-    .dx-btn.primary { background: #fff; color: #4338ca; box-shadow: 0 8px 18px rgba(15,23,42,.2); }
-    .dx-btn.primary:hover { color: #3730a3; transform: translateY(-1px); box-shadow: 0 12px 24px rgba(15,23,42,.25); }
+    .dx-btn.primary { background: #fff; color: #0a6b65; box-shadow: 0 8px 18px rgba(15,23,42,.2); }
+    .dx-btn.primary:hover { color: #075f5a; transform: translateY(-1px); box-shadow: 0 12px 24px rgba(15,23,42,.25); }
     .dx-btn.ghost { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.3); color: #fff; }
     .dx-btn.ghost:hover { background: rgba(255,255,255,.24); color: #fff; }
 
@@ -53,14 +53,14 @@
     .dx-card { background: #fff; border: 1px solid var(--dx-line); border-radius: 20px; padding: 1.35rem 1.4rem; box-shadow: 0 1px 3px rgba(15,23,42,.04); }
     .dx-card-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .6rem; margin-bottom: 1rem; }
     .dx-card-head h2 { margin: 0; font-size: .98rem; font-weight: 800; color: var(--dx-ink); display: flex; align-items: center; gap: 9px; }
-    .dx-card-head h2 .hi { width: 32px; height: 32px; border-radius: 10px; background: #eef2ff; color: var(--dx-brand); display: inline-flex; align-items: center; justify-content: center; font-size: .85rem; }
+    .dx-card-head h2 .hi { width: 32px; height: 32px; border-radius: 10px; background: #e3f3f0; color: var(--dx-brand); display: inline-flex; align-items: center; justify-content: center; font-size: .85rem; }
     .dx-card-head .sub { font-size: .76rem; color: var(--dx-muted); font-weight: 500; }
-    .dx-link { font-size: .78rem; font-weight: 800; color: var(--dx-brand); text-decoration: none; background: #eef2ff; border-radius: 10px; padding: .4rem .8rem; }
-    .dx-link:hover { background: #e0e7ff; color: #4338ca; }
+    .dx-link { font-size: .78rem; font-weight: 800; color: var(--dx-brand); text-decoration: none; background: #e3f3f0; border-radius: 10px; padding: .4rem .8rem; }
+    .dx-link:hover { background: #cfe9e5; color: #0a6b65; }
 
     /* ---------- Queue ---------- */
-    .dx-progress { height: 8px; border-radius: 999px; background: #eef2ff; overflow: hidden; }
-    .dx-progress > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #4f46e5, #7c3aed); transition: width .6s ease; }
+    .dx-progress { height: 8px; border-radius: 999px; background: #e3f3f0; overflow: hidden; }
+    .dx-progress > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #0c8c84, #0c8c84); transition: width .6s ease; }
     .dx-progress-meta { display: flex; justify-content: space-between; font-size: .76rem; color: var(--dx-muted); font-weight: 600; margin: .45rem 0 1rem; }
 
     .dx-counts { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6rem; margin-bottom: 1.1rem; }
@@ -70,15 +70,15 @@
     .dx-count .l i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
 
     .dx-row { display: flex; align-items: center; gap: 13px; padding: .75rem .9rem; border: 1px solid var(--dx-line); border-radius: 14px; margin-bottom: .55rem; background: #fff; transition: border-color .15s, box-shadow .15s; }
-    .dx-row:hover { border-color: #c7d2fe; box-shadow: 0 6px 16px rgba(79,70,229,.08); }
-    .dx-row.live { border-color: #4f46e5; background: #fafaff; box-shadow: 0 0 0 3px rgba(79,70,229,.08); }
-    .dx-no { width: 40px; height: 40px; border-radius: 11px; background: #eef2ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
-    .dx-row.live .dx-no { background: #4f46e5; color: #fff; }
+    .dx-row:hover { border-color: #9bd2cc; box-shadow: 0 6px 16px rgba(12,140,132,.08); }
+    .dx-row.live { border-color: #0c8c84; background: #fafaff; box-shadow: 0 0 0 3px rgba(12,140,132,.08); }
+    .dx-no { width: 40px; height: 40px; border-radius: 11px; background: #e3f3f0; color: #0a6b65; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
+    .dx-row.live .dx-no { background: #0c8c84; color: #fff; }
     .dx-row .nm { font-weight: 800; color: var(--dx-ink); font-size: .92rem; }
     .dx-row .mt { font-size: .78rem; color: var(--dx-muted); }
     .dx-row .vt { font-size: .76rem; color: #0f766e; font-weight: 700; }
     .dx-go { border: 0; border-radius: 11px; background: var(--dx-brand); color: #fff; font-weight: 800; font-size: .8rem; padding: .5rem .95rem; text-decoration: none; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; transition: background .15s; }
-    .dx-go:hover { background: #4338ca; color: #fff; }
+    .dx-go:hover { background: #0a6b65; color: #fff; }
     .dx-empty { text-align: center; padding: 2rem 1rem; color: var(--dx-muted); font-size: .86rem; }
     .dx-empty i { display: block; font-size: 1.9rem; color: #cbd5e1; margin-bottom: .5rem; }
 
@@ -91,11 +91,11 @@
 
     /* ---------- Quick actions ---------- */
     .dx-qa { display: flex; align-items: center; gap: 12px; padding: .75rem .9rem; border: 1px solid var(--dx-line); border-radius: 14px; text-decoration: none; color: var(--dx-ink); font-weight: 700; font-size: .85rem; margin-bottom: .55rem; transition: all .15s; }
-    .dx-qa:hover { border-color: #c7d2fe; background: #fafbff; color: var(--dx-ink); transform: translateX(2px); }
+    .dx-qa:hover { border-color: #9bd2cc; background: #fafbff; color: var(--dx-ink); transform: translateX(2px); }
     .dx-qa .ic { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; }
     .dx-qa .ar { margin-left: auto; color: #cbd5e1; font-size: .75rem; }
-    .dx-qa.main { background: linear-gradient(135deg, #4f46e5, #7c3aed); border-color: transparent; color: #fff; box-shadow: 0 10px 22px rgba(79,70,229,.25); }
-    .dx-qa.main:hover { color: #fff; background: linear-gradient(135deg, #4338ca, #6d28d9); }
+    .dx-qa.main { background: linear-gradient(135deg, #0c8c84, #0c8c84); border-color: transparent; color: #fff; box-shadow: 0 10px 22px rgba(12,140,132,.25); }
+    .dx-qa.main:hover { color: #fff; background: linear-gradient(135deg, #0a6b65, #0a6b65); }
     .dx-qa.main .ic { background: rgba(255,255,255,.18); color: #fff; }
     .dx-qa.main .ar { color: rgba(255,255,255,.7); }
 
@@ -171,7 +171,7 @@
 <div class="row g-3 mb-4">
     <div class="col-6 col-xl-3">
         <div class="dx-stat">
-            <div class="ico" style="background:#ede9fe;color:#7c3aed;"><i class="fa-solid fa-wallet"></i></div>
+            <div class="ico" style="background:#daf0ed;color:#0c8c84;"><i class="fa-solid fa-wallet"></i></div>
             <div class="min-w">
                 <div class="num">৳{{ number_format($stats['wallet_balance'], 2) }}</div>
                 <div class="lbl">Wallet ব্যালেন্স</div>
@@ -189,7 +189,7 @@
     </div>
     <div class="col-6 col-xl-3">
         <div class="dx-stat">
-            <div class="ico" style="background:#eef2ff;color:#4f46e5;"><i class="fa-solid fa-hospital"></i></div>
+            <div class="ico" style="background:#e3f3f0;color:#0c8c84;"><i class="fa-solid fa-hospital"></i></div>
             <div class="min-w">
                 <div class="num">{{ $stats['total_chambers'] }}</div>
                 <div class="lbl">মোট চেম্বার</div>
@@ -229,7 +229,7 @@
             </div>
 
             <div class="dx-counts">
-                <div class="dx-count"><div class="n">{{ $qTotal }}</div><div class="l"><i style="background:#6366f1;"></i>মোট</div></div>
+                <div class="dx-count"><div class="n">{{ $qTotal }}</div><div class="l"><i style="background:#0c8c84;"></i>মোট</div></div>
                 <div class="dx-count"><div class="n">{{ $qWait }}</div><div class="l"><i style="background:#f59e0b;"></i>অপেক্ষায়</div></div>
                 <div class="dx-count"><div class="n">{{ $qLive }}</div><div class="l"><i style="background:#22c55e;"></i>চলছে</div></div>
                 <div class="dx-count"><div class="n">{{ $qDone }}</div><div class="l"><i style="background:#94a3b8;"></i>সম্পন্ন</div></div>
@@ -295,7 +295,7 @@
                 <i class="fa-solid fa-chevron-right ar"></i>
             </a>
             <a href="{{ route('doctor.prescriptions.index') }}" class="dx-qa">
-                <span class="ic" style="background:#eef2ff;color:#4f46e5;"><i class="fa-solid fa-list-ul"></i></span> প্রেসক্রিপশন লিস্ট
+                <span class="ic" style="background:#e3f3f0;color:#0c8c84;"><i class="fa-solid fa-list-ul"></i></span> প্রেসক্রিপশন লিস্ট
                 <i class="fa-solid fa-chevron-right ar"></i>
             </a>
             <a href="{{ route('doctor.patients.index') }}" class="dx-qa">
@@ -359,8 +359,8 @@
 
     const ctx = el.getContext('2d');
     const grad = ctx.createLinearGradient(0, 0, 0, 270);
-    grad.addColorStop(0, 'rgba(79,70,229,.25)');
-    grad.addColorStop(1, 'rgba(79,70,229,0)');
+    grad.addColorStop(0, 'rgba(12,140,132,.25)');
+    grad.addColorStop(1, 'rgba(12,140,132,0)');
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -371,11 +371,11 @@
             datasets: [{
                 label: 'রোগী সংখ্যা',
                 data: d.data,
-                borderColor: '#4f46e5',
+                borderColor: '#0c8c84',
                 borderWidth: 2.5,
                 backgroundColor: grad,
                 pointBackgroundColor: '#fff',
-                pointBorderColor: '#4f46e5',
+                pointBorderColor: '#0c8c84',
                 pointBorderWidth: 2,
                 pointRadius: 3.5,
                 pointHoverRadius: 6,

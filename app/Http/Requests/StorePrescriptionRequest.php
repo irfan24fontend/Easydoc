@@ -27,6 +27,7 @@ class StorePrescriptionRequest extends FormRequest
     {
         return [
             'type' => 'nullable|in:full,investigation_only',
+            'offline_ref' => 'nullable|string|max:64',
 
             'parent_prescription_id' =>
                 'nullable|integer|exists:prescriptions,id',

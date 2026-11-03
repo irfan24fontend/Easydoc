@@ -85,6 +85,9 @@ Route::middleware(['auth', 'role:super_admin'])
             ->name('doctors.certificate');
 
         Route::resource('doctors', DoctorController::class);
+        Route::patch('doctors/{doctor}/charges', [DoctorController::class, 'updateCharges'])
+            ->whereNumber('doctor')
+            ->name('doctors.charges.update');
         Route::resource('templates', PrescriptionTemplateController::class);
         Route::resource('chambers', ChamberController::class);
 
@@ -244,7 +247,7 @@ Route::middleware(['auth', 'role:doctor', 'doctor.approved'])
         Route::get('prescriptions/{prescription}/print', [PrescriptionController::class, 'print'])
             ->whereNumber('prescription')
             ->name('prescriptions.print');
-        Route::get('prescriptions/{prescription}/reprint', [PrescriptionController::class, 'reprint'])
+        Route::post('prescriptions/{prescription}/reprint', [PrescriptionController::class, 'reprint'])
             ->whereNumber('prescription')
             ->name('prescriptions.reprint');
     });

@@ -19,6 +19,11 @@ class Doctor extends Model
         'photo',
         'about',
         'prescription_charge',
+        'investigation_advice_charge',
+        'ai_diagnosis_charge',
+        'ai_medicine_charge',
+        'ai_interaction_charge',
+        'chamber_request_charge',
         'medical_college',
         'bmdc_certificate',
         'approval_status',
@@ -126,6 +131,30 @@ class Doctor extends Model
 
     public function getPrescriptionCharge(): float
     {
-        return (float) ($this->prescription_charge ?? config('easydoc.default_prescription_charge'));
+        return $this->getCharge('prescription');
+    }
+
+    public function getCharge(string $type): float
+    {
+        if ($type === 'reprint') {
+            return 0.0;
+        }
+
+        $map = [
+            'prescription' => ['prescription_charge', 'default_prescription_charge'],
+            'investigation_advice' => ['investigation_advice_charge', 'investigation_advice_charge'],
+            'ai_diagnosis' => ['ai_diagnosis_charge', 'ai_diagnosis_charge'],
+            'ai_medicine' => ['ai_medicine_charge', 'ai_medicine_charge'],
+            'ai_interaction' => ['ai_interaction_charge', 'ai_interaction_charge'],
+            'chamber_request' => ['chamber_request_charge', 'chamber_request_charge'],
+        ];
+
+        if (! isset($map[$type])) {
+            throw new \InvalidArgumentException("Unknown charge type: {$type}");
+        }
+
+        [$column, $configKey] = $map[$type];
+
+        return (float) ($this->{$column} ?? config("easydoc.{$configKey}", 0));
     }
 }

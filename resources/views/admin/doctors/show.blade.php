@@ -50,11 +50,11 @@
         <!-- Header Section -->
         <div class="d-flex justify-content-between align-items-center mb-5">
             <div>
-                <span class="badge text-uppercase tracking-wider px-2.5 py-1 mb-2 font-semibold" style="font-size: 0.65rem; background-color: #e0e7ff; color: #4338ca;">Practitioner Record</span>
+                <span class="badge text-uppercase tracking-wider px-2.5 py-1 mb-2 font-semibold" style="font-size: 0.65rem; background-color: #cfe9e5; color: #0a6b65;">Practitioner Record</span>
                 <h1 class="h2 fw-bold text-slate-900 m-0">Doctor Profile</h1>
             </div>
             <div class="d-flex gap-2">
-                <a href="{{ route('admin.doctors.edit', $doctor->id) }}" class="btn btn-primary rounded-pill px-4 small fw-medium shadow-sm d-flex align-items-center gap-2" style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); border: none;">
+                <a href="{{ route('admin.doctors.edit', $doctor->id) }}" class="btn btn-primary rounded-pill px-4 small fw-medium shadow-sm d-flex align-items-center gap-2" style="background: linear-gradient(135deg, #0c8c84 0%, #075f5a 100%); border: none;">
                     <i class="fas fa-edit"></i> Modify Record
                 </a>
                 <a href="{{ route('admin.doctors.index') }}" class="btn btn-light border rounded-pill px-4 text-secondary small fw-medium">
@@ -134,7 +134,7 @@
 
                     <!-- Primary Typography Identification -->
                     <h3 class="fw-bold text-slate-900 mb-1">{{ $doctor->user->name }}</h3>
-                    <p class="text-indigo-600 fw-semibold mb-3 small">{{ $doctor->designation ?? 'Medical Practitioner' }}</p>
+                    <p class="text-teal-700 fw-semibold mb-3 small">{{ $doctor->designation ?? 'Medical Practitioner' }}</p>
                     
                     <div class="bg-light rounded-3 p-3 mb-2 text-start">
                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -156,7 +156,7 @@
                 <!-- Section 1: Security & Communications Mapping -->
                 <div class="glass-card p-4 mb-4">
                     <div class="d-flex align-items-center gap-2 mb-4">
-                        <div class="icon-wrapper" style="background-color: #e0e7ff; color: #4f46e5;">
+                        <div class="icon-wrapper" style="background-color: #cfe9e5; color: #0c8c84;">
                             <i class="fas fa-address-book"></i>
                         </div>
                         <h5 class="fw-bold m-0 text-slate-800">Communication Variables</h5>
@@ -165,7 +165,7 @@
                     <div class="px-2">
                         <div class="data-row d-flex align-items-center justify-content-between">
                             <span class="meta-label">Primary Inbox Route</span>
-                            <span class="meta-value text-indigo-600 fw-semibold"><i class="far fa-envelope me-1 opacity-75"></i> {{ $doctor->user->email }}</span>
+                            <span class="meta-value text-teal-700 fw-semibold"><i class="far fa-envelope me-1 opacity-75"></i> {{ $doctor->user->email }}</span>
                         </div>
                         <div class="data-row d-flex align-items-center justify-content-between">
                             <span class="meta-label">Mobile Sub-Connection</span>

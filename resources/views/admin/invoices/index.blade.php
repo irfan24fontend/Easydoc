@@ -20,8 +20,8 @@
         font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em;
         padding: 0.4rem 0.75rem; border-radius: 6px; text-decoration: none; display: inline-block; transition: all 0.2s ease;
     }
-    .btn-action-text.view { color: #4f46e5; background-color: #eeebff; border: 1px solid #e0e7ff; }
-    .btn-action-text.view:hover { background-color: #4f46e5; color: #ffffff; }
+    .btn-action-text.view { color: #0c8c84; background-color: #daf0ed; border: 1px solid #cfe9e5; }
+    .btn-action-text.view:hover { background-color: #0c8c84; color: #ffffff; }
 </style>
 @endpush
 
@@ -34,7 +34,7 @@
                 <h1 class="h4 fw-bold text-dark m-0">Recharge Invoices</h1>
                 <p class="text-muted small m-0">Every wallet recharge made by Super Admin, with a printable invoice.</p>
             </div>
-            <a href="{{ route('admin.wallets.index') }}" class="btn btn-primary px-4 fw-semibold" style="background-color: #4f46e5; border-color: #4f46e5;">
+            <a href="{{ route('admin.wallets.index') }}" class="btn btn-primary px-4 fw-semibold" style="background-color: #0c8c84; border-color: #0c8c84;">
                 <i class="fa-solid fa-bolt me-1"></i> New Recharge
             </a>
         </div>
@@ -77,7 +77,7 @@
                                     <div class="text-muted fw-normal" style="font-size: 0.75rem;">{{ $inv->doctor->doctor_code ?? '' }}</div>
                                 </td>
                                 <td>
-                                    <span class="badge rounded-pill px-3 py-2" style="background-color:#eef2ff;color:#4338ca;font-weight:600;">
+                                    <span class="badge rounded-pill px-3 py-2" style="background-color:#e3f3f0;color:#0a6b65;font-weight:600;">
                                         {{ $inv->payment_method ?: '—' }}
                                     </span>
                                 </td>

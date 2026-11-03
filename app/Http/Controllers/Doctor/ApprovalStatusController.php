@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Doctor;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 
 class ApprovalStatusController extends Controller
 {
-    public function show(): View|RedirectResponse
+    public function show()
     {
         $doctor = auth()->user()->doctor;
 

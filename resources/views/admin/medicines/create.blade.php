@@ -10,12 +10,12 @@
 
     .btn-ghost { background: #fff; border: 1px solid #e2e8f0; color: #475569 !important; border-radius: 10px; font-weight: 600; font-size: 0.85rem; padding: 0.6rem 1.1rem; }
     .btn-ghost:hover { background: #f8fafc; }
-    .btn-brand { background: linear-gradient(135deg, #4f46e5, #4338ca); color: #fff !important; border: none; border-radius: 10px; font-weight: 700; font-size: 0.875rem; padding: 0.7rem 1.6rem; box-shadow: 0 4px 10px rgba(79,70,229,.25); }
+    .btn-brand { background: linear-gradient(135deg, #0c8c84, #0a6b65); color: #fff !important; border: none; border-radius: 10px; font-weight: 700; font-size: 0.875rem; padding: 0.7rem 1.6rem; box-shadow: 0 4px 10px rgba(12,140,132,.25); }
     .btn-brand:hover { filter: brightness(1.05); color: #fff; }
 
     .section-card { background: #fff; border: 1px solid #eef0f4; border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.03); margin-bottom: 1.25rem; overflow: hidden; }
     .section-head { padding: 1.1rem 1.4rem; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; }
-    .section-head i { width: 32px; height: 32px; border-radius: 9px; background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+    .section-head i { width: 32px; height: 32px; border-radius: 9px; background: #e3f3f0; color: #0c8c84; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
     .section-head.sponsor-head i { background: #fef3c7; color: #b45309; }
     .section-head h6 { margin: 0; font-weight: 800; color: #0f172a; font-size: 0.9rem; }
     .section-head span { display: block; font-size: 0.75rem; color: #94a3b8; }
@@ -23,7 +23,7 @@
 
     .field-label { font-size: 0.78rem; font-weight: 700; color: #334155; margin-bottom: 0.4rem; display: block; }
     .modern-input, .modern-select { border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 0.65rem 0.9rem; font-size: 0.875rem; color: #1e293b; width: 100%; background: #fff; }
-    .modern-input:focus, .modern-select:focus { border-color: #4f46e5; box-shadow: 0 0 0 4px rgba(79,70,229,.1); outline: none; }
+    .modern-input:focus, .modern-select:focus { border-color: #0c8c84; box-shadow: 0 0 0 4px rgba(12,140,132,.1); outline: none; }
 
     .toggle-row { display: flex; align-items: center; justify-content: space-between; background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1rem; }
     .toggle-row strong { font-size: 0.85rem; color: #0f172a; }
@@ -44,7 +44,7 @@
 
     <div class="d-flex justify-content-between align-items-center page-head mb-4">
         <div>
-            <span class="text-uppercase fw-bold" style="font-size:0.7rem; color:#4f46e5; letter-spacing:.06em;">Medicine Database</span>
+            <span class="text-uppercase fw-bold" style="font-size:0.7rem; color:#0c8c84; letter-spacing:.06em;">Medicine Database</span>
             <h1>নতুন মেডিসিন যোগ করুন</h1>
             <p>Brand, generic, dosage form এবং প্রয়োজনে sponsorship সেট করুন।</p>
         </div>

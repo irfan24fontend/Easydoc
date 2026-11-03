@@ -5,9 +5,9 @@
 @push('styles')
 <style>
     .glass-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 1px 3px rgba(15,23,42,.04); }
-    .pid-badge { display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 700; font-size: .78rem; padding: .2rem .55rem; border-radius: 6px; background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; white-space: nowrap; }
+    .pid-badge { display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 700; font-size: .78rem; padding: .2rem .55rem; border-radius: 6px; background: #e3f3f0; color: #0a6b65; border: 1px solid #cfe9e5; white-space: nowrap; }
     .avatar-lg { width: 64px; height: 64px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; flex-shrink: 0; }
-    .av-male { background: #e0e7ff; color: #3730a3; }
+    .av-male { background: #cfe9e5; color: #075f5a; }
     .av-female { background: #fce7f3; color: #9d174d; }
     .av-other { background: #e2e8f0; color: #334155; }
 
@@ -33,19 +33,19 @@
     .vlabel { font-size: .66rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; }
     .vtext { font-size: .86rem; color: #1e293b; white-space: pre-line; }
     .type-badge { font-size: .68rem; font-weight: 700; padding: .25rem .6rem; border-radius: 999px; white-space: nowrap; display: inline-block; }
-    .type-full { background: #e0e7ff; color: #3730a3; }
+    .type-full { background: #cfe9e5; color: #075f5a; }
     .type-inv { background: #ccfbf1; color: #115e59; }
     .state-pending { background: #fef3c7; color: #92400e; }
     .state-done { background: #dcfce7; color: #166534; }
     .med-row { display: flex; gap: 10px; align-items: baseline; padding: .35rem 0; border-bottom: 1px dashed #eef0f4; font-size: .84rem; }
     .med-row:last-child { border-bottom: 0; }
-    .med-row .dose { font-weight: 700; color: #3730a3; background: #eef2ff; border-radius: 6px; padding: .05rem .45rem; font-size: .76rem; white-space: nowrap; }
+    .med-row .dose { font-weight: 700; color: #075f5a; background: #e3f3f0; border-radius: 6px; padding: .05rem .45rem; font-size: .76rem; white-space: nowrap; }
 
     .btn-act { font-size: .72rem; font-weight: 700; padding: .38rem .7rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; border: 1px solid transparent; transition: all .15s; }
     .btn-act.view { color: #475569; background: #f1f5f9; border-color: #e2e8f0; }
     .btn-act.view:hover { background: #475569; color: #fff; }
-    .btn-act.print { color: #4f46e5; background: #eeebff; border-color: #e0e7ff; }
-    .btn-act.print:hover { background: #4f46e5; color: #fff; }
+    .btn-act.print { color: #0c8c84; background: #daf0ed; border-color: #cfe9e5; }
+    .btn-act.print:hover { background: #0c8c84; color: #fff; }
     .btn-act.edit { color: #b45309; background: #fef3c7; border-color: #fde68a; }
     .btn-act.edit:hover { background: #b45309; color: #fff; }
     .btn-act.cont { color: #fff; background: #f59e0b; }
@@ -72,7 +72,7 @@
         </a>
         <div class="d-flex gap-2 flex-wrap">
             <a href="{{ route('doctor.patients.edit', $patient) }}" class="btn btn-outline-secondary btn-sm fw-semibold"><i class="fa-solid fa-pen me-1"></i> তথ্য সম্পাদনা</a>
-            <a href="{{ route('doctor.prescriptions.create', ['patient' => $patient->id]) }}" class="btn btn-primary btn-sm fw-bold px-3" style="background:#4f46e5;border-color:#4f46e5;">
+            <a href="{{ route('doctor.prescriptions.create', ['patient' => $patient->id]) }}" class="btn btn-primary btn-sm fw-bold px-3" style="background:#0c8c84;border-color:#0c8c84;">
                 <i class="fa-solid fa-file-medical me-1"></i> নতুন Prescription
             </a>
         </div>
@@ -261,7 +261,7 @@
                     <i class="fa-solid fa-file-circle-xmark d-block mb-2" style="font-size:2rem;color:#cbd5e1;"></i>
                     এই রোগীর এখনো কোনো প্রেসক্রিপশন নেই।
                     <div class="mt-3">
-                        <a href="{{ route('doctor.prescriptions.create', ['patient' => $patient->id]) }}" class="btn btn-primary btn-sm fw-bold" style="background:#4f46e5;border-color:#4f46e5;">
+                        <a href="{{ route('doctor.prescriptions.create', ['patient' => $patient->id]) }}" class="btn btn-primary btn-sm fw-bold" style="background:#0c8c84;border-color:#0c8c84;">
                             <i class="fa-solid fa-file-medical me-1"></i> প্রথম Prescription লিখুন
                         </a>
                     </div>
@@ -289,7 +289,7 @@
 
         const sets = [];
         if (d.sys.some(v => v !== null)) { sets.push(ds('BP (Sys)', d.sys, '#dc2626', 'y')); sets.push(ds('BP (Dia)', d.dia, '#f97316', 'y')); }
-        if (d.pulse.some(v => v !== null)) sets.push(ds('Pulse', d.pulse, '#4f46e5', 'y'));
+        if (d.pulse.some(v => v !== null)) sets.push(ds('Pulse', d.pulse, '#2563eb', 'y'));
         if (d.temp.some(v => v !== null)) sets.push(ds('Temp °F', d.temp, '#0d9488', 'y2', [5, 4]));
 
         const hasTemp = d.temp.some(v => v !== null);

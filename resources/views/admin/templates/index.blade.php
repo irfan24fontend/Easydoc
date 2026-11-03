@@ -74,7 +74,7 @@
                 <h1 class="h4 fw-bold text-dark m-0">Prescription Templates</h1>
                 <p class="text-muted small m-0">Manage layout markup, stylesheets, and print definitions.</p>
             </div>
-            <a href="{{ route('admin.templates.create') }}" class="btn btn-primary px-4 fw-semibold" style="background-color: #4f46e5; border-color: #4f46e5;">
+            <a href="{{ route('admin.templates.create') }}" class="btn btn-primary px-4 fw-semibold" style="background-color: #0c8c84; border-color: #0c8c84;">
                 + Create Template
             </a>
         </div>

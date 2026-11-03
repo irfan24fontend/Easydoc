@@ -4,14 +4,14 @@
 
 @push('styles')
 <style>
-    :root { --ch-brand: #4f46e5; --ch-ink: #0f172a; --ch-muted: #64748b; --ch-line: #e5e9f0; }
+    :root { --ch-brand: #0c8c84; --ch-ink: #0f172a; --ch-muted: #64748b; --ch-line: #e5e9f0; }
 
     /* ---------- Hero ---------- */
     .ch-hero {
         position: relative; overflow: hidden; border-radius: 22px; padding: 1.6rem 1.8rem; color: #fff;
         background: radial-gradient(1200px 300px at 90% -20%, rgba(255,255,255,.18), transparent 60%),
-                    linear-gradient(135deg, #4f46e5 0%, #6d28d9 55%, #7c3aed 100%);
-        box-shadow: 0 14px 34px rgba(79,70,229,.28);
+                    linear-gradient(135deg, #0c8c84 0%, #0a6b65 55%, #0c8c84 100%);
+        box-shadow: 0 14px 34px rgba(12,140,132,.28);
     }
     .ch-hero::after { content: ""; position: absolute; right: -60px; bottom: -80px; width: 240px; height: 240px; border-radius: 50%; background: rgba(255,255,255,.07); }
     .ch-hero h1 { font-size: 1.55rem; font-weight: 800; letter-spacing: -.02em; margin: 0; }
@@ -37,13 +37,13 @@
     .ch-search { position: relative; flex: 1 1 260px; }
     .ch-search i { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: .85rem; }
     .ch-search input { width: 100%; border: 1px solid #e2e8f0; border-radius: 12px; padding: .55rem .9rem .55rem 2.3rem; font-size: .88rem; background: #f8fafc; transition: all .15s; }
-    .ch-search input:focus { outline: none; background: #fff; border-color: var(--ch-brand); box-shadow: 0 0 0 4px rgba(79,70,229,.1); }
+    .ch-search input:focus { outline: none; background: #fff; border-color: var(--ch-brand); box-shadow: 0 0 0 4px rgba(12,140,132,.1); }
 
     .ch-tabs { display: flex; gap: .35rem; flex-wrap: wrap; }
     .ch-tab { border: 1px solid #e2e8f0; background: #fff; color: #475569; font-size: .78rem; font-weight: 700; padding: .45rem .85rem; border-radius: 999px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; transition: all .15s; }
-    .ch-tab:hover { background: #eef2ff; border-color: #c7d2fe; color: #4338ca; }
+    .ch-tab:hover { background: #e3f3f0; border-color: #9bd2cc; color: #0a6b65; }
     .ch-tab .c { background: #f1f5f9; color: #475569; border-radius: 999px; padding: 0 .5rem; font-size: .7rem; }
-    .ch-tab.active { background: var(--ch-brand); border-color: var(--ch-brand); color: #fff; box-shadow: 0 4px 12px rgba(79,70,229,.25); }
+    .ch-tab.active { background: var(--ch-brand); border-color: var(--ch-brand); color: #fff; box-shadow: 0 4px 12px rgba(12,140,132,.25); }
     .ch-tab.active .c { background: rgba(255,255,255,.25); color: #fff; }
 
     /* ---------- Cards ---------- */
@@ -64,12 +64,12 @@
     .ch-card.locked .ch-body { opacity: .72; }
     .ch-card.is-busy { pointer-events: none; }
     .ch-card.is-busy::after { content: ""; position: absolute; inset: 0; background: rgba(255,255,255,.65); backdrop-filter: blur(1px); }
-    .ch-spin { position: absolute; z-index: 2; top: 50%; left: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; border: 3px solid #c7d2fe; border-top-color: var(--ch-brand); animation: spin .7s linear infinite; display: none; }
+    .ch-spin { position: absolute; z-index: 2; top: 50%; left: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; border: 3px solid #9bd2cc; border-top-color: var(--ch-brand); animation: spin .7s linear infinite; display: none; }
     .ch-card.is-busy .ch-spin { display: block; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .ch-top { display: flex; align-items: center; gap: 12px; padding: 1.25rem 1.25rem 1rem; }
-    .ch-icon { width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg,#4f46e5,#7c3aed); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; box-shadow: 0 6px 14px rgba(79,70,229,.25); }
+    .ch-icon { width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg,#0c8c84,#0c8c84); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; box-shadow: 0 6px 14px rgba(12,140,132,.25); }
     .ch-card.locked .ch-icon { background: #cbd5e1; box-shadow: none; }
     .ch-card.off .ch-icon { background: linear-gradient(135deg,#94a3b8,#64748b); box-shadow: none; }
     .ch-top h5 { margin: 0; font-size: 1.02rem; font-weight: 800; color: var(--ch-ink); }
@@ -88,12 +88,12 @@
     .ch-info .txt { min-width: 0; flex: 1; padding-top: 3px; word-break: break-word; }
     .ch-info a { color: inherit; text-decoration: none; }
     .ch-info a:hover { color: var(--ch-brand); }
-    .mini-act { border: 0; background: #eef2ff; color: #4338ca; width: 26px; height: 26px; border-radius: 8px; font-size: .72rem; display: inline-flex; align-items: center; justify-content: center; margin-left: 6px; cursor: pointer; transition: all .15s; }
+    .mini-act { border: 0; background: #e3f3f0; color: #0a6b65; width: 26px; height: 26px; border-radius: 8px; font-size: .72rem; display: inline-flex; align-items: center; justify-content: center; margin-left: 6px; cursor: pointer; transition: all .15s; }
     .mini-act:hover { background: var(--ch-brand); color: #fff; }
 
-    .day-chip { display: inline-block; font-size: .72rem; font-weight: 700; padding: .18rem .55rem; border-radius: 999px; background: #eef2ff; color: #4338ca; margin: 0 4px 4px 0; }
+    .day-chip { display: inline-block; font-size: .72rem; font-weight: 700; padding: .18rem .55rem; border-radius: 999px; background: #e3f3f0; color: #0a6b65; margin: 0 4px 4px 0; }
     .time-chip { display: inline-block; font-size: .72rem; font-weight: 700; padding: .18rem .55rem; border-radius: 999px; background: #ecfeff; color: #0e7490; }
-    .tpl-badge { font-size: .72rem; font-weight: 700; background: #f5f3ff; color: #6d28d9; padding: .2rem .55rem; border-radius: 8px; }
+    .tpl-badge { font-size: .72rem; font-weight: 700; background: #f0f8f7; color: #0a6b65; padding: .2rem .55rem; border-radius: 8px; }
 
     /* ---------- Footer / control ---------- */
     .ch-foot { border-top: 1px solid #f1f5f9; background: #f8fafc; padding: .95rem 1.25rem; }
@@ -114,7 +114,7 @@
     .sw .track::before { content: ""; position: absolute; width: 22px; height: 22px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .25s; box-shadow: 0 1px 4px rgba(0,0,0,.3); }
     .sw input:checked + .track { background: linear-gradient(135deg,#22c55e,#16a34a); }
     .sw input:checked + .track::before { transform: translateX(24px); }
-    .sw input:focus-visible + .track { box-shadow: 0 0 0 4px rgba(79,70,229,.25); }
+    .sw input:focus-visible + .track { box-shadow: 0 0 0 4px rgba(12,140,132,.25); }
     .sw.disabled { cursor: not-allowed; opacity: .45; }
     .sw.disabled input { cursor: not-allowed; }
 
@@ -122,7 +122,7 @@
 
     /* ---------- Rules / empty ---------- */
     .ch-rules { background: #fff; border: 1px solid var(--ch-line); border-radius: 16px; }
-    .ch-rules summary { cursor: pointer; padding: .8rem 1.1rem; font-weight: 700; font-size: .85rem; color: #3730a3; list-style: none; display: flex; align-items: center; gap: 8px; }
+    .ch-rules summary { cursor: pointer; padding: .8rem 1.1rem; font-weight: 700; font-size: .85rem; color: #075f5a; list-style: none; display: flex; align-items: center; gap: 8px; }
     .ch-rules summary::-webkit-details-marker { display: none; }
     .ch-rules summary .chev { margin-left: auto; transition: transform .2s; color: #94a3b8; }
     .ch-rules[open] summary .chev { transform: rotate(180deg); }
@@ -140,21 +140,21 @@
     .cf-icon.green { background: #dcfce7; color: #16a34a; }
 
     /* ---------- Chamber request additions ---------- */
-    .ch-btn-new { display: inline-flex; align-items: center; gap: 8px; margin-top: .9rem; background: #fff; color: #4338ca; font-weight: 800; font-size: .86rem; padding: .55rem 1.05rem; border-radius: 12px; text-decoration: none; box-shadow: 0 6px 16px rgba(15,23,42,.18); transition: transform .15s, box-shadow .15s; position: relative; z-index: 1; }
-    .ch-btn-new:hover { color: #3730a3; transform: translateY(-1px); box-shadow: 0 10px 22px rgba(15,23,42,.22); }
-    .ch-btn-new span { background: #eef2ff; color: #4338ca; border-radius: 999px; padding: .05rem .55rem; font-size: .72rem; }
-    .ch-card.pending::before { background: linear-gradient(90deg, #6366f1, #a5b4fc); }
-    .ch-card.pending .ch-icon { background: linear-gradient(135deg,#a5b4fc,#818cf8); box-shadow: none; }
+    .ch-btn-new { display: inline-flex; align-items: center; gap: 8px; margin-top: .9rem; background: #fff; color: #0a6b65; font-weight: 800; font-size: .86rem; padding: .55rem 1.05rem; border-radius: 12px; text-decoration: none; box-shadow: 0 6px 16px rgba(15,23,42,.18); transition: transform .15s, box-shadow .15s; position: relative; z-index: 1; }
+    .ch-btn-new:hover { color: #075f5a; transform: translateY(-1px); box-shadow: 0 10px 22px rgba(15,23,42,.22); }
+    .ch-btn-new span { background: #e3f3f0; color: #0a6b65; border-radius: 999px; padding: .05rem .55rem; font-size: .72rem; }
+    .ch-card.pending::before { background: linear-gradient(90deg, #0c8c84, #a8dcd6); }
+    .ch-card.pending .ch-icon { background: linear-gradient(135deg,#a8dcd6,#818cf8); box-shadow: none; }
     .ch-card.rejected { background: #fafafa; }
     .ch-card.rejected::before { background: linear-gradient(90deg, #9ca3af, #d1d5db); }
     .ch-card.rejected .ch-icon { background: #d1d5db; box-shadow: none; }
     .ch-card.rejected .ch-body { opacity: .65; }
-    .ch-flag.pending { background: #e0e7ff; color: #3730a3; }
+    .ch-flag.pending { background: #cfe9e5; color: #075f5a; }
     .ch-flag.rejected { background: #f3f4f6; color: #4b5563; }
     .ch-note { font-size: .78rem; border-radius: 10px; padding: .55rem .7rem; line-height: 1.45; }
-    .ch-note.pending { background: #eef2ff; border: 1px solid #c7d2fe; color: #3730a3; }
+    .ch-note.pending { background: #e3f3f0; border: 1px solid #9bd2cc; color: #075f5a; }
     .ch-note.rejected { background: #f9fafb; border: 1px solid #e5e7eb; color: #4b5563; }
-    .pill.wait { background: #e0e7ff; color: #3730a3; }
+    .pill.wait { background: #cfe9e5; color: #075f5a; }
 
     @media (prefers-reduced-motion: reduce) { .ch-card, .live-dot { animation: none; } }
 </style>
@@ -165,7 +165,7 @@
     $approved    = $chambers->filter(fn ($c) => ($c->request_status ?? 'approved') === 'approved');
     $pendingCnt  = $chambers->filter(fn ($c) => ($c->request_status ?? '') === 'waiting_request')->count();
     $rejectedCnt = $chambers->filter(fn ($c) => ($c->request_status ?? '') === 'rejected')->count();
-    $requestFee  = \App\Services\ChamberRequestService::FEE;
+    $requestFee  = auth()->user()->doctor?->getCharge('chamber_request') ?? config('easydoc.chamber_request_charge', 500);
     $total      = $approved->count();
     $lockedCnt  = $approved->filter(fn ($c) => !$c->status)->count();
     $enabledCnt = $total - $lockedCnt;
@@ -206,7 +206,7 @@
         <div class="row g-3 mb-4">
             <div class="col-6 col-lg-3">
                 <div class="ch-stat">
-                    <div class="ico" style="background:#eef2ff;color:#4f46e5;"><i class="fa-solid fa-hospital"></i></div>
+                    <div class="ico" style="background:#e3f3f0;color:#0c8c84;"><i class="fa-solid fa-hospital"></i></div>
                     <div><div class="num">{{ $total }}</div><div class="lbl">মোট চেম্বার</div></div>
                 </div>
             </div>
@@ -261,7 +261,7 @@
                 <i class="fa-solid fa-hospital-user"></i>
                 <h5 class="fw-bold mt-2">এখনো কোনো চেম্বার যোগ করা হয়নি</h5>
                 <p class="text-muted mb-3">নতুন চেম্বারের জন্য রিকোয়েস্ট পাঠান। Super Admin অনুমোদন করলে এখানে দেখতে পাবেন।</p>
-                <a href="{{ route('doctor.chambers.request.create') }}" class="btn btn-primary fw-bold" style="background:#4f46e5;border-color:#4f46e5;border-radius:12px;">
+                <a href="{{ route('doctor.chambers.request.create') }}" class="btn btn-primary fw-bold" style="background:#0c8c84;border-color:#0c8c84;border-radius:12px;">
                     <i class="fa-solid fa-plus me-1"></i> নতুন চেম্বার রিকোয়েস্ট
                 </a>
             </div>
@@ -436,7 +436,7 @@
                 <p class="text-muted mb-0" id="cfMessage" style="font-size:.9rem;"></p>
                 <div class="d-flex gap-2 mt-4">
                     <button type="button" class="btn btn-light border fw-semibold flex-fill" id="cfCancel">না</button>
-                    <button type="button" class="btn btn-primary fw-bold flex-fill" id="cfOk" style="background:#4f46e5;border-color:#4f46e5;">হ্যাঁ</button>
+                    <button type="button" class="btn btn-primary fw-bold flex-fill" id="cfOk" style="background:#0c8c84;border-color:#0c8c84;">হ্যাঁ</button>
                 </div>
             </div>
         </div>

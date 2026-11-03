@@ -7,10 +7,10 @@ use App\Http\Requests\StoreSerialRequest;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\Serial;
+use App\Models\Chamber;
 use App\Services\SerialService;
 use Exception;
-use Illuminate\Http\Request;
-
+use Illuminate\Http\Request;
 class SerialController extends Controller
 {
     public function __construct(protected SerialService $service) {}
@@ -31,16 +31,20 @@ class SerialController extends Controller
         $date = $this->service->normalizeDate($request->query('date'));
         $isToday = $date === $today;
 
-        $serials = $this->service->queueFor($doctor, $date);
+        $chambers = auth()->user()->assistantProfile->chambers()
+            ->where('request_status', Chamber::REQUEST_APPROVED)->where('status', true)->get();
+        $operationalChambers = $chambers->filter(fn (Chamber $chamber) => $chamber->isOperational())->values();
+        $selectedChamber = $operationalChambers->firstWhere('id', (int) $request->query('chamber_id')) ?? $operationalChambers->first();
+        $serials = $selectedChamber ? $this->service->queueFor($doctor, $date, $selectedChamber->id) : collect();
         $counts = $this->service->counts($serials);
-        $activeChamber = $doctor->activeChamber();
+        $activeChamber = $selectedChamber;
 
         $maxDate = SerialService::maxDate();
-        $upcoming = $this->service->upcomingDates($doctor);
+        $upcoming = $selectedChamber ? $this->service->upcomingDates($doctor, 7, $selectedChamber->id) : collect();
 
         return view('assistant.serials.index', compact(
             'doctor', 'serials', 'counts', 'activeChamber',
-            'date', 'today', 'isToday', 'maxDate', 'upcoming'
+            'date', 'today', 'isToday', 'maxDate', 'upcoming', 'operationalChambers', 'selectedChamber'
         ));
     }
 
@@ -57,14 +61,14 @@ class SerialController extends Controller
         $dateStr = $serial->serial_date->toDateString();
 
         return redirect()
-            ->route('assistant.serials.index', ['date' => $dateStr])
+            ->route('assistant.serials.index', ['date' => $dateStr, 'chamber_id' => $serial->chamber_id])
             ->with('success', "সিরিয়াল #{$serial->serial_number} দেওয়া হয়েছে ({$serial->serial_date->format('d M Y')})।");
     }
 
     public function status(Request $request, Serial $serial)
     {
         $doctor = $this->doctor();
-        abort_unless($serial->doctor_id === $doctor->id, 403);
+        abort_unless($serial->doctor_id === $doctor->id && auth()->user()->assistantProfile->chambers()->whereKey($serial->chamber_id)->exists(), 403);
 
         $data = $request->validate(['status' => 'required|in:waiting,skipped,cancelled']);
 
@@ -82,6 +86,8 @@ class SerialController extends Controller
         $doctor = $this->doctor();
         $mobile = trim($request->get('mobile', ''));
         $date = $this->service->normalizeDate($request->get('date'));
+        $chamberId = $request->integer('chamber_id');
+        abort_unless(auth()->user()->assistantProfile->chambers()->whereKey($chamberId)->exists(), 403);
 
         $patient = Patient::where('doctor_id', $doctor->id)->where('mobile', $mobile)->first();
 
@@ -92,6 +98,7 @@ class SerialController extends Controller
         $open = Serial::where('doctor_id', $doctor->id)
             ->where('serial_date', $date)
             ->where('patient_id', $patient->id)
+            ->where('chamber_id', $chamberId)
             ->whereIn('status', ['waiting', 'in_progress'])
             ->first();
 

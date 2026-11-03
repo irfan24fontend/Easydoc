@@ -10,15 +10,15 @@
     .stat-tile .num { font-size: 1.4rem; font-weight: 800; color: #0f172a; line-height: 1.1; }
     .stat-tile .lbl { font-size: .74rem; color: #64748b; font-weight: 600; }
     a.stat-tile { text-decoration: none; transition: all .15s; }
-    a.stat-tile:hover { border-color: #c7d2fe; box-shadow: 0 6px 16px rgba(79,70,229,.08); }
+    a.stat-tile:hover { border-color: #9bd2cc; box-shadow: 0 6px 16px rgba(12,140,132,.08); }
 
     .saas-table th { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #475569; background: #f1f5f9; border-bottom: 2px solid #e2e8f0; padding: .9rem 1.1rem; white-space: nowrap; }
     .saas-table td { font-size: .86rem; color: #334155; padding: .8rem 1.1rem; vertical-align: middle; border-bottom: 1px solid #eef0f4; }
     .saas-table tr:hover td { background: #f8fafc; }
 
-    .pid-badge { display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 700; font-size: .75rem; padding: .18rem .5rem; border-radius: 6px; background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; white-space: nowrap; }
+    .pid-badge { display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 700; font-size: .75rem; padding: .18rem .5rem; border-radius: 6px; background: #e3f3f0; color: #0a6b65; border: 1px solid #cfe9e5; white-space: nowrap; }
     .avatar { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: .8rem; flex-shrink: 0; }
-    .av-male { background: #e0e7ff; color: #3730a3; }
+    .av-male { background: #cfe9e5; color: #075f5a; }
     .av-female { background: #fce7f3; color: #9d174d; }
     .av-other { background: #e2e8f0; color: #334155; }
     .pending-pill { font-size: .68rem; font-weight: 800; background: #fef3c7; color: #92400e; border-radius: 999px; padding: .2rem .55rem; white-space: nowrap; }
@@ -26,8 +26,8 @@
     .btn-act { font-size: .72rem; font-weight: 700; padding: .38rem .7rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; border: 1px solid transparent; transition: all .15s; }
     .btn-act.view { color: #475569; background: #f1f5f9; border-color: #e2e8f0; }
     .btn-act.view:hover { background: #475569; color: #fff; }
-    .btn-act.rx { color: #fff; background: #4f46e5; }
-    .btn-act.rx:hover { background: #4338ca; color: #fff; }
+    .btn-act.rx { color: #fff; background: #0c8c84; }
+    .btn-act.rx:hover { background: #0a6b65; color: #fff; }
     .btn-act.edit { color: #b45309; background: #fef3c7; border-color: #fde68a; }
     .btn-act.edit:hover { background: #b45309; color: #fff; }
 
@@ -52,7 +52,7 @@
             <a href="{{ route('doctor.patients.export', request()->query()) }}" class="btn btn-outline-secondary fw-semibold">
                 <i class="fa-solid fa-file-csv me-1"></i> CSV Export
             </a>
-            <a href="{{ route('doctor.patients.create') }}" class="btn btn-primary fw-semibold px-4" style="background:#4f46e5;border-color:#4f46e5;">
+            <a href="{{ route('doctor.patients.create') }}" class="btn btn-primary fw-semibold px-4" style="background:#0c8c84;border-color:#0c8c84;">
                 <i class="fa-solid fa-user-plus me-1"></i> নতুন রোগী
             </a>
         </div>
@@ -62,7 +62,7 @@
     <div class="row g-3 mb-4">
         <div class="col-6 col-lg-3">
             <a href="{{ route('doctor.patients.index') }}" class="stat-tile">
-                <div class="ico" style="background:#eef2ff;color:#4f46e5;"><i class="fa-solid fa-users"></i></div>
+                <div class="ico" style="background:#e3f3f0;color:#0c8c84;"><i class="fa-solid fa-users"></i></div>
                 <div><div class="num">{{ $stats['total'] }}</div><div class="lbl">মোট রোগী</div></div>
             </a>
         </div>
@@ -150,7 +150,7 @@
                 </div>
             </div>
             <div class="col-12 col-lg-4 d-flex gap-2 justify-content-lg-end">
-                <button class="btn btn-primary fw-semibold px-4" style="background:#4f46e5;border-color:#4f46e5;"><i class="fa-solid fa-filter me-1"></i> Filter</button>
+                <button class="btn btn-primary fw-semibold px-4" style="background:#0c8c84;border-color:#0c8c84;"><i class="fa-solid fa-filter me-1"></i> Filter</button>
                 @if($hasFilter || request('sort'))
                     <a href="{{ route('doctor.patients.index') }}" class="btn btn-outline-secondary fw-semibold">Reset</a>
                 @endif

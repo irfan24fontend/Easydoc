@@ -6,7 +6,7 @@
 <style>
     .an-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; box-shadow:0 4px 6px -1px rgba(0,0,0,.05); padding:1.4rem; }
     .an-type { display:inline-block; font-size:.68rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; padding:.22rem .6rem; border-radius:999px; }
-    .an-type.feature { background:#ede9fe; color:#6d28d9; }
+    .an-type.feature { background:#daf0ed; color:#0a6b65; }
     .an-type.news { background:#e0f2fe; color:#0369a1; }
     .an-type.notice { background:#fef3c7; color:#b45309; }
     .an-item { border:1px solid #e2e8f0; border-radius:12px; padding:1rem 1.1rem; background:#fff; }

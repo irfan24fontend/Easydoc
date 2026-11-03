@@ -20,8 +20,8 @@
         width: 100%;
     }
     .modern-input:focus, .modern-select:focus, .modern-textarea:focus {
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        border-color: #0c8c84;
+        box-shadow: 0 0 0 4px rgba(12, 140, 132, 0.1);
         outline: none;
     }
     .form-label-custom {
@@ -34,7 +34,7 @@
         display: block;
     }
     .btn-gradient {
-        background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+        background: linear-gradient(135deg, #0c8c84 0%, #075f5a 100%);
         color: white !important;
         border: none;
         border-radius: 10px;
@@ -47,7 +47,7 @@
 
         <div class="d-flex justify-content-between align-items-center mb-5">
             <div>
-                <span class="badge mb-2" style="font-size: 0.65rem; background-color: #e0e7ff; color: #4338ca;">CHAMBER SETUP</span>
+                <span class="badge mb-2" style="font-size: 0.65rem; background-color: #cfe9e5; color: #0a6b65;">CHAMBER SETUP</span>
                 <h1 class="h2 fw-bold text-slate-900 m-0">Edit Chamber</h1>
             </div>
             <a href="{{ route('admin.chambers.index') }}" class="btn btn-light border rounded-pill px-4 text-secondary small fw-medium">

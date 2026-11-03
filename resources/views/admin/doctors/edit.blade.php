@@ -23,8 +23,8 @@
         color: #334155;
     }
     .modern-input:focus, .modern-select:focus { 
-        border-color: #4f46e5; 
-        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); 
+        border-color: #0c8c84;
+        box-shadow: 0 0 0 4px rgba(12, 140, 132, 0.1);
         outline: none; 
     }
     .form-label-custom { 
@@ -161,7 +161,7 @@
 
                     <!-- Actions Trigger Box -->
                     <div class="glass-card p-3">
-                        <button type="submit" class="btn btn-primary w-100 py-2.5 mb-2 fw-semibold shadow-sm" style="background-color: #4f46e5; border-color: #4f46e5;">
+                        <button type="submit" class="btn btn-primary w-100 py-2.5 mb-2 fw-semibold shadow-sm" style="background-color: #0c8c84; border-color: #0c8c84;">
                             Save Changes
                         </button>
                         <a href="{{ route('admin.doctors.index') }}" class="btn btn-light border w-100 py-2.5 text-secondary fw-medium small">
@@ -172,6 +172,43 @@
             </div>
 
         </form>
+
+        <div class="glass-card p-4 mt-4">
+            <div class="mb-3">
+                <h2 class="h5 fw-bold mb-1">Doctor specific charges</h2>
+                <p class="text-muted small mb-0">Leave a field empty to use the platform default. Enter 0 to make that action free.</p>
+            </div>
+            <form method="POST" action="{{ route('admin.doctors.charges.update', $doctor) }}">
+                @csrf
+                @method('PATCH')
+                @php
+                    $chargeFields = [
+                        'prescription_charge' => ['Prescription', 'default_prescription_charge'],
+                        'investigation_advice_charge' => ['Investigation advice', 'investigation_advice_charge'],
+                        'ai_diagnosis_charge' => ['AI diagnosis', 'ai_diagnosis_charge'],
+                        'ai_medicine_charge' => ['AI medicine suggestion', 'ai_medicine_charge'],
+                        'ai_interaction_charge' => ['AI interaction check', 'ai_interaction_charge'],
+                        'chamber_request_charge' => ['Chamber request', 'chamber_request_charge'],
+                    ];
+                @endphp
+                <div class="row g-3">
+                    @foreach($chargeFields as $field => [$label, $configKey])
+                        <div class="col-sm-6 col-lg-4">
+                            <label class="form-label-custom" for="{{ $field }}">{{ $label }} (৳)</label>
+                            <input id="{{ $field }}" type="number" step="0.01" min="0" name="{{ $field }}"
+                                   class="form-control modern-input @error($field) is-invalid @enderror"
+                                   value="{{ old($field, $doctor->{$field}) }}" placeholder="Default: ৳{{ number_format((float) config('easydoc.' . $configKey, 0), 2) }}">
+                            @error($field) <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            <div class="form-text">Current rate: ৳{{ number_format($doctor->getCharge($field === 'prescription_charge' ? 'prescription' : str_replace('_charge', '', $field)), 2) }}</div>
+                        </div>
+                    @endforeach
+                </div>
+                <p class="small text-muted mt-3 mb-0"><i class="fa-solid fa-circle-check text-success me-1"></i> Prescription reprints are always free.</p>
+                <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-primary px-4">Save charge rates</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 @endsection

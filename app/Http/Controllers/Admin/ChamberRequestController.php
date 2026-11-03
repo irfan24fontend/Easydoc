@@ -51,7 +51,7 @@ class ChamberRequestController extends Controller
         return view('admin.chamber-requests.show', [
             'chamber'   => $chamber,
             'templates' => PrescriptionTemplate::where('status', true)->orderBy('name')->get(),
-            'fee'       => ChamberRequestService::FEE,
+            'fee'       => (float) $chamber->fee_charged,
         ]);
     }
 

@@ -14,14 +14,14 @@
     .btn-ghost { background: #fff; border: 1px solid #e2e8f0; color: #475569 !important; border-radius: 10px; font-weight: 600; font-size: 0.85rem; padding: 0.6rem 1.1rem; }
     .btn-ghost:hover { background: #f8fafc; }
     .btn-brand {
-        background: linear-gradient(135deg, #4f46e5, #4338ca); color: #fff !important; border: none; border-radius: 10px;
-        font-weight: 700; font-size: 0.875rem; padding: 0.7rem 1.6rem; box-shadow: 0 4px 10px rgba(79,70,229,.25);
+        background: linear-gradient(135deg, #0c8c84, #0a6b65); color: #fff !important; border: none; border-radius: 10px;
+        font-weight: 700; font-size: 0.875rem; padding: 0.7rem 1.6rem; box-shadow: 0 4px 10px rgba(12,140,132,.25);
     }
     .btn-brand:hover { filter: brightness(1.05); color: #fff; }
 
     .section-card { background: #fff; border: 1px solid #eef0f4; border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.03); margin-bottom: 1.25rem; overflow: hidden; }
     .section-head { padding: 1.1rem 1.4rem; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; }
-    .section-head i { width: 32px; height: 32px; border-radius: 9px; background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+    .section-head i { width: 32px; height: 32px; border-radius: 9px; background: #e3f3f0; color: #0c8c84; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
     .section-head h6 { margin: 0; font-weight: 800; color: #0f172a; font-size: 0.9rem; }
     .section-head span { display: block; font-size: 0.75rem; color: #94a3b8; }
     .section-body { padding: 1.4rem; }
@@ -34,7 +34,7 @@
         color: #1e293b; width: 100%; background: #fff;
     }
     .modern-input:focus, .modern-select:focus, .modern-textarea:focus {
-        border-color: #4f46e5; box-shadow: 0 0 0 4px rgba(79,70,229,.1); outline: none;
+        border-color: #0c8c84; box-shadow: 0 0 0 4px rgba(12,140,132,.1); outline: none;
     }
 
     /* Status toggle */
@@ -45,7 +45,7 @@
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; inset: 0; background: #e2e8f0; border-radius: 999px; transition: .2s; }
     .slider::before { content: ""; position: absolute; height: 20px; width: 20px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .2s; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
-    .switch input:checked + .slider { background: #4f46e5; }
+    .switch input:checked + .slider { background: #0c8c84; }
     .switch input:checked + .slider::before { transform: translateX(20px); }
 
     .sticky-footer {
@@ -59,7 +59,7 @@
 
         <div class="d-flex justify-content-between align-items-center page-head mb-4">
             <div>
-                <span class="text-uppercase fw-bold" style="font-size:0.7rem; color:#4f46e5; letter-spacing:.06em;">Chamber Setup</span>
+                <span class="text-uppercase fw-bold" style="font-size:0.7rem; color:#0c8c84; letter-spacing:.06em;">Chamber Setup</span>
                 <h1>নতুন চেম্বার যোগ করুন</h1>
                 <p>ডাক্তার নির্বাচন করে চেম্বারের তথ্য ও প্রেসক্রিপশন টেমপ্লেট সেট করুন।</p>
             </div>

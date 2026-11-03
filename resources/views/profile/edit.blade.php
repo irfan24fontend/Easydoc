@@ -12,13 +12,13 @@
 
 @push('styles')
 <style>
-    .pf { --p1:#7c3aed; --p2:#06b6d4; --p3:#ec4899; --glass:rgba(255,255,255,.7); --line:rgba(124,58,237,.16); position:relative; isolation:isolate; max-width:1180px; margin:0 auto; }
+    .pf { --p1:#0c8c84; --p2:#06b6d4; --p3:#ec4899; --glass:rgba(255,255,255,.7); --line:rgba(12,140,132,.16); position:relative; isolation:isolate; max-width:1180px; margin:0 auto; }
     .pf::before { content:''; position:absolute; inset:-16px -10px; z-index:-1; border-radius:32px;
-        background: radial-gradient(560px 300px at 6% 0%, rgba(124,58,237,.18), transparent 62%), radial-gradient(480px 300px at 96% 6%, rgba(6,182,212,.18), transparent 62%), radial-gradient(520px 380px at 50% 100%, rgba(236,72,153,.10), transparent 62%); }
+        background: radial-gradient(560px 300px at 6% 0%, rgba(12,140,132,.18), transparent 62%), radial-gradient(480px 300px at 96% 6%, rgba(6,182,212,.18), transparent 62%), radial-gradient(520px 380px at 50% 100%, rgba(236,72,153,.10), transparent 62%); }
     @keyframes pfFlow { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
     @keyframes pfIn { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none} }
 
-    .pf-hero { background:linear-gradient(120deg,#4c1d95,#7c3aed,#2563eb,#06b6d4); background-size:220% 220%; animation:pfFlow 14s ease infinite; border-radius:26px; padding:26px 28px; color:#fff; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,.25); box-shadow:0 18px 50px rgba(124,58,237,.33), inset 0 1px 0 rgba(255,255,255,.35); margin-bottom:22px; display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
+    .pf-hero { background:linear-gradient(120deg,#4c1d95,#0c8c84,#2563eb,#06b6d4); background-size:220% 220%; animation:pfFlow 14s ease infinite; border-radius:26px; padding:26px 28px; color:#fff; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,.25); box-shadow:0 18px 50px rgba(12,140,132,.33), inset 0 1px 0 rgba(255,255,255,.35); margin-bottom:22px; display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
     .pf-hero::after { content:''; position:absolute; width:300px; height:300px; right:-80px; top:-140px; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.35), transparent 65%); pointer-events:none; }
     .pf-avatar { width:78px; height:78px; border-radius:24px; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:800; letter-spacing:.02em; background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.5); backdrop-filter:blur(10px); box-shadow:0 0 0 6px rgba(255,255,255,.12), 0 10px 30px rgba(0,0,0,.2); flex-shrink:0; }
     .pf-hero h1 { font-size:24px; font-weight:800; margin:0; letter-spacing:-.01em; text-shadow:0 2px 18px rgba(0,0,0,.25); }
@@ -32,7 +32,7 @@
     .pf-card { background:var(--glass); -webkit-backdrop-filter:blur(18px) saturate(165%); backdrop-filter:blur(18px) saturate(165%); border:1px solid rgba(255,255,255,.8); border-radius:26px; padding:24px; box-shadow:0 10px 40px rgba(76,29,149,.09), inset 0 1px 0 rgba(255,255,255,.85); animation:pfIn .35s ease both; }
     .pf-card + .pf-card { margin-top:22px; }
     .pf-title { display:flex; align-items:center; gap:12px; margin-bottom:4px; }
-    .pf-ico { width:40px; height:40px; border-radius:14px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; background:linear-gradient(135deg,var(--p1),var(--p2)); box-shadow:0 8px 20px rgba(99,102,241,.35); flex-shrink:0; }
+    .pf-ico { width:40px; height:40px; border-radius:14px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; background:linear-gradient(135deg,var(--p1),var(--p2)); box-shadow:0 8px 20px rgba(12,140,132,.35); flex-shrink:0; }
     .pf-ico.warn { background:linear-gradient(135deg,#f43f5e,#f97316); box-shadow:0 8px 20px rgba(244,63,94,.35); }
     .pf-title h2 { font-size:17px; font-weight:800; color:#0f172a; margin:0; letter-spacing:-.01em; }
     .pf-sub { color:#64748b; font-size:13px; margin:0 0 18px 52px; }
@@ -42,15 +42,15 @@
     .pf-field { position:relative; margin-bottom:16px; }
     .pf-input { width:100%; background:rgba(255,255,255,.8); border:1px solid var(--line); border-radius:14px; padding:12px 14px 12px 42px; font-size:14px; color:#0f172a; transition:border-color .15s, box-shadow .15s; outline:none; }
     .pf-input.pr { padding-right:46px; }
-    .pf-input:focus { border-color:var(--p1); box-shadow:0 0 0 4px rgba(124,58,237,.13), 0 0 28px rgba(6,182,212,.25); }
+    .pf-input:focus { border-color:var(--p1); box-shadow:0 0 0 4px rgba(12,140,132,.13), 0 0 28px rgba(6,182,212,.25); }
     .pf-input.is-bad { border-color:#fb7185; }
     .pf-fi { position:absolute; left:14px; top:38px; color:#a78bfa; font-size:14px; pointer-events:none; }
     .pf-eye { position:absolute; right:8px; top:30px; width:34px; height:34px; border:0; background:transparent; color:#94a3b8; border-radius:10px; }
-    .pf-eye:hover { background:rgba(124,58,237,.08); color:var(--p1); }
+    .pf-eye:hover { background:rgba(12,140,132,.08); color:var(--p1); }
     .pf-err { color:#e11d48; font-size:12px; margin-top:5px; font-weight:600; }
     .pf-hint { font-size:12px; margin-top:6px; font-weight:600; }
 
-    .pf-btn { border:0; border-radius:14px; padding:11px 22px; font-size:14px; font-weight:700; color:#fff; background:linear-gradient(135deg,#6d28d9,#4f46e5 55%,#0891b2); box-shadow:0 8px 22px rgba(99,102,241,.38); display:inline-flex; align-items:center; gap:8px; transition:transform .15s, filter .15s; }
+    .pf-btn { border:0; border-radius:14px; padding:11px 22px; font-size:14px; font-weight:700; color:#fff; background:linear-gradient(135deg,#0a6b65,#0c8c84 55%,#0c8c84); box-shadow:0 8px 22px rgba(12,140,132,.38); display:inline-flex; align-items:center; gap:8px; transition:transform .15s, filter .15s; }
     .pf-btn:hover { filter:brightness(1.08); transform:translateY(-1px); }
     .pf-btn.danger { background:linear-gradient(135deg,#e11d48,#f97316); box-shadow:0 8px 22px rgba(225,29,72,.35); }
     .pf-btn.ghost { background:#fff; color:#475569; box-shadow:none; border:1px solid #e2e8f0; }
@@ -58,13 +58,13 @@
     .pf-meter { display:flex; gap:5px; margin-top:8px; }
     .pf-meter span { flex:1; height:6px; border-radius:6px; background:#e2e8f0; transition:background .2s; }
 
-    .pf-row { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:11px 0; border-bottom:1px dashed rgba(124,58,237,.18); font-size:13px; }
+    .pf-row { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:11px 0; border-bottom:1px dashed rgba(12,140,132,.18); font-size:13px; }
     .pf-row:last-child { border-bottom:0; }
     .pf-row span { color:#64748b; } .pf-row b { color:#0f172a; text-align:right; }
     .pf-links a { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:14px; color:#334155; text-decoration:none; font-size:14px; font-weight:600; transition:background .15s, transform .15s; }
-    .pf-links a:hover { background:linear-gradient(90deg,rgba(124,58,237,.1),rgba(6,182,212,.08)); transform:translateX(3px); color:#4338ca; }
-    .pf-links a i { width:30px; height:30px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#eef2ff; color:#6366f1; font-size:13px; }
-    .pf-tip { background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(6,182,212,.08)); border:1px solid var(--line); border-radius:18px; padding:14px 16px; font-size:12.5px; color:#475569; line-height:1.6; }
+    .pf-links a:hover { background:linear-gradient(90deg,rgba(12,140,132,.1),rgba(6,182,212,.08)); transform:translateX(3px); color:#0a6b65; }
+    .pf-links a i { width:30px; height:30px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#e3f3f0; color:#0c8c84; font-size:13px; }
+    .pf-tip { background:linear-gradient(135deg,rgba(12,140,132,.08),rgba(6,182,212,.08)); border:1px solid var(--line); border-radius:18px; padding:14px 16px; font-size:12.5px; color:#475569; line-height:1.6; }
 
     .pf-danger { border-color:rgba(251,113,133,.45); background:linear-gradient(135deg,rgba(255,241,242,.75),rgba(255,247,237,.7)); }
     .pf-warnbox { background:#fff1f2; border:1px solid #fecdd3; color:#9f1239; border-radius:14px; padding:12px 14px; font-size:13px; margin-bottom:14px; }

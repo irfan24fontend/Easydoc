@@ -9,6 +9,12 @@ Route::get('/p/{token}', [PublicPrescriptionController::class, 'show'])
     ->middleware('throttle:60,1')
     ->name('prescription.public');
 
+// A separate read-only endpoint confirms the stored prescription record without exposing its share controls.
+Route::get('/prescription/verify/{token}', [PublicPrescriptionController::class, 'verify'])
+    ->where('token', '[A-Za-z0-9]{40}')
+    ->middleware('throttle:60,1')
+    ->name('prescription.verify');
+
 // Remote image proxy (JPG/PDF download e CORS problem na hoy)
 Route::get('/easydoc/img', [PublicPrescriptionController::class, 'image'])
     ->middleware('throttle:120,1')

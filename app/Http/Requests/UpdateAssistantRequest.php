@@ -26,6 +26,11 @@ class UpdateAssistantRequest extends FormRequest
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
             'password' => 'nullable|string|min:6',
             'status' => 'required|in:active,inactive',
+            'chamber_ids' => 'required|array|min:1',
+            'chamber_ids.*' => [
+                'required', 'integer', 'distinct',
+                Rule::exists('chambers', 'id')->where('doctor_id', auth()->user()->doctor?->id),
+            ],
         ];
     }
 }

@@ -10,15 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: { extend: {
-                colors: { ink: '#10262b', soft: '#46606a', teal: { DEFAULT: '#0c8c84', deep: '#0a6b65' }, mint: '#e3f3f0', mist: '#f3f7f7', line: '#d3e0e0', amber: '#f4b63f' },
-                fontFamily: { display: ['"Bricolage Grotesque"', '"Hind Siliguri"', 'sans-serif'], sans: ['"Hind Siliguri"', 'system-ui', 'sans-serif'] }
-            } }
-        }
-    </script>
+    @vite(['resources/css/app.css', 'resources/css/theme.css'])
     <style>
         body { font-family: 'Hind Siliguri', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
         .font-display { letter-spacing: -0.01em; }

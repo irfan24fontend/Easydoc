@@ -8,6 +8,28 @@ use Illuminate\Http\Request;
 
 class PublicPrescriptionController extends Controller
 {
+    /** Public QR verification page: token lookup proves the prescription exists in the system. */
+    public function verify(string $token)
+    {
+        $prescription = Prescription::where('verification_token', $token)
+            ->with(['patient', 'doctor.user', 'chamber', 'medicines'])
+            ->first();
+
+        $headers = [
+            'Cache-Control' => 'no-store, private',
+            'Referrer-Policy' => 'no-referrer',
+            'X-Robots-Tag' => 'noindex, nofollow, noarchive',
+        ];
+
+        if ($prescription?->patient) {
+            $prescription->patient->append('patient_code');
+        }
+
+        return response()->view('public.prescription-verification', [
+            'prescription' => $prescription,
+        ], $prescription ? 200 : 404, $headers);
+    }
+
     /**
      * Public (login charai) prescription page.
      * Doctor\PrescriptionController::print() er logic hubohu - shudhu login/ownership check nai.
@@ -34,6 +56,8 @@ class PublicPrescriptionController extends Controller
             ], 200, $headers);
         }
 
+        $verificationUrl = route('prescription.verify', $prescription->ensureVerificationToken());
+
         if ($prescription->medicines->isEmpty()) {
             $medicineTable = '<div class="no-medicine-note" style="padding:14px 6px;font-size:12.5px;color:#64748b;">No medicine prescribed.</div>';
         } else {
@@ -56,7 +80,7 @@ class PublicPrescriptionController extends Controller
             : '<div class="rx-section"><div class="rx-label">Investigation Findings:</div><div class="rx-text">' . nl2br(e($findings)) . '</div></div>';
 
         $logo = $doctor->photo
-            ? '<img src="' . asset('storage/' . $doctor->photo) . '" style="max-width:70px;">'
+            ? '<img src="' . e(asset('storage/' . $doctor->photo)) . '" style="max-width:70px;">'
             : '<div style="width:55px;height:55px;border-radius:50%;border:3px solid #4f46e5;display:flex;align-items:center;justify-content:center;font-weight:700;">+</div>';
 
         $p = $prescription->patient;
@@ -73,25 +97,25 @@ class PublicPrescriptionController extends Controller
             : '<div class="rx-followup">Follow-up: ' . e($fuText) . ' <small>(abar dekha korun)</small></div>';
 
         $replacements = [
-            'doctor_name'      => $doctor->user->name ?? '',
-            'doctor_degree'    => $doctor->qualification ?? '',
-            'doctor_bmdc'      => $doctor->bmdc_number ?? '',
-            'chamber_name'     => $chamber->chamber_name ?? '',
-            'hospital_name'    => $chamber->hospital_name ?? '',
-            'hospital_address' => $chamber->address ?? '',
-            'hospital_phone'   => $chamber->phone ?? '',
-            'date'             => $prescription->created_at->format('d M Y'),
-            'patient_name'     => $p->name ?? '',
-            'patient_id'       => $p->patient_code ?? '',
-            'patient_code'     => $p->patient_code ?? '',
-            'patient_age'      => $p->age ?? '',
-            'patient_gender'   => $p->gender ?? '',
-            'patient_weight'   => ($p && $p->weight) ? $p->weight . ' kg' : '',
-            'blood_group'      => $p->blood_group ?? '',
-            'patient_address'  => $p->address ?? '',
-            'bp'               => $prescription->bp ?? '',
-            'pulse'            => $prescription->pulse ?? '',
-            'temperature'      => $prescription->temperature ?? '',
+            'doctor_name'      => e($doctor->user->name ?? ''),
+            'doctor_degree'    => e($doctor->qualification ?? ''),
+            'doctor_bmdc'      => e($doctor->bmdc_number ?? ''),
+            'chamber_name'     => e($chamber->chamber_name ?? ''),
+            'hospital_name'    => e($chamber->hospital_name ?? ''),
+            'hospital_address' => e($chamber->address ?? ''),
+            'hospital_phone'   => e($chamber->phone ?? ''),
+            'date'             => e($prescription->created_at->format('d M Y')),
+            'patient_name'     => e($p->name ?? ''),
+            'patient_id'       => e($p->patient_code ?? ''),
+            'patient_code'     => e($p->patient_code ?? ''),
+            'patient_age'      => e($p->age ?? ''),
+            'patient_gender'   => e($p->gender ?? ''),
+            'patient_weight'   => e(($p && $p->weight) ? $p->weight . ' kg' : ''),
+            'blood_group'      => e($p->blood_group ?? ''),
+            'patient_address'  => e($p->address ?? ''),
+            'bp'               => e($prescription->bp ?? ''),
+            'pulse'            => e($prescription->pulse ?? ''),
+            'temperature'      => e($prescription->temperature ?? ''),
             'diagnosis'            => nl2br(e($prescription->diagnosis)),
             'clinical_complaints'  => nl2br(e($prescription->clinical_complaints)),
             'risk_factors'         => nl2br(e($prescription->risk_factors)),
@@ -115,6 +139,7 @@ class PublicPrescriptionController extends Controller
             'html'         => $html,
             'css'          => $template->css,
             'paperSize'    => $template->paper_size,
+            'verificationUrl' => $verificationUrl,
             'isPublic'     => true,
         ], 200, $headers);
     }
@@ -165,7 +190,11 @@ class PublicPrescriptionController extends Controller
     public function revoke(Request $request, $id)
     {
         $p = $this->ownedPrescription($request, $id);
-        $p->forceFill(['share_token' => null, 'shared_at' => null])->save();
+        $p->forceFill([
+            'share_token' => null,
+            'shared_at' => null,
+            'verification_token' => null,
+        ])->save();
 
         if ($request->expectsJson()) {
             return response()->json(['ok' => true]);

@@ -3,7 +3,7 @@
         'success' => ['fg' => '#15803d', 'bg' => '#ecfdf3', 'ring' => '#86efac', 'grad1' => '#16a34a', 'grad2' => '#15803d'],
         'warning' => ['fg' => '#b45309', 'bg' => '#fffbeb', 'ring' => '#fcd34d', 'grad1' => '#f59e0b', 'grad2' => '#d97706'],
         'danger'  => ['fg' => '#b91c1c', 'bg' => '#fef2f2', 'ring' => '#fca5a5', 'grad1' => '#ef4444', 'grad2' => '#b91c1c'],
-        'info'    => ['fg' => '#4338ca', 'bg' => '#eef2ff', 'ring' => '#c7d2fe', 'grad1' => '#4f46e5', 'grad2' => '#4338ca'],
+        'info'    => ['fg' => '#0a6b65', 'bg' => '#e3f3f0', 'ring' => '#9bd2cc', 'grad1' => '#0c8c84', 'grad2' => '#0a6b65'],
     ];
     $t = $tones[$tone ?? 'info'] ?? $tones['info'];
 
@@ -140,7 +140,7 @@
     <tr>
         <td align="center" style="padding:22px 20px 0;">
             <p style="margin:0 0 6px;font-size:12.5px;color:#94a3b8;line-height:1.6;">এই ইমেইলটি {{ $appName }} থেকে স্বয়ংক্রিয়ভাবে পাঠানো হয়েছে। এতে সরাসরি রিপ্লাই করবেন না।</p>
-            <p style="margin:0;font-size:12.5px;"><a href="{{ $appUrl }}" style="color:#6366f1;text-decoration:none;font-weight:600;">{{ $appUrl }}</a></p>
+            <p style="margin:0;font-size:12.5px;"><a href="{{ $appUrl }}" style="color:#0c8c84;text-decoration:none;font-weight:600;">{{ $appUrl }}</a></p>
         </td>
     </tr>
     <tr><td style="height:24px;line-height:24px;font-size:1px;">&nbsp;</td></tr>
