@@ -152,12 +152,13 @@
         }
         .rx-verification {
             display: inline-flex; flex-direction: column; align-items: center;
+            box-sizing: border-box; flex: 0 0 27mm; min-width: 27mm;
             width: 27mm; padding: 1.5mm; background: #fff; color: #0f172a;
             border: .25mm solid #cbd5e1; border-radius: 1mm; text-align: center;
             font: 7pt/1.2 Arial, sans-serif;
         }
-        .verification-qr-code { width: 22mm; height: 22mm; margin: 0 auto 1mm; }
-        .verification-qr-code img, .verification-qr-code canvas { display: block; width: 100%; height: 100%; }
+        .verification-qr-code { box-sizing: border-box; flex: 0 0 22mm; width: 22mm; min-width: 22mm; height: 22mm; aspect-ratio: 1; overflow: hidden; margin: 0 auto 1mm; }
+        .verification-qr-code img, .verification-qr-code canvas { display: block; width: 22mm !important; min-width: 22mm; max-width: none; height: 22mm !important; min-height: 22mm; max-height: none; object-fit: contain; }
         .rx-verification-url { display: block; margin-top: .5mm; color: #334155; font-size: 5.5pt; overflow-wrap: anywhere; }
 
         /* ---------- Toast ---------- */
