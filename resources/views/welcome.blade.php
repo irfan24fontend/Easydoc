@@ -45,7 +45,7 @@
 
     {{-- ============ HEADER ============ --}}
     <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-line" style="padding-top: env(safe-area-inset-top, 0px)">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div class="w-full max-w-none mx-auto px-4 sm:px-6 lg:px-10 2xl:px-16 h-16 flex items-center justify-between">
             <a href="{{ url('/') }}" class="flex items-center gap-2.5" aria-label="EasyDoc home">
                 <span class="w-9 h-9 rounded-lg bg-teal text-white grid place-items-center font-display font-extrabold">ED</span>
                 <span class="font-display font-extrabold text-xl">EasyDoc</span>
@@ -87,7 +87,7 @@
 
     {{-- ============ HERO ============ --}}
     <section class="bg-mist">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-14 md:pt-16 md:pb-20 grid lg:grid-cols-[1.05fr_.95fr] gap-10 lg:gap-14 items-center">
+        <div class="w-full max-w-none mx-auto px-4 sm:px-6 lg:px-10 2xl:px-16 pt-10 pb-14 md:pt-16 md:pb-20 grid lg:grid-cols-[1.05fr_.95fr] gap-10 lg:gap-14 items-center">
             <div>
                 <p class="inline-flex items-center gap-2 bg-mint text-teal-deep text-sm font-semibold px-3 py-1.5 rounded-full mb-5">
                     <i class="fa-solid fa-shield-heart"></i> BMDC verified ডাক্তারদের জন্য
@@ -163,7 +163,7 @@
     </section>
 
     {{-- ============ FEATURES ============ --}}
-    <section id="features" class="max-w-6xl mx-auto px-4 sm:px-6 py-16 md:py-24">
+    <section id="features" class="w-full max-w-none mx-auto px-4 sm:px-6 lg:px-10 2xl:px-16 py-16 md:py-24">
         <div class="max-w-2xl mb-10 md:mb-14">
             <h2 class="font-display font-extrabold text-3xl md:text-4xl leading-tight">রোগী দেখা থেকে Print পর্যন্ত, যা যা লাগে</h2>
             <p class="mt-3 text-soft text-lg">দিনে যত রোগীই দেখুন, প্রতিটা ধাপ থাকছে কয়েক ক্লিকের মধ্যে।</p>
@@ -223,7 +223,7 @@
 
     {{-- ============ HOW IT STARTS ============ --}}
     <section id="how" class="bg-ink text-white">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-16 md:py-24">
+        <div class="w-full max-w-none mx-auto px-4 sm:px-6 lg:px-10 2xl:px-16 py-16 md:py-24">
             <div class="max-w-2xl mb-10 md:mb-14">
                 <h2 class="font-display font-extrabold text-3xl md:text-4xl leading-tight">চার ধাপে শুরু</h2>
                 <p class="mt-3 text-white/70 text-lg">শুধু যাচাই করা ডাক্তাররাই সিস্টেম ব্যবহার করতে পারেন। তাই Register-এর পর একটা approval ধাপ আছে।</p>
@@ -261,7 +261,7 @@
     </section>
 
     {{-- ============ PRICING ============ --}}
-    <section id="pricing" class="max-w-6xl mx-auto px-4 sm:px-6 py-16 md:py-24">
+    <section id="pricing" class="w-full max-w-none mx-auto px-4 sm:px-6 lg:px-10 2xl:px-16 py-16 md:py-24">
         <div class="max-w-2xl mb-10 md:mb-14">
             <h2 class="font-display font-extrabold text-3xl md:text-4xl leading-tight">ব্যবহার অনুযায়ী খরচ, আগে থেকেই জানা</h2>
             <p class="mt-3 text-soft text-lg">Wallet-এ balance রাখুন। Prescription তৈরি করলে ও AI সাজেশন নিলে সেই অনুযায়ী টাকা কাটা হয়।</p>
@@ -322,7 +322,7 @@
     </section>
 
     {{-- ============ FAQ ============ --}}
-    <section id="faq" class="max-w-3xl mx-auto px-4 sm:px-6 py-16 md:py-24">
+    <section id="faq" class="w-full max-w-none mx-auto px-4 sm:px-6 lg:px-10 2xl:px-16 py-16 md:py-24">
         <h2 class="font-display font-extrabold text-3xl md:text-4xl mb-8">সাধারণ জিজ্ঞাসা</h2>
 
         <div class="space-y-3">
@@ -365,7 +365,7 @@
     </section>
 
     {{-- ============ CTA ============ --}}
-    <section class="max-w-6xl mx-auto px-4 sm:px-6 pb-16 md:pb-24">
+    <section class="w-full max-w-none mx-auto px-4 sm:px-6 lg:px-10 2xl:px-16 pb-16 md:pb-24">
         <div class="bg-teal rounded-3xl px-6 py-12 md:py-14 text-center text-white">
             <h2 class="font-display font-extrabold text-3xl md:text-4xl leading-tight">আজই EasyDoc-এ শুরু করুন</h2>
             <p class="mt-3 text-white/85 max-w-xl mx-auto text-lg">নতুন হলে Register করুন, আগে থেকে অ্যাকাউন্ট থাকলে Login করুন।</p>
@@ -384,7 +384,7 @@
 
     {{-- ============ FOOTER ============ --}}
     <footer id="contact" class="border-t border-line">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 grid sm:grid-cols-2 md:grid-cols-3 gap-10">
+        <div class="w-full max-w-none mx-auto px-4 sm:px-6 lg:px-10 2xl:px-16 py-12 grid sm:grid-cols-2 md:grid-cols-3 gap-10">
             <div>
                 <div class="flex items-center gap-2.5 mb-3">
                     <span class="w-9 h-9 rounded-lg bg-teal text-white grid place-items-center font-display font-extrabold">ED</span>
