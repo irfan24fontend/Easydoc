@@ -20,4 +20,5 @@ EASYDOC FULL UPDATE (print page + public link + JPG/PDF + mobile)
 5) Follow-up date: followup-snippet.php er code Doctor\PrescriptionController::print() e
    '$replacements = [' er age boshan, ar array te 'followup_block' / 'followup_date' line add korun.
 
-6) git add . ; git commit -m "final print page" ; git push origin main  -> cPanel Deploy HEAD Commit
+6) npm run build (update Vite production assets before deployment)
+   git add . ; git commit -m "final print page" ; git push origin main  -> cPanel Deploy HEAD Commit

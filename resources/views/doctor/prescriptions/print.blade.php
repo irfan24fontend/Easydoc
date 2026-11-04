@@ -157,6 +157,7 @@
             border: .25mm solid #cbd5e1; border-radius: 1mm; text-align: center;
             font: 7pt/1.2 Arial, sans-serif;
         }
+        .rx-verification-default { position: absolute; right: 5mm; bottom: 5mm; z-index: 5; }
         .verification-qr-code { box-sizing: border-box; flex: 0 0 22mm; width: 22mm; min-width: 22mm; height: 22mm; aspect-ratio: 1; overflow: hidden; margin: 0 auto 1mm; }
         .verification-qr-code img, .verification-qr-code canvas { display: block; width: 22mm !important; min-width: 22mm; max-width: none; height: 22mm !important; min-height: 22mm; max-height: none; object-fit: contain; }
         .rx-verification-url { display: block; margin-top: .5mm; color: #334155; font-size: 5.5pt; overflow-wrap: anywhere; }
@@ -330,7 +331,7 @@
         <div class="rx-sheet" id="sheet">
             {!! $html !!}
             @unless($hasVerificationQr)
-                <aside class="rx-verification" aria-label="Prescription authenticity verification">
+                <aside class="rx-verification rx-verification-default" aria-label="Prescription authenticity verification">
                     <div class="verification-qr-code" data-verification-url="{{ $verificationUrl }}"></div>
                     <strong>Verify prescription</strong>
                     <a class="rx-verification-url" href="{{ $verificationUrl }}">Scan to verify</a>
@@ -364,7 +365,7 @@
 
     <div class="rx-toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
@@ -481,8 +482,7 @@
         }
 
         /* ---------------- JPG / PDF download ---------------- */
-        var TARGET_W = Math.round(CFG.wMm / 25.4 * 300);          // 300 DPI (A4 = 2480px)
-        var GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        var TARGET_W = Math.round(CFG.wMm / 25.4 * 240);          // 240 DPI: sharp output without excessive phone memory use
         function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
         function proxify(root) {          // remote image gulo same-origin kore (CORS er jonno)
@@ -511,26 +511,32 @@
             var clone = sheet.cloneNode(true);
             clone.removeAttribute('id');
             clone.style.cssText += ';width:' + CFG.wPx + 'px;min-height:' + CFG.hPx + 'px;box-shadow:none;margin:0;';
+            clone.style.fontFamily = getComputedStyle(sheet).fontFamily;
+            clone.style.lineHeight = '1.55';
             host.appendChild(clone);
             document.body.appendChild(host);
             proxify(clone);
 
             var done = function () { if (host.parentNode) host.parentNode.removeChild(host); window.scrollTo(sx, sy); };
-            var opts = function (ratio, skipFonts) {
-                return { pixelRatio: ratio, backgroundColor: '#ffffff', cacheBust: false, imagePlaceholder: GIF,
-                         skipFonts: !!skipFonts, width: CFG.wPx, height: Math.max(clone.scrollHeight, CFG.hPx), style: { margin: '0' } };
+            var captureHeight = Math.max(clone.scrollHeight, CFG.hPx);
+            var opts = function (scale) {
+                return { scale: scale, backgroundColor: '#ffffff', useCORS: true, allowTaint: false,
+                         width: CFG.wPx, height: captureHeight, windowWidth: CFG.wPx,
+                         windowHeight: captureHeight, scrollX: 0, scrollY: 0,
+                         imageTimeout: 10000, logging: false };
             };
-            var attempts = [[TARGET_W / CFG.wPx, false], [2, false], [1.5, true], [1, true]];
+            var attempts = [TARGET_W / CFG.wPx, 2, 1.5, 1];
             var lastErr;
             function tryAt(i) {
                 if (i >= attempts.length) return Promise.reject(lastErr || new Error('render failed'));
-                return htmlToImage.toCanvas(clone, opts(attempts[i][0], attempts[i][1]))
+                return html2canvas(clone, opts(attempts[i]))
                     .catch(function (e) { lastErr = e; return wait(200).then(function () { return tryAt(i + 1); }); });
             }
-            var fonts = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+            var fonts = document.fonts
+                ? document.fonts.load('16px "Noto Sans Bengali"').catch(function () {}).then(function () { return document.fonts.ready; })
+                : Promise.resolve();
             return fonts.then(function () { return imgsReady(clone); })
-                .then(function () { return wait(250); })
-                .then(function () { return htmlToImage.toCanvas(clone, opts(1, true)).catch(function () {}); })   // warm-up
+                .then(function () { return wait(500); })
                 .then(function () { return tryAt(0); })
                 .then(function (c) { done(); return c; }, function (e) { done(); throw e; });
         }
@@ -575,7 +581,7 @@
                 all.forEach(function (b) { b.disabled = true; });
                 toast('Toiri hocche... ekto opekkha korun', false, true);
                 Promise.resolve().then(function () {
-                    if (typeof htmlToImage === 'undefined') throw new Error('Library load hoyni - internet check korun');
+                    if (typeof html2canvas === 'undefined') throw new Error('Image export library load hoyni - internet check korun');
                     if (type === 'pdf' && !(window.jspdf && window.jspdf.jsPDF)) throw new Error('PDF library load hoyni - internet check korun');
                     return snap();
                 }).then(function (c) {
