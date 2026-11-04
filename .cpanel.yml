@@ -6,4 +6,9 @@ deployment:
     - /bin/cp -f public/sw.js $DEPLOYPATH/sw.js
     - /bin/cp -rf public/js/. $DEPLOYPATH/js/
     - /bin/cp -rf public/css/. $DEPLOYPATH/css/
-    - /bin/cp -rf public/build/. $DEPLOYPATH/build/
+    # Publish hashed assets first, then atomically switch the manifest. This
+    # prevents Laravel from linking to CSS files before cPanel has copied them.
+    - /bin/mkdir -p $DEPLOYPATH/build/assets
+    - /bin/cp -rf public/build/assets/. $DEPLOYPATH/build/assets/
+    - /bin/cp -f public/build/manifest.json $DEPLOYPATH/build/manifest.json.tmp
+    - /bin/mv -f $DEPLOYPATH/build/manifest.json.tmp $DEPLOYPATH/build/manifest.json
