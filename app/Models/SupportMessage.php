@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class SupportMessage extends Model
 {
     protected $fillable = [
-        'support_conversation_id', 'sender_id', 'sender_type', 'body', 'read_at',
+        'support_conversation_id', 'sender_id', 'sender_type', 'body', 'read_at', 'image_path', 'image_name',
     ];
 
     protected $casts = [

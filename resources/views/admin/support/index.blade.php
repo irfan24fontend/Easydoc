@@ -9,10 +9,13 @@
         <h1 class="h3 fw-bold mb-1">Doctor live chat</h1>
         <div class="text-muted">Reply to doctors who need help with EasyDoc.</div>
     </div>
-    <div class="btn-group" role="group" aria-label="Filter conversations">
-        <a class="btn {{ $status === 'open' ? 'btn-success' : 'btn-outline-secondary' }}" href="{{ route('admin.support.index', ['status' => 'open']) }}">Open</a>
-        <a class="btn {{ $status === 'closed' ? 'btn-success' : 'btn-outline-secondary' }}" href="{{ route('admin.support.index', ['status' => 'closed']) }}">Closed</a>
-        <a class="btn {{ $status === 'all' ? 'btn-success' : 'btn-outline-secondary' }}" href="{{ route('admin.support.index', ['status' => 'all']) }}">All</a>
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+        <a class="btn btn-success" href="{{ route('admin.support.create') }}"><i class="fa-solid fa-plus me-1"></i> New message</a>
+        <div class="btn-group" role="group" aria-label="Filter conversations">
+            <a class="btn {{ $status === 'open' ? 'btn-success' : 'btn-outline-secondary' }}" href="{{ route('admin.support.index', ['status' => 'open']) }}">Open</a>
+            <a class="btn {{ $status === 'closed' ? 'btn-success' : 'btn-outline-secondary' }}" href="{{ route('admin.support.index', ['status' => 'closed']) }}">Closed</a>
+            <a class="btn {{ $status === 'all' ? 'btn-success' : 'btn-outline-secondary' }}" href="{{ route('admin.support.index', ['status' => 'all']) }}">All</a>
+        </div>
     </div>
 </div>
 
@@ -41,7 +44,7 @@
                         </td>
                         <td style="min-width:240px;max-width:460px">
                             <div class="fw-semibold text-truncate">{{ $conversation->subject }}</div>
-                            <div class="small text-muted text-truncate">{{ $latest?->body ?? 'No messages yet' }}</div>
+                            <div class="small text-muted text-truncate">{{ $latest?->body ?: ($latest?->image_path ? 'Image attachment' : 'No messages yet') }}</div>
                         </td>
                         <td>
                             <span class="badge rounded-pill {{ $conversation->status === 'open' ? 'text-bg-success' : 'text-bg-secondary' }}">{{ ucfirst($conversation->status) }}</span>

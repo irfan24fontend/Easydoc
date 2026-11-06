@@ -77,12 +77,18 @@ Route::middleware(['auth', 'role:super_admin'])
 
         // Doctor support live chat
         Route::get('support', [AdminSupportChatController::class, 'index'])->name('support.index');
+        Route::get('support/create', [AdminSupportChatController::class, 'create'])->name('support.create');
+        Route::post('support', [AdminSupportChatController::class, 'start'])->middleware('throttle:30,1')->name('support.start');
+        Route::get('support-messages/{message}/image', [AdminSupportChatController::class, 'image'])
+            ->whereNumber('message')->name('support.image');
         Route::get('support/{conversation}', [AdminSupportChatController::class, 'show'])
             ->whereNumber('conversation')->name('support.show');
         Route::get('support/{conversation}/messages', [AdminSupportChatController::class, 'messages'])
             ->whereNumber('conversation')->middleware('throttle:120,1')->name('support.messages');
         Route::post('support/{conversation}/messages', [AdminSupportChatController::class, 'reply'])
             ->whereNumber('conversation')->middleware('throttle:30,1')->name('support.reply');
+        Route::post('support/{conversation}/typing', [AdminSupportChatController::class, 'typing'])
+            ->whereNumber('conversation')->middleware('throttle:120,1')->name('support.typing');
         Route::patch('support/{conversation}/close', [AdminSupportChatController::class, 'close'])
             ->whereNumber('conversation')->name('support.close');
 
@@ -146,6 +152,10 @@ Route::middleware(['auth', 'role:doctor'])
             ->middleware('throttle:120,1')->name('support-chat.state');
         Route::post('support-chat', [DoctorSupportChatController::class, 'send'])
             ->middleware('throttle:30,1')->name('support-chat.send');
+        Route::post('support-chat/typing', [DoctorSupportChatController::class, 'typing'])
+            ->middleware('throttle:120,1')->name('support-chat.typing');
+        Route::get('support-chat/messages/{message}/image', [DoctorSupportChatController::class, 'image'])
+            ->whereNumber('message')->name('support-chat.image');
     });
 
 Route::middleware(['auth', 'role:doctor', 'doctor.approved'])
