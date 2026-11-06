@@ -19,6 +19,19 @@
                     <span>Dashboard</span>
                 </a>
 
+                @php
+                    $unreadSupportChats = \App\Models\SupportConversation::where('status', 'open')
+                        ->whereHas('messages', fn ($query) => $query->where('sender_type', 'doctor')->whereNull('read_at'))
+                        ->count();
+                @endphp
+                <a href="{{ route('admin.support.index') }}" class="side-link {{ Request::is('admin/support*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-headset"></i>
+                    <span>Doctor Support</span>
+                    @if($unreadSupportChats > 0)
+                        <span title="Unread support chats" style="margin-left:auto;font-size:11px;font-weight:800;background:#f59e0b;color:#0f172a;padding:1px 8px;border-radius:999px;">{{ $unreadSupportChats }}</span>
+                    @endif
+                </a>
+
                 @php $pendingDoctors = \App\Models\Doctor::where('approval_status', 'pending')->count(); @endphp
                 <a href="{{ route('admin.doctors.index') }}" class="side-link {{ Request::is('admin/doctors*') ? 'active' : '' }}">
                     <i class="fa-solid fa-user-doctor"></i>

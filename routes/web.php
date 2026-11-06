@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\MedicineController;
 use App\Http\Controllers\Admin\PrescriptionTemplateController;
 use App\Http\Controllers\Admin\WalletController;
+use App\Http\Controllers\Admin\SupportChatController as AdminSupportChatController;
 use App\Http\Controllers\Assistant\SerialController as AssistantSerialController;
 use App\Http\Controllers\Doctor\ApprovalStatusController;
 use App\Http\Controllers\Doctor\AssistantController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Doctor\PrescriptionController;
 use App\Http\Controllers\Doctor\PatientController;
 use App\Http\Controllers\Doctor\PublicProfileController;
 use App\Http\Controllers\Doctor\QueueController;
+use App\Http\Controllers\Doctor\SupportChatController as DoctorSupportChatController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicDoctorController;
 use Illuminate\Support\Facades\Route;
@@ -72,6 +74,17 @@ Route::middleware(['auth', 'role:super_admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Doctor support live chat
+        Route::get('support', [AdminSupportChatController::class, 'index'])->name('support.index');
+        Route::get('support/{conversation}', [AdminSupportChatController::class, 'show'])
+            ->whereNumber('conversation')->name('support.show');
+        Route::get('support/{conversation}/messages', [AdminSupportChatController::class, 'messages'])
+            ->whereNumber('conversation')->middleware('throttle:120,1')->name('support.messages');
+        Route::post('support/{conversation}/messages', [AdminSupportChatController::class, 'reply'])
+            ->whereNumber('conversation')->middleware('throttle:30,1')->name('support.reply');
+        Route::patch('support/{conversation}/close', [AdminSupportChatController::class, 'close'])
+            ->whereNumber('conversation')->name('support.close');
 
         // Doctor registration review (approve / reject / private BMDC certificate)
         Route::patch('doctors/{doctor}/approve', [DoctorController::class, 'approve'])
@@ -129,6 +142,10 @@ Route::middleware(['auth', 'role:doctor'])
     ->name('doctor.')
     ->group(function () {
         Route::get('approval-status', [ApprovalStatusController::class, 'show'])->name('approval.status');
+        Route::get('support-chat', [DoctorSupportChatController::class, 'state'])
+            ->middleware('throttle:120,1')->name('support-chat.state');
+        Route::post('support-chat', [DoctorSupportChatController::class, 'send'])
+            ->middleware('throttle:30,1')->name('support-chat.send');
     });
 
 Route::middleware(['auth', 'role:doctor', 'doctor.approved'])

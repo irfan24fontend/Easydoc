@@ -7,6 +7,7 @@
     <title>Application status | {{ config('app.name', 'EasyDoc') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root { --ink:#10262b; --ink-soft:#46606a; --teal:#0c8c84; --teal-deep:#0a6b65; --mint:#e3f3f0; --mist:#f3f7f7; --line:#d3e0e0; --amber:#f4b63f; --danger:#b3261e; --danger-bg:#fdecea;
@@ -85,5 +86,8 @@
         </p>
     @endif
 </main>
+@if ($doctor)
+    @include('doctor.support._widget')
+@endif
 </body>
 </html>
