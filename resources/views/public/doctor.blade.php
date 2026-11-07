@@ -4,15 +4,25 @@
     $photo     = $doctor->photoUrl();
     $url       = $profile->url();
     $initials  = strtoupper($str::substr(trim(preg_replace('/^dr\.?\s+/i', '', $name)), 0, 2));
-    $expertise = $profile->expertise ?? [];
-    $languages = $profile->languages ?? [];
-    $education = $profile->education ?? [];
-    $workExp   = $profile->work_experience ?? [];
-    $title     = $name . ' | ' . $doctor->speciality . ' | ' . config('app.name', 'EasyDoc');
-    $desc      = $str::limit($profile->tagline . '. ' . strip_tags($profile->about), 155);
+    $expertise = collect($profile->expertise ?? [])->filter(fn ($item) => is_string($item) && trim($item) !== '')->values()->all();
+    $languages = collect($profile->languages ?? [])->filter(fn ($item) => is_string($item) && trim($item) !== '')->values()->all();
+    $education = collect($profile->education ?? [])->filter(fn ($item) => is_array($item) && (filled($item['degree'] ?? null) || filled($item['institution'] ?? null)))->values()->all();
+    $workExp   = collect($profile->work_experience ?? [])->filter(fn ($item) => is_array($item) && (filled($item['position'] ?? null) || filled($item['organization'] ?? null)))->values()->all();
+    $about     = trim((string) ($profile->about ?? ''));
+    $speciality = trim((string) ($doctor->speciality ?? ''));
+    $title     = implode(' | ', array_filter([$name, $speciality, config('app.name', 'EasyDoc')], fn ($part) => trim((string) $part) !== ''));
+    $desc      = $str::limit(implode('. ', array_filter([$profile->tagline, strip_tags($about)], fn ($part) => trim((string) $part) !== '')), 155);
     $phone     = $profile->show_contact ? ($doctor->user->phone ?? null) : null;
     $email     = $profile->show_contact ? ($doctor->user->email ?? null) : null;
     $firstChamber = $chambers->first();
+    $hasEducation = count($education) > 0 || filled($doctor->medical_college);
+    $hasAbout = filled($about) || count($expertise) > 0;
+    $firstChamberSchedule = $firstChamber
+        ? collect([$firstChamber->visiting_days, $firstChamber->visiting_time])->filter(fn ($part) => filled($part))->implode(' · ')
+        : '';
+    $hasAppointment = $profile->consultation_fee !== null || filled($phone)
+        || ($firstChamber && (filled($firstChamber->chamber_name) || filled($firstChamberSchedule) || filled($firstChamber->address)));
+    $firstSection = $hasAbout ? 'about' : ($hasEducation ? 'education' : (count($workExp) ? 'experience' : 'chambers'));
 
     $schema = array_filter([
         '@context'         => 'https://schema.org',
@@ -20,7 +30,7 @@
         'name'             => $name,
         'url'              => $url,
         'image'            => $photo,
-        'medicalSpecialty' => $doctor->speciality,
+        'medicalSpecialty' => $speciality,
         'description'      => $profile->tagline,
     ]);
 
@@ -54,7 +64,7 @@
     @if ($isPreview)<meta name="robots" content="noindex">@endif
 
     <meta property="og:type" content="profile">
-    <meta property="og:title" content="{{ $name }} - {{ $doctor->speciality }}">
+    <meta property="og:title" content="{{ $name }}{{ $speciality ? ' - ' . $speciality : '' }}">
     <meta property="og:description" content="{{ $desc }}">
     <meta property="og:url" content="{{ $url }}">
     @if ($photo)<meta property="og:image" content="{{ $photo }}">@endif
@@ -85,7 +95,7 @@
         /* top bar */
         .top{background:#fff;border-bottom:1px solid var(--line)}
         .top-in{max-width:1080px;margin:0 auto;padding:13px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-        .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 18px var(--serif);color:var(--navy)}
+        .brand{display:flex;align-items:center;gap:10px;min-width:0;text-decoration:none;font:700 18px var(--serif);color:var(--navy);overflow-wrap:anywhere}
         .brand i{width:26px;height:26px;border-radius:6px;background:var(--navy);display:grid;place-items:center}
         .top small{color:var(--mute);font-size:13px;display:flex;align-items:center;gap:6px}
         .top small svg{color:var(--teal)}
@@ -93,15 +103,17 @@
         .page{width:100%;max-width:1080px;margin:0 auto;padding:20px 20px 60px}
 
         /* identity card */
-        .profile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px;display:grid;grid-template-columns:176px 1fr;gap:28px}
+        .profile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px;display:grid;grid-template-columns:minmax(120px,176px) minmax(0,1fr);gap:28px}
+        .profile>*{min-width:0}
         .photo{width:176px;height:220px;border-radius:10px;overflow:hidden;background:#e8edf3;border:1px solid var(--line)}
         .photo img{width:100%;height:100%;object-fit:cover;object-position:center top}
         .photo .ph{width:100%;height:100%;display:grid;place-items:center;font:700 48px var(--serif);color:var(--navy)}
         .kicker{font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--teal)}
-        .ident h1{font-size:clamp(24px,3.4vw,34px);font-weight:700;margin:6px 0 8px;overflow-wrap:anywhere}
-        .creds{font-size:16px;font-weight:500;color:var(--ink)}
-        .desig{font-size:15px;color:var(--mute);margin-top:2px}
-        .tag{margin-top:12px;font-size:15.5px;color:var(--body);max-width:64ch}
+        .ident{min-width:0}
+        .ident h1{font-size:clamp(24px,3.4vw,34px);font-weight:700;margin:6px 0 8px;overflow-wrap:anywhere;word-break:normal}
+        .creds{font-size:16px;font-weight:500;color:var(--ink);overflow-wrap:anywhere}
+        .desig{font-size:15px;color:var(--mute);margin-top:2px;overflow-wrap:anywhere}
+        .tag{margin-top:12px;font-size:15.5px;color:var(--body);max-width:64ch;overflow-wrap:anywhere}
         .keyfacts{grid-column:1/-1;margin:0;padding-top:20px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px 24px}
         .keyfacts dt{font-size:11.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--mute);margin-bottom:3px}
         .keyfacts dd{min-width:0;margin:0;font-size:15.5px;font-weight:600;color:var(--ink);overflow-wrap:anywhere}
@@ -135,8 +147,8 @@
 
         .chamber{border:1px solid var(--line);border-radius:10px;padding:20px 22px}
         .chamber + .chamber{margin-top:14px}
-        .chamber h3{font-size:18px}
-        .hosp{color:var(--teal);font-weight:600;font-size:14.5px;margin-top:2px}
+        .chamber h3{font-size:18px;overflow-wrap:anywhere}
+        .hosp{color:var(--teal);font-weight:600;font-size:14.5px;margin-top:2px;overflow-wrap:anywhere}
         .info{margin:16px 0 0;display:grid;gap:10px}
         .info div{display:grid;grid-template-columns:minmax(62px,84px) minmax(0,1fr);gap:12px;font-size:15px}
         .info dt{color:var(--mute);font-size:13.5px;padding-top:1px}
@@ -147,7 +159,7 @@
         .row-btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 
         /* buttons */
-        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-decoration:none;font:600 15px var(--sans);padding:11px 18px;border-radius:8px;border:1px solid transparent;transition:background .15s,border-color .15s}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:0;white-space:normal;overflow-wrap:anywhere;cursor:pointer;text-decoration:none;font:600 15px var(--sans);padding:11px 18px;border-radius:8px;border:1px solid transparent;transition:background .15s,border-color .15s}
         .btn svg{width:18px;height:18px;flex:none}
         .btn-primary{background:var(--navy);color:#fff}
         .btn-primary:hover{background:var(--navy-2)}
@@ -159,9 +171,9 @@
         .side{display:grid;gap:20px;position:sticky;top:76px}
         .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px}
         .card h2{font-size:18px;margin-bottom:14px}
-        .fee{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:16px}
+        .fee{display:flex;justify-content:space-between;align-items:baseline;gap:12px;min-width:0;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:16px}
         .fee span{font-size:14px;color:var(--mute)}
-        .fee b{font:700 24px var(--serif);color:var(--navy)}
+        .fee b{font:700 24px var(--serif);color:var(--navy);text-align:right;overflow-wrap:anywhere}
         .next{font-size:14.5px;color:var(--body);margin-bottom:16px}
         .next b{display:block;font-size:15.5px;color:var(--ink)}
         .stack{display:grid;gap:10px}
@@ -172,6 +184,7 @@
         .share-row{display:flex;gap:8px;flex-wrap:wrap}
         .share-row .btn{flex:1 1 120px;padding:9px 6px;font-size:13.5px;min-width:0;white-space:normal;overflow-wrap:anywhere}
         .empty{color:var(--mute)}
+        .empty-state{padding:16px;border:1px dashed #cbd5e1;border-radius:8px;background:#f9fafb;line-height:1.6}
 
         footer{margin-top:28px;text-align:center;color:var(--mute);font-size:13px;display:grid;gap:4px}
         footer a{color:var(--navy);font-weight:600;text-decoration:none}
@@ -220,6 +233,10 @@
             .sec{padding:16px 12px}
             .chamber{padding:13px}
         }
+        @media (prefers-reduced-motion:reduce){
+            html{scroll-behavior:auto}
+            *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+        }
     </style>
 </head>
 <body>
@@ -254,19 +271,21 @@
 
         <div class="ident">
             <div class="head">
-                <p class="kicker">{{ $doctor->speciality }}</p>
+                @if ($speciality)<p class="kicker">{{ $speciality }}</p>@endif
                 <h1>{{ $name }}</h1>
-                <p class="creds">{{ $doctor->qualification }}</p>
+                @if ($doctor->qualification)<p class="creds">{{ $doctor->qualification }}</p>@endif
                 @if ($doctor->designation)<p class="desig">{{ $doctor->designation }}</p>@endif
             </div>
             @if ($profile->tagline)<p class="tag">{{ $profile->tagline }}</p>@endif
         </div>
 
         <dl class="keyfacts">
-            <div>
-                <dt>BMDC registration</dt>
-                <dd>{{ $doctor->bmdc_number }} <span class="vf"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Verified</span></dd>
-            </div>
+            @if ($doctor->bmdc_number)
+                <div>
+                    <dt>BMDC registration</dt>
+                    <dd>{{ $doctor->bmdc_number }} <span class="vf"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Verified</span></dd>
+                </div>
+            @endif
             @if ($doctor->experienceLabel())<div><dt>Experience</dt><dd>{{ $doctor->experienceLabel() }}</dd></div>@endif
             @if (count($languages))<div><dt>Languages</dt><dd>{{ implode(', ', $languages) }}</dd></div>@endif
             @if ($profile->consultation_fee !== null)<div><dt>Consultation fee</dt><dd>&#2547;{{ number_format($profile->consultation_fee) }}</dd></div>@endif
@@ -275,10 +294,10 @@
 
     <nav class="subnav" aria-label="Profile sections">
         <div class="subnav-in" id="tabsIn">
-            <a href="#about" class="on">About</a>
-            <a href="#education">Education</a>
-            @if (count($workExp))<a href="#experience">Experience</a>@endif
-            <a href="#chambers">Chambers</a>
+            @if ($hasAbout)<a href="#about" @class(['on' => $firstSection === 'about'])>About</a>@endif
+            @if ($hasEducation)<a href="#education" @class(['on' => $firstSection === 'education'])>Education</a>@endif
+            @if (count($workExp))<a href="#experience" @class(['on' => $firstSection === 'experience'])>Experience</a>@endif
+            <a href="#chambers" @class(['on' => $firstSection === 'chambers'])>Chambers</a>
         </div>
     </nav>
 
@@ -286,30 +305,34 @@
 
         <div class="main">
 
+            @if ($hasAbout)
             <section class="sec" id="about">
                 <h2>About</h2>
-                <p class="about">{{ $profile->about }}</p>
+                @if ($about)<p class="about">{{ $about }}</p>@endif
                 @if (count($expertise))
                     <p class="sub">Areas of expertise</p>
                     <div class="tags">@foreach ($expertise as $item)<span>{{ $item }}</span>@endforeach</div>
                 @endif
             </section>
+            @endif
 
+            @if ($hasEducation)
             <section class="sec" id="education">
                 <h2>Education</h2>
                 <ul class="entries">
                     @foreach ($education as $e)
                         <li>
-                            <strong>{{ $e['degree'] }}</strong>
-                            <span>{{ $e['institution'] }}</span>
+                            @if (! empty($e['degree']))<strong>{{ $e['degree'] }}</strong>@endif
+                            @if (! empty($e['institution']))<span>{{ $e['institution'] }}</span>@endif
                             @if (! empty($e['year']))<em>{{ $e['year'] }}</em>@endif
                         </li>
                     @endforeach
-                    @if ($doctor->medical_college && ! collect($education)->contains(fn ($e) => $str::contains($str::lower($e['institution']), $str::lower($doctor->medical_college))))
+                    @if ($doctor->medical_college && ! collect($education)->contains(fn ($e) => $str::contains($str::lower($e['institution'] ?? ''), $str::lower($doctor->medical_college))))
                         <li><strong>MBBS</strong><span>{{ $doctor->medical_college }}</span></li>
                     @endif
                 </ul>
             </section>
+            @endif
 
             @if (count($workExp))
             <section class="sec" id="experience">
@@ -317,8 +340,8 @@
                 <ul class="entries">
                     @foreach ($workExp as $w)
                         <li>
-                            <strong>{{ $w['position'] }}</strong>
-                            <span>{{ $w['organization'] }}</span>
+                            @if (! empty($w['position']))<strong>{{ $w['position'] }}</strong>@endif
+                            @if (! empty($w['organization']))<span>{{ $w['organization'] }}</span>@endif
                             @if (! empty($w['from']))<em>{{ $w['from'] }} &ndash; {{ ! empty($w['to']) ? $w['to'] : 'Present' }}</em>@endif
                         </li>
                     @endforeach
@@ -329,23 +352,23 @@
             <section class="sec" id="chambers">
                 <h2>Chambers</h2>
                 @if ($chambers->isEmpty())
-                    <p class="empty">No active chamber is listed right now.</p>
+                    <p class="empty empty-state">No active chamber is listed right now.</p>
                 @else
                     @foreach ($chambers as $c)
                         @php $days = preg_split('/\s*[,،|\/]\s*/u', (string) $c->visiting_days, -1, PREG_SPLIT_NO_EMPTY); @endphp
                         <article class="chamber">
-                            <h3>{{ $c->chamber_name }}</h3>
-                            <p class="hosp">{{ $c->hospital_name }}</p>
+                            @if ($c->chamber_name)<h3>{{ $c->chamber_name }}</h3>@endif
+                            @if ($c->hospital_name)<p class="hosp">{{ $c->hospital_name }}</p>@endif
                             <dl class="info">
-                                <div><dt>Address</dt><dd>{{ $c->address }}</dd></div>
-                                <div><dt>Days</dt><dd>@if (count($days) > 1)<span class="days">@foreach ($days as $d)<b>{{ $d }}</b>@endforeach</span>@else{{ $c->visiting_days }}@endif</dd></div>
-                                <div><dt>Time</dt><dd>{{ $c->visiting_time }}</dd></div>
+                                @if ($c->address)<div><dt>Address</dt><dd>{{ $c->address }}</dd></div>@endif
+                                @if ($c->visiting_days)<div><dt>Days</dt><dd>@if (count($days) > 1)<span class="days">@foreach ($days as $d)<b>{{ $d }}</b>@endforeach</span>@else{{ $c->visiting_days }}@endif</dd></div>@endif
+                                @if ($c->visiting_time)<div><dt>Time</dt><dd>{{ $c->visiting_time }}</dd></div>@endif
                                 @if ($profile->show_contact && $c->phone)
                                     <div><dt>Phone</dt><dd><a href="tel:{{ preg_replace('/\s+/', '', $c->phone) }}">{{ $c->phone }}</a></dd></div>
                                 @endif
                             </dl>
                             <div class="row-btns">
-                                <a class="btn btn-primary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ urlencode($c->address) }}">{!! $ico['nav'] !!} Get directions</a>
+                                @if ($c->address)<a class="btn btn-primary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ urlencode($c->address) }}">{!! $ico['nav'] !!} Get directions</a>@endif
                                 @if ($profile->show_contact && $c->phone)
                                     <a class="btn btn-line" href="tel:{{ preg_replace('/\s+/', '', $c->phone) }}">{!! $ico['phone'] !!} Call chamber</a>
                                 @endif
@@ -358,19 +381,21 @@
 
         {{-- Sidebar --}}
         <aside class="side">
+            @if ($hasAppointment)
             <div class="card">
                 <h2>Appointment</h2>
                 @if ($profile->consultation_fee !== null)
                     <div class="fee"><span>Consultation fee</span><b>&#2547;{{ number_format($profile->consultation_fee) }}</b></div>
                 @endif
-                @if ($firstChamber)
-                    <div class="next"><b>{{ $firstChamber->chamber_name }}</b>{{ $firstChamber->visiting_days }} &middot; {{ $firstChamber->visiting_time }}</div>
+                @if ($firstChamber && (filled($firstChamber->chamber_name) || $firstChamberSchedule))
+                    <div class="next">@if ($firstChamber->chamber_name)<b>{{ $firstChamber->chamber_name }}</b>@endif @if ($firstChamberSchedule)<span>{{ $firstChamberSchedule }}</span>@endif</div>
                 @endif
                 <div class="stack">
-                    @if ($phone)<a class="btn btn-primary btn-block" href="tel:{{ $phone }}">{!! $ico['phone'] !!} Call {{ $phone }}</a>@endif
-                    @if ($firstChamber)<a class="btn {{ $phone ? 'btn-line' : 'btn-primary' }} btn-block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ urlencode($firstChamber->address) }}">{!! $ico['nav'] !!} Get directions</a>@endif
+                    @if ($phone)<a class="btn btn-primary btn-block" href="tel:{{ preg_replace('/\s+/', '', $phone) }}">{!! $ico['phone'] !!} Call {{ $phone }}</a>@endif
+                    @if ($firstChamber && $firstChamber->address)<a class="btn {{ $phone ? 'btn-line' : 'btn-primary' }} btn-block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ urlencode($firstChamber->address) }}">{!! $ico['nav'] !!} Get directions</a>@endif
                 </div>
             </div>
+            @endif
 
             @if ($email || $profile->website_url || $profile->facebook_url)
             <div class="card">
@@ -404,9 +429,9 @@
 {{-- Mobile action bar --}}
 <div class="mbar" aria-label="Quick actions">
     @if ($phone)
-        <a class="btn btn-primary" href="tel:{{ $phone }}">{!! $ico['phone'] !!} Call</a>
+        <a class="btn btn-primary" href="tel:{{ preg_replace('/\s+/', '', $phone) }}">{!! $ico['phone'] !!} Call</a>
     @endif
-    @if ($firstChamber)
+    @if ($firstChamber && $firstChamber->address)
         <a class="btn {{ $phone ? 'btn-line' : 'btn-primary' }}" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ urlencode($firstChamber->address) }}">{!! $ico['nav'] !!} Directions</a>
     @endif
     <button type="button" class="btn btn-line" data-share="{{ $url }}" data-title="{{ $name }}">{!! $ico['share'] !!} Share</button>
