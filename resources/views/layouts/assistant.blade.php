@@ -4,7 +4,7 @@
     $assistantChamber = $assistantDoctor?->activeChamber();
 @endphp
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,7 +43,7 @@
         <div class="as-brand-icon"><i class="fa-solid fa-stethoscope"></i></div>
         <div>
             <h6>EasyDoc</h6>
-            <small>ASSISTANT PANEL</small>
+            <small>{{ __('ASSISTANT PANEL') }}</small>
         </div>
     </div>
 
@@ -56,9 +56,11 @@
         @endif
         <span class="as-chip"><i class="fa-solid fa-user me-1"></i> {{ $authUser->name }}</span>
 
+        @include('layouts.locale-switcher')
+
         <form method="POST" action="{{ route('logout') }}" class="m-0">
             @csrf
-            <button type="submit" class="as-logout"><i class="fa-solid fa-arrow-right-from-bracket me-1"></i> Logout</button>
+            <button type="submit" class="as-logout"><i class="fa-solid fa-arrow-right-from-bracket me-1"></i> {{ __('Logout') }}</button>
         </form>
     </div>
 </div>
@@ -79,5 +81,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 @stack('scripts')
+@include('layouts.locale-runtime')
 </body>
 </html>

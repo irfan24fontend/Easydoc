@@ -22,6 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'doctor.approved' => \App\Http\Middleware\EnsureDoctorApproved::class,
         ]);
 
+        $middleware->appendToGroup('web', \App\Http\Middleware\SetLocale::class);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (TokenMismatchException $exception, Request $request) {

@@ -23,6 +23,7 @@ use App\Http\Controllers\Doctor\QueueController;
 use App\Http\Controllers\Doctor\SupportChatController as DoctorSupportChatController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicDoctorController;
+use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,6 +32,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::view('/', 'welcome');
+Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
 // Shareable public doctor profile (no login needed)
 Route::get('/dr/{slug}', [PublicDoctorController::class, 'show'])

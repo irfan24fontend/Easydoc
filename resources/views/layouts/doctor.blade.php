@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 
 <head>
     <meta charset="UTF-8">
@@ -122,6 +122,7 @@
 
 @stack('scripts')
 
+@include('layouts.locale-runtime')
 </body>
 
 </html>

@@ -27,5 +27,6 @@
                 {{ $slot }}
             </div>
         </div>
+    @include('layouts.locale-runtime')
     </body>
 </html>

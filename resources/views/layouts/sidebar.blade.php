@@ -6,17 +6,17 @@
             <div class="brand-icon"><i class="fa-solid fa-stethoscope"></i></div>
             <div>
                 <h4>EasyDoc</h4>
-                <span>ADMIN SUITE</span>
+                <span>{{ __('ADMIN SUITE') }}</span>
             </div>
         </div>
 
         <div class="p-3">
-            <span class="nav-section-label">Core Management</span>
+            <span class="nav-section-label">{{ __('Core Management') }}</span>
 
             <nav class="nav flex-column gap-1">
                 <a href="{{ route('admin.dashboard') }}" class="side-link {{ Request::is('admin/dashboard') || Request::is('dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-pie"></i>
-                    <span>Dashboard</span>
+                    <span>{{ __('Dashboard') }}</span>
                 </a>
 
                 @php
@@ -26,7 +26,7 @@
                 @endphp
                 <a href="{{ route('admin.support.index') }}" class="side-link {{ Request::is('admin/support*') ? 'active' : '' }}">
                     <i class="fa-solid fa-headset"></i>
-                    <span>Doctor Support</span>
+                    <span>{{ __('Doctor Support') }}</span>
                     @if($unreadSupportChats > 0)
                         <span title="Unread support chats" style="margin-left:auto;font-size:11px;font-weight:800;background:#f59e0b;color:#0f172a;padding:1px 8px;border-radius:999px;">{{ $unreadSupportChats }}</span>
                     @endif
@@ -35,7 +35,7 @@
                 @php $pendingDoctors = \App\Models\Doctor::where('approval_status', 'pending')->count(); @endphp
                 <a href="{{ route('admin.doctors.index') }}" class="side-link {{ Request::is('admin/doctors*') ? 'active' : '' }}">
                     <i class="fa-solid fa-user-doctor"></i>
-                    <span>Doctors</span>
+                    <span>{{ __('Doctors') }}</span>
                     @if($pendingDoctors > 0)
                         <span title="Approval pending" style="margin-left:auto;font-size:11px;font-weight:800;background:#f59e0b;color:#0f172a;padding:1px 8px;border-radius:999px;">{{ $pendingDoctors }}</span>
                     @endif
@@ -51,7 +51,7 @@
                    data-bs-toggle="collapse" role="button"
                    aria-expanded="{{ $chamberOpen ? 'true' : 'false' }}" aria-controls="chamberSubmenu">
                     <i class="fa-solid fa-hospital"></i>
-                    <span>Chambers</span>
+                    <span>{{ __('Chambers') }}</span>
                     @if($pendingChambers > 0)
                         <span style="margin-left:auto;font-size:11px;font-weight:800;background:#f59e0b;color:#0f172a;padding:1px 8px;border-radius:999px;">{{ $pendingChambers }}</span>
                     @endif
@@ -61,11 +61,11 @@
                     <div class="sub-links">
                         <a href="{{ route('admin.chambers.index') }}" class="side-sublink {{ Request::is('admin/chambers*') && ! Request::is('admin/chamber-requests*') ? 'active' : '' }}">
                             <i class="fa-solid fa-list"></i>
-                            <span>All Chambers</span>
+                            <span>{{ __('All Chambers') }}</span>
                         </a>
                         <a href="{{ route('admin.chamber-requests.index') }}" class="side-sublink {{ Request::is('admin/chamber-requests*') ? 'active' : '' }}">
                             <i class="fa-solid fa-inbox"></i>
-                            <span>Chamber Requests</span>
+                            <span>{{ __('Chamber Requests') }}</span>
                             @if($pendingChambers > 0)
                                 <span style="margin-left:auto;font-size:11px;font-weight:800;background:#f59e0b;color:#0f172a;padding:1px 8px;border-radius:999px;">{{ $pendingChambers }}</span>
                             @endif
@@ -75,7 +75,7 @@
 
                 <a href="{{ route('admin.templates.index') }}" class="side-link {{ Request::is('admin/templates*') ? 'active' : '' }}">
                     <i class="fa-solid fa-file-medical"></i>
-                    <span>Prescription Templates</span>
+                    <span>{{ __('Prescription Templates') }}</span>
                 </a>
 
                 {{-- Wallet Management (submenu: All Wallets / Recharge Requests / Invoices) --}}
@@ -90,7 +90,7 @@
                    data-bs-toggle="collapse" role="button"
                    aria-expanded="{{ $walletOpen ? 'true' : 'false' }}" aria-controls="walletSubmenu">
                     <i class="fa-solid fa-wallet"></i>
-                    <span>Wallet Management</span>
+                    <span>{{ __('Wallet Management') }}</span>
                     @if($pendingRecharges > 0)
                         <span style="margin-left:auto;font-size:11px;font-weight:800;background:#f59e0b;color:#0f172a;padding:1px 8px;border-radius:999px;">{{ $pendingRecharges }}</span>
                     @endif
@@ -100,12 +100,12 @@
                     <div class="sub-links">
                         <a href="{{ route('admin.wallets.index') }}" class="side-sublink {{ Request::is('admin/wallets*') ? 'active' : '' }}">
                             <i class="fa-solid fa-user-doctor"></i>
-                            <span>All Wallets</span>
+                            <span>{{ __('All Wallets') }}</span>
                         </a>
                         @if(Route::has('admin.recharge-requests.index'))
                             <a href="{{ route('admin.recharge-requests.index') }}" class="side-sublink {{ Request::is('admin/recharge-requests*') ? 'active' : '' }}">
                                 <i class="fa-solid fa-hand-holding-dollar"></i>
-                                <span>Recharge Requests</span>
+                                <span>{{ __('Recharge Requests') }}</span>
                                 @if($pendingRecharges > 0)
                                     <span style="margin-left:auto;font-size:11px;font-weight:800;background:#f59e0b;color:#0f172a;padding:1px 8px;border-radius:999px;">{{ $pendingRecharges }}</span>
                                 @endif
@@ -113,27 +113,27 @@
                         @endif
                         <a href="{{ route('admin.invoices.index') }}" class="side-sublink {{ Request::is('admin/invoices*') ? 'active' : '' }}">
                             <i class="fa-solid fa-file-invoice"></i>
-                            <span>Invoices</span>
+                            <span>{{ __('Invoices') }}</span>
                         </a>
                     </div>
                 </div>
 
                 <a href="{{ route('admin.medicines.index') }}" class="side-link {{ Request::is('admin/medicines*') ? 'active' : '' }}">
                     <i class="fa-solid fa-pills"></i>
-                    <span>Medicines</span>
+                    <span>{{ __('Medicines') }}</span>
                 </a>
 
                 @if(Route::has('admin.announcements.index'))
                     <a href="{{ route('admin.announcements.index') }}" class="side-link {{ Request::is('admin/announcements*') ? 'active' : '' }}">
                         <i class="fa-solid fa-bullhorn"></i>
-                        <span>Notifications</span>
+                        <span>{{ __('Notifications') }}</span>
                     </a>
                 @endif
 
                 <a href="#" class="side-link disabled">
                     <i class="fa-solid fa-user-injured"></i>
-                    <span>Patients</span>
-                    <span class="soon-badge">Soon</span>
+                    <span>{{ __('Patients') }}</span>
+                    <span class="soon-badge">{{ __('Soon') }}</span>
                 </a>
             </nav>
         </div>
@@ -151,7 +151,7 @@
         <form method="POST" action="{{ route('logout') }}" class="mt-2">
             @csrf
             <button type="submit" class="logout-btn">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> {{ __('Logout') }}
             </button>
         </form>
     </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bn" class="scroll-smooth">
+<html lang="{{ app()->getLocale() }}" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -52,23 +52,24 @@
             </a>
 
             <nav class="hidden md:flex items-center gap-7 text-[15px] font-medium text-soft" aria-label="Main">
-                <a href="#features" class="hover:text-teal">Features</a>
-                <a href="#how" class="hover:text-teal">কীভাবে শুরু করবেন</a>
-                <a href="#pricing" class="hover:text-teal">Pricing</a>
+                <a href="#features" class="hover:text-teal">{{ __('Features') }}</a>
+                <a href="#how" class="hover:text-teal">{{ __('How to start') }}</a>
+                <a href="#pricing" class="hover:text-teal">{{ __('Pricing') }}</a>
                 <a href="#faq" class="hover:text-teal">FAQ</a>
-                <a href="#contact" class="hover:text-teal">যোগাযোগ</a>
+                <a href="#contact" class="hover:text-teal">{{ __('Contact') }}</a>
             </nav>
 
             <div class="flex items-center gap-2">
+                @include('layouts.locale-switcher')
                 @auth
-                    <a href="{{ url('/dashboard') }}" class="hidden sm:inline-flex items-center gap-2 bg-teal hover:bg-teal-deep text-white text-sm font-semibold px-4 py-2.5 rounded-lg"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+                    <a href="{{ url('/dashboard') }}" class="hidden sm:inline-flex items-center gap-2 bg-teal hover:bg-teal-deep text-white text-sm font-semibold px-4 py-2.5 rounded-lg"><i class="fa-solid fa-gauge-high"></i> {{ __('Dashboard') }}</a>
                 @else
-                    <a href="{{ route('login') }}" class="hidden sm:inline-flex text-sm font-semibold px-4 py-2.5 rounded-lg border border-line hover:bg-mist">Login</a>
+                    <a href="{{ route('login') }}" class="hidden sm:inline-flex text-sm font-semibold px-4 py-2.5 rounded-lg border border-line hover:bg-mist">{{ __('Login') }}</a>
                     @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="hidden sm:inline-flex items-center gap-2 bg-teal hover:bg-teal-deep text-white text-sm font-semibold px-4 py-2.5 rounded-lg">Doctor Register</a>
+                        <a href="{{ route('register') }}" class="hidden sm:inline-flex items-center gap-2 bg-teal hover:bg-teal-deep text-white text-sm font-semibold px-4 py-2.5 rounded-lg">{{ __('Doctor Register') }}</a>
                     @endif
                 @endauth
-                <button id="menuBtn" class="md:hidden w-10 h-10 grid place-items-center rounded-lg border border-line" aria-label="Menu খুলুন" aria-expanded="false" aria-controls="mobileMenu">
+                <button id="menuBtn" class="md:hidden w-10 h-10 grid place-items-center rounded-lg border border-line" aria-label="{{ __('Open menu') }}" aria-expanded="false" aria-controls="mobileMenu">
                     <i class="fa-solid fa-bars" id="menuIcon"></i>
                 </button>
             </div>
@@ -76,11 +77,11 @@
 
         <div id="mobileMenu" class="md:hidden hidden border-t border-line bg-white">
             <nav class="px-4 py-3 grid gap-1 text-base font-medium" aria-label="Mobile">
-                <a href="#features" class="menu-link px-3 py-3 rounded-lg hover:bg-mist">Features</a>
-                <a href="#how" class="menu-link px-3 py-3 rounded-lg hover:bg-mist">কীভাবে শুরু করবেন</a>
-                <a href="#pricing" class="menu-link px-3 py-3 rounded-lg hover:bg-mist">Pricing</a>
+                <a href="#features" class="menu-link px-3 py-3 rounded-lg hover:bg-mist">{{ __('Features') }}</a>
+                <a href="#how" class="menu-link px-3 py-3 rounded-lg hover:bg-mist">{{ __('How to start') }}</a>
+                <a href="#pricing" class="menu-link px-3 py-3 rounded-lg hover:bg-mist">{{ __('Pricing') }}</a>
                 <a href="#faq" class="menu-link px-3 py-3 rounded-lg hover:bg-mist">FAQ</a>
-                <a href="#contact" class="menu-link px-3 py-3 rounded-lg hover:bg-mist">যোগাযোগ</a>
+                <a href="#contact" class="menu-link px-3 py-3 rounded-lg hover:bg-mist">{{ __('Contact') }}</a>
             </nav>
         </div>
     </header>
@@ -512,5 +513,6 @@
         if (!reduce) { auto = setInterval(function () { show((cur + 1) % cases.length, false); }, 6500); }
     })();
     </script>
+@include('layouts.locale-runtime')
 </body>
 </html>

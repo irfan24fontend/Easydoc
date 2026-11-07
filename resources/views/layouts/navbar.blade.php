@@ -1,16 +1,17 @@
 <nav class="topbar">
     <div class="topbar-left">
-    <button type="button" class="topbar-toggle" data-sidebar-toggle aria-label="Open menu" aria-controls="adminSidebar" aria-expanded="false">
+    <button type="button" class="topbar-toggle" data-sidebar-toggle aria-label="{{ __('Open menu') }}" aria-controls="adminSidebar" aria-expanded="false">
         <i class="fa-solid fa-bars"></i>
     </button>
     <div class="topbar-search">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Search doctors, chambers, templates...">
+        <input type="text" placeholder="{{ __('Search doctors, chambers, templates...') }}">
     </div>
     </div>
 
     <div class="topbar-right">
-        <button class="icon-pill" title="Notifications">
+        @include('layouts.locale-switcher')
+        <button class="icon-pill" title="{{ __('Notifications') }}">
             <i class="fa-regular fa-bell"></i>
         </button>
 
@@ -19,17 +20,17 @@
                 <div class="profile-avatar">{{ strtoupper(substr(auth()->user()->name ?? 'AD', 0, 2)) }}</div>
                 <div class="d-none d-md-block text-start">
                     <div class="profile-name">{{ auth()->user()->name ?? 'Admin' }}</div>
-                    <div class="profile-role">Super Admin</div>
+                    <div class="profile-role">{{ __('Super Admin') }}</div>
                 </div>
                 <i class="fa-solid fa-chevron-down small"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2">
-                <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
+                <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="fa-solid fa-user me-2"></i>{{ __('Profile') }}</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="dropdown-item text-danger"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Logout</button>
+                        <button type="submit" class="dropdown-item text-danger"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>{{ __('Logout') }}</button>
                     </form>
                 </li>
             </ul>

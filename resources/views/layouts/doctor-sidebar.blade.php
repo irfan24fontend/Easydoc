@@ -30,22 +30,22 @@
             <div class="brand-icon"><i class="fa-solid fa-stethoscope"></i></div>
             <div>
                 <h4>EasyDoc</h4>
-                <span>DOCTOR PANEL</span>
+                <span>{{ __('DOCTOR PANEL') }}</span>
             </div>
         </div>
 
         <div class="p-3">
-            <span class="nav-section-label">Main Menu</span>
+            <span class="nav-section-label">{{ __('Main Menu') }}</span>
 
             <nav class="nav flex-column gap-1">
                 <a href="{{ route('doctor.dashboard') }}" class="side-link {{ Request::is('doctor/dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-pie"></i>
-                    <span>Dashboard</span>
+                    <span>{{ __('Dashboard') }}</span>
                 </a>
 
                 <a href="{{ route('doctor.queue.index') }}" class="side-link {{ Request::is('doctor/queue*') ? 'active' : '' }}">
                     <i class="fa-solid fa-list-ol"></i>
-                    <span>আজকের কিউ</span>
+                    <span>{{ __('Today’s Queue') }}</span>
                     @if($openQueue > 0)
                         <span class="count-badge">{{ $openQueue }}</span>
                     @endif
@@ -53,27 +53,27 @@
 
                 <a href="{{ route('doctor.prescriptions.create') }}" class="side-link {{ $isCreateRx ? 'active' : '' }}">
                     <i class="fa-solid fa-file-medical"></i>
-                    <span>Create Prescription</span>
+                    <span>{{ __('Create Prescription') }}</span>
                 </a>
 
                 <a href="{{ route('doctor.prescriptions.index') }}" class="side-link {{ $isListRx ? 'active' : '' }}">
                     <i class="fa-solid fa-list-check"></i>
-                    <span>Prescription List</span>
+                    <span>{{ __('Prescription List') }}</span>
                 </a>
 
                 <a href="{{ route('doctor.assistants.index') }}" class="side-link {{ Request::is('doctor/assistants*') ? 'active' : '' }}">
                     <i class="fa-solid fa-user-group"></i>
-                    <span>আমার সহকারী</span>
+                    <span>{{ __('My Assistants') }}</span>
                 </a>
 
                 <a href="{{ route('doctor.patients.index') }}" class="side-link {{ Request::is('doctor/patients*') ? 'active' : '' }}">
                     <i class="fa-solid fa-user-injured"></i>
-                    <span>Patients</span>
+                    <span>{{ __('Patients') }}</span>
                 </a>
 
                 <a href="{{ route('doctor.chambers.index') }}" class="side-link {{ Request::is('doctor/chambers*') ? 'active' : '' }}">
                     <i class="fa-solid fa-hospital"></i>
-                    <span>My Chambers</span>
+                    <span>{{ __('My Chambers') }}</span>
                 </a>
 
                 {{-- Public Profile (submenu: Create / Manage) --}}
@@ -82,26 +82,26 @@
                    data-submenu="publicProfileMenu" role="button"
                    aria-expanded="{{ $profileOpen ? 'true' : 'false' }}" aria-controls="publicProfileMenu">
                     <i class="fa-solid fa-id-card"></i>
-                    <span>Public Profile</span>
+                    <span>{{ __('Public Profile') }}</span>
                     <i class="fa-solid fa-chevron-down caret"></i>
                 </a>
                 <div class="submenu {{ $profileOpen ? 'open' : '' }}" id="publicProfileMenu">
                     <div class="sub-links">
                         @if($hasPublicProfile)
-                            <span class="side-sublink disabled" title="আপনার প্রোফাইল তৈরি করা আছে">
+                            <span class="side-sublink disabled" title="{{ __('Your profile is already created') }}">
                                 <i class="fa-solid fa-circle-plus"></i>
-                                <span>Create</span>
-                                <span class="soon-badge">Done</span>
+                                <span>{{ __('Create') }}</span>
+                                <span class="soon-badge">{{ __('Done') }}</span>
                             </span>
                         @else
                             <a href="{{ route('doctor.public-profile.create') }}" class="side-sublink {{ Request::is('doctor/public-profile/create') ? 'active' : '' }}">
                                 <i class="fa-solid fa-circle-plus"></i>
-                                <span>Create</span>
+                                <span>{{ __('Create') }}</span>
                             </a>
                         @endif
                         <a href="{{ route('doctor.public-profile.edit') }}" class="side-sublink {{ Request::is('doctor/public-profile') ? 'active' : '' }}">
                             <i class="fa-solid fa-sliders"></i>
-                            <span>Manage</span>
+                            <span>{{ __('Manage') }}</span>
                         </a>
                     </div>
                 </div>
@@ -109,13 +109,13 @@
                 @if(Route::has('doctor.favorites.index'))
                     <a href="{{ route('doctor.favorites.index') }}" class="side-link {{ Request::is('doctor/favorites*') ? 'active' : '' }}">
                         <i class="fa-solid fa-star"></i>
-                        <span>Favorite Medicines</span>
+                        <span>{{ __('Favorite Medicines') }}</span>
                     </a>
                 @else
                     <a href="#" class="side-link disabled">
                         <i class="fa-solid fa-star"></i>
-                        <span>Favorite Medicines</span>
-                        <span class="soon-badge">Soon</span>
+                        <span>{{ __('Favorite Medicines') }}</span>
+                        <span class="soon-badge">{{ __('Soon') }}</span>
                     </a>
                 @endif
 
@@ -126,41 +126,41 @@
                        data-submenu="walletMenu" role="button"
                        aria-expanded="{{ $walletOpen ? 'true' : 'false' }}" aria-controls="walletMenu">
                         <i class="fa-solid fa-wallet"></i>
-                        <span>Wallet</span>
+                        <span>{{ __('Wallet') }}</span>
                         <i class="fa-solid fa-chevron-down caret"></i>
                     </a>
                     <div class="submenu {{ $walletOpen ? 'open' : '' }}" id="walletMenu">
                         <div class="sub-links">
                             <a href="{{ route('doctor.wallet.recharge') }}" class="side-sublink {{ Request::is('doctor/wallet/recharge') ? 'active' : '' }}">
                                 <i class="fa-solid fa-circle-plus"></i>
-                                <span>Recharge</span>
+                                <span>{{ __('Recharge') }}</span>
                             </a>
                             <a href="{{ route('doctor.wallet.invoices') }}" class="side-sublink {{ Request::is('doctor/wallet/invoices*') ? 'active' : '' }}">
                                 <i class="fa-solid fa-file-invoice"></i>
-                                <span>Invoices</span>
+                                <span>{{ __('Invoices') }}</span>
                             </a>
                             <a href="{{ route('doctor.wallet.log') }}" class="side-sublink {{ Request::is('doctor/wallet/log') ? 'active' : '' }}">
                                 <i class="fa-solid fa-receipt"></i>
-                                <span>Log</span>
+                                <span>{{ __('Activity Log') }}</span>
                             </a>
                         </div>
                     </div>
 
                     <a href="{{ route('doctor.notifications.index') }}" class="side-link {{ Request::is('doctor/notifications*') ? 'active' : '' }}">
                         <i class="fa-solid fa-bell"></i>
-                        <span>Notifications</span>
+                        <span>{{ __('Notifications') }}</span>
                         <span class="count-badge js-notif-count" style="{{ $unreadNotifs > 0 ? '' : 'display:none' }}">{{ $unreadNotifs > 99 ? '99+' : $unreadNotifs }}</span>
                     </a>
 
                     <a href="{{ route('doctor.news.index') }}" class="side-link {{ Request::is('doctor/news*') ? 'active' : '' }}">
                         <i class="fa-solid fa-newspaper"></i>
-                        <span>News</span>
+                        <span>{{ __('News') }}</span>
                     </a>
                 @else
                     <a href="#" class="side-link disabled">
                         <i class="fa-solid fa-wallet"></i>
-                        <span>Wallet & Recharge</span>
-                        <span class="soon-badge">Soon</span>
+                        <span>{{ __('Wallet & Recharge') }}</span>
+                        <span class="soon-badge">{{ __('Soon') }}</span>
                     </a>
                 @endif
             </nav>
@@ -171,7 +171,7 @@
         {{-- Wallet quick view --}}
         <div class="wallet-mini mb-3">
             <div class="d-flex justify-content-between align-items-center">
-                <span class="wallet-mini-label"><i class="fa-solid fa-wallet me-1"></i> <span class="wm-text">Balance</span></span>
+                <span class="wallet-mini-label"><i class="fa-solid fa-wallet me-1"></i> <span class="wm-text">{{ __('Balance') }}</span></span>
                 <span class="wallet-mini-amount">৳{{ number_format(optional($doctor?->wallet)->balance ?? 0, 2) }}</span>
             </div>
         </div>
@@ -187,7 +187,7 @@
         <form method="POST" action="{{ route('logout') }}" class="mt-2">
             @csrf
             <button type="submit" class="logout-btn">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="logout-text">Logout</span>
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="logout-text">{{ __('Logout') }}</span>
             </button>
         </form>
     </div>

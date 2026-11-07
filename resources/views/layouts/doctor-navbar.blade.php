@@ -6,7 +6,7 @@
 
 <nav class="topbar">
     <div class="d-flex align-items-center gap-2">
-        <button type="button" class="icon-pill sidebar-toggle" data-sidebar-toggle aria-label="Sidebar toggle" aria-expanded="true" title="Sidebar খুলুন/বন্ধ করুন">
+        <button type="button" class="icon-pill sidebar-toggle" data-sidebar-toggle aria-label="{{ __('Sidebar toggle') }}" aria-expanded="true" title="{{ __('Sidebar toggle') }}">
             <i class="fa-solid fa-bars"></i>
         </button>
 
@@ -16,13 +16,14 @@
             </span>
         @else
             <span class="chamber-chip chip-warning">
-                <i class="fa-solid fa-triangle-exclamation me-1"></i> No Active Chamber
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> {{ __('No Active Chamber') }}
             </span>
         @endif
     </div>
 
     <div class="topbar-right">
-        <button class="icon-pill" title="Notifications">
+        @include('layouts.locale-switcher')
+        <button class="icon-pill" title="{{ __('Notifications') }}">
             <i class="fa-regular fa-bell"></i>
         </button>
 
@@ -31,17 +32,17 @@
                 <div class="profile-avatar">{{ strtoupper(substr(auth()->user()->name ?? 'DR', 0, 2)) }}</div>
                 <div class="d-none d-md-block text-start">
                     <div class="profile-name">Dr. {{ auth()->user()->name ?? '' }}</div>
-                    <div class="profile-role">{{ $doctor->speciality ?? 'Doctor' }}</div>
+                    <div class="profile-role">{{ $doctor->speciality ?? __('Doctor') }}</div>
                 </div>
                 <i class="fa-solid fa-chevron-down small"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2">
-                <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
+                <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="fa-solid fa-user me-2"></i>{{ __('Profile') }}</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="dropdown-item text-danger"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Logout</button>
+                        <button type="submit" class="dropdown-item text-danger"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>{{ __('Logout') }}</button>
                     </form>
                 </li>
             </ul>
@@ -82,4 +83,10 @@
     }
     .profile-name { font-size: 0.8rem; font-weight: 700; color: #0f172a; line-height: 1.1; }
     .profile-role { font-size: 0.7rem; color: #94a3b8; }
+
+    @media (max-width: 575px) {
+        .topbar { padding: 0.65rem 0.75rem; flex-wrap: wrap; }
+        .topbar-right { margin-left: auto; gap: 6px; }
+        .chamber-chip { max-width: calc(100vw - 85px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    }
 </style>

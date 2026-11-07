@@ -583,19 +583,34 @@
         .pp-side { grid-template-columns:1fr;align-items:start; }
     }
     @media (max-width:640px) {
-        .pp::before { inset:-8px -4px; }
+        .pp::before { inset:-8px 0; }
+        .pp,.pp-layout,.pp-main,.pp-side,.pp-card,.pp-status,.pp-hero { min-width:0;max-width:100%; }
+        .pp-layout { grid-template-columns:minmax(0,1fr); }
         .pp-hero { gap:14px;padding:20px;border-radius:18px; }
         .pp-hero-ico { width:46px;height:46px;border-radius:14px; }
         .pp-status { padding:16px; }
         .pp-linkbox { align-items:stretch; }
-        .pp-linkbox code { align-self:center;font-size:.76rem; }
+        .pp-linkbox code { min-width:0;align-self:center;font-size:.76rem;overflow-wrap:anywhere;word-break:break-all; }
         .pp-share { gap:7px; }
         .pp-share > span { width:100%; }
         .pp-layout { gap:14px; }
-        .pp-side { grid-template-columns:1fr; }
+        .pp-side { grid-template-columns:minmax(0,1fr); }
         .pp-card { padding:17px;border-radius:15px; }
-        .pp-actions { position:sticky;bottom:8px;z-index:20; }
-        .pp-actions .pp-btn.lg { flex:1;justify-content:center;padding:.75rem .8rem; }
+        .pp-card-head h2,.pp-readonly strong { min-width:0;overflow-wrap:anywhere; }
+        .pp-row .row > * { min-width:0; }
+        .pp-toggle { align-items:flex-start;gap:10px;padding:12px; }
+        .pp-toggle > .flex-grow-1 { min-width:0; }
+        .pp-actions { position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;flex-wrap:wrap; }
+        .pp-actions .pp-btn.lg { min-width:0;flex:1 1 130px;justify-content:center;padding:.75rem .65rem; }
+    }
+    @media (max-width:480px) {
+        .pp-status > .d-flex:first-child > .d-flex { width:100%; }
+        .pp-status > .d-flex:first-child > .d-flex > * { flex:1 1 130px; }
+        .pp-status > .d-flex:first-child > .d-flex form button { width:100%;justify-content:center; }
+        .pp-share a { flex:1 1 calc(50% - 7px);justify-content:center; }
+        .pp-toggle { flex-wrap:wrap; }
+        .pp-toggle > .flex-grow-1 { flex:1 1 calc(100% - 52px); }
+        .pp-toggle .form-check { margin-left:auto!important; }
     }
     @media (prefers-reduced-motion:reduce) {
         .pp-card,.pp-row { animation:none!important; }
