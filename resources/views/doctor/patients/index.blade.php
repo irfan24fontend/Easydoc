@@ -46,7 +46,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
             <h1 class="h4 fw-bold text-dark m-0">Patients</h1>
-            <p class="text-muted small m-0">আপনার সব রোগী — নাম, মোবাইল বা Patient ID (যেমন PT-0007) দিয়ে খুঁজুন।</p>
+            <p class="text-muted small m-0">আপনার সব রোগী — নাম, মোবাইল বা Patient ID (যেমন 12547) দিয়ে খুঁজুন।</p>
         </div>
         <div class="d-flex gap-2 flex-wrap">
             <a href="{{ route('doctor.patients.export', request()->query()) }}" class="btn btn-outline-secondary fw-semibold">
@@ -93,7 +93,7 @@
                 <label class="flabel">খুঁজুন</label>
                 <div class="input-group">
                     <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
-                    <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="নাম / মোবাইল / PT-0007">
+                    <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="নাম / মোবাইল / 12547">
                 </div>
             </div>
             <div class="col-6 col-md-3 col-lg-2">

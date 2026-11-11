@@ -123,6 +123,11 @@
                     <span>{{ __('Medicines') }}</span>
                 </a>
 
+                <a href="{{ route('admin.advertisements.index') }}" class="side-link {{ Request::is('admin/advertisements*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-rectangle-ad"></i>
+                    <span>{{ __('Medicine Ads') }}</span>
+                </a>
+
                 @if(Route::has('admin.announcements.index'))
                     <a href="{{ route('admin.announcements.index') }}" class="side-link {{ Request::is('admin/announcements*') ? 'active' : '' }}">
                         <i class="fa-solid fa-bullhorn"></i>

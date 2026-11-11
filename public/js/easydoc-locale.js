@@ -13,13 +13,6 @@
         }
     });
 
-    var entries = Array.from(dictionary.entries()).sort(function (a, b) {
-        return b[0].length - a[0].length;
-    });
-    var escapeRegExp = function (value) {
-        return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    };
-
     function translate(value) {
         var original = String(value);
         var leading = (original.match(/^\s*/) || [''])[0];
@@ -29,17 +22,9 @@
 
         var exact = dictionary.get(normalize(trimmed));
         if (exact) return leading + exact + trailing;
-
-        var result = trimmed;
-        entries.forEach(function (entry) {
-            var source = entry[0];
-            var target = entry[1];
-            if (source.length < 3 || !result.toLocaleLowerCase().includes(source)) return;
-            var pattern = new RegExp('(^|[^\\p{L}\\p{N}])(' + escapeRegExp(source) + ')(?=$|[^\\p{L}\\p{N}])', 'giu');
-            result = result.replace(pattern, function (_match, before) { return before + target; });
-        });
-
-        return leading + result + trailing;
+        // Translate whole phrases only. Replacing individual words inside an
+        // unmatched sentence creates broken Bengali/English mixtures.
+        return original;
     }
 
     var ignoredTextTags = { SCRIPT: true, STYLE: true, NOSCRIPT: true, TEXTAREA: true, INPUT: true, PRE: true, CODE: true, SVG: true };

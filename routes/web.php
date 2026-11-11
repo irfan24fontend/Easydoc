@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ChamberController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DoctorController;
+use App\Http\Controllers\Admin\AdvertisementController;
 use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\MedicineController;
 use App\Http\Controllers\Admin\PrescriptionTemplateController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Admin\WalletController;
 use App\Http\Controllers\Admin\SupportChatController as AdminSupportChatController;
 use App\Http\Controllers\Assistant\SerialController as AssistantSerialController;
 use App\Http\Controllers\Doctor\ApprovalStatusController;
+use App\Http\Controllers\Doctor\AdvertisementController as DoctorAdvertisementController;
 use App\Http\Controllers\Doctor\AssistantController;
 use App\Http\Controllers\Doctor\ChamberController as DoctorChamberController;
 use App\Http\Controllers\Admin\ChamberRequestController as AdminChamberRequestController;
@@ -124,6 +126,12 @@ Route::middleware(['auth', 'role:super_admin'])
             ->whereNumber('chamber')->name('chamber-requests.toggle');
         Route::resource('medicines', MedicineController::class);
 
+        // Sponsored medicine advertisements
+        Route::post('advertisements/settings', [AdvertisementController::class, 'updateSettings'])
+            ->name('advertisements.settings.update');
+        Route::resource('advertisements', AdvertisementController::class)
+            ->except(['show']);
+
         // Wallets
         Route::get('wallets', [WalletController::class, 'index'])->name('wallets.index');
         Route::get('wallets/{wallet}/recharge', [WalletController::class, 'create'])->name('wallets.create');
@@ -166,6 +174,8 @@ Route::middleware(['auth', 'role:doctor', 'doctor.approved'])
     ->prefix('doctor')
     ->name('doctor.')
     ->group(function () {
+        Route::post('ads/next', [DoctorAdvertisementController::class, 'next'])
+            ->middleware('throttle:30,1')->name('ads.next');
         Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('dashboard');
 
         // Public profile (one per doctor): create + manage

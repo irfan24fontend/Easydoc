@@ -86,8 +86,7 @@ class PatientService
 
     /**
      * Mobile ba Patient ID diye khuja.
-     * "PT-0007" / "pt7"  => Patient ID
-     * onno kichu          => mobile number (ekoi number-e ekadhik patient ashte pare)
+     * Numeric patient code (12547...) ba legacy PT code diye patient khoje.
      *
      * @return array{0: Collection<int, Patient>, 1: string}  [patients, 'code'|'mobile']
      */
@@ -95,9 +94,10 @@ class PatientService
     {
         $query = trim($query);
 
-        if (preg_match('/^PT-?\s*(\d+)$/i', $query, $m)) {
+        $patientNo = Patient::patientNoFromSearchTerm($query);
+        if ($patientNo !== null) {
             $patients = Patient::where('doctor_id', $doctorId)
-                ->where('patient_no', (int) $m[1])
+                ->where('patient_no', $patientNo)
                 ->get();
 
             return [$patients, 'code'];

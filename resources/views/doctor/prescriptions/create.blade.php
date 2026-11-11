@@ -418,7 +418,7 @@
                         <div id="patientSearchWrap" class="mb-3">
                             <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Find Existing Patient</label>
                             <div class="flex gap-1">
-                                <input type="text" id="patientSearch" placeholder="Mobile or Patient ID (e.g., PT-0007)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
+                                <input type="text" id="patientSearch" placeholder="Mobile or Patient ID (e.g., 12547)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
                                 <button type="button" id="patientSearchBtn" class="bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-3 rounded-lg">Search</button>
                             </div>
                             <p class="text-[11px] text-slate-400 mt-1">একই মোবাইল নম্বরে একাধিক রোগী থাকতে পারে — তাই Patient ID দিয়েও খুঁজতে পারেন।</p>

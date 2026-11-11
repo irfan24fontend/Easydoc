@@ -9,4 +9,4 @@
     window.easyDocLocale = @json(app()->getLocale());
     window.easyDocMessages = @json($localeMessages);
 </script>
-<script src="{{ asset('js/easydoc-locale.js') }}" defer></script>
+<script src="{{ asset('js/easydoc-locale.js') }}?v={{ filemtime(public_path('js/easydoc-locale.js')) }}" defer></script>

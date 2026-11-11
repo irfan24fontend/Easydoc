@@ -6,13 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Patient extends Model
 {
+    public const PATIENT_CODE_START = 12547;
+
     protected $fillable = [
         'doctor_id', 'patient_no', 'name', 'mobile', 'age', 'weight', 'gender', 'blood_group', 'address',
     ];
 
     /**
-     * Patient ID, jemon: PT-0007
-     * (proti doctor-er nijer patient-der jonno alada serial)
+     * Display a doctor's patient sequence starting at 12547.
      */
     public function getPatientCodeAttribute(): ?string
     {
@@ -20,7 +21,30 @@ class Patient extends Model
             return null;
         }
 
-        return 'PT-' . str_pad((string) $this->patient_no, 4, '0', STR_PAD_LEFT);
+        return (string) (self::PATIENT_CODE_START + (int) $this->patient_no - 1);
+    }
+
+    /** Resolve the new numeric code and older PT/numeric IDs to the stored sequence. */
+    public static function patientNoFromSearchTerm(?string $term): ?int
+    {
+        $term = trim((string) $term);
+
+        if (preg_match('/^PT-?\s*(\d+)$/i', $term, $matches)) {
+            return (int) $matches[1];
+        }
+
+        if (! preg_match('/^\d{1,9}$/', $term)) {
+            return null;
+        }
+
+        $number = (int) $term;
+
+        if ($number >= self::PATIENT_CODE_START) {
+            return $number - self::PATIENT_CODE_START + 1;
+        }
+
+        // Keep older short numeric searches working for existing records.
+        return strlen($term) <= 4 ? $number : null;
     }
 
     /** Avatar-er jonno naam-er prothom 2 okkhor */
@@ -47,7 +71,7 @@ class Patient extends Model
     }
 
     /**
-     * Naam, mobile ba Patient ID (PT-0007 / pt7 / 7) diye khuja
+     * Search by name, mobile, the new numeric code, or an older PT code.
      */
     public function scopeSearch($query, ?string $term)
     {
@@ -61,10 +85,9 @@ class Patient extends Model
             $w->where('name', 'like', "%{$term}%")
               ->orWhere('mobile', 'like', "%{$term}%");
 
-            if (preg_match('/^PT-?\s*(\d+)$/i', $term, $m)) {
-                $w->orWhere('patient_no', (int) $m[1]);
-            } elseif (ctype_digit($term) && strlen($term) <= 5) {
-                $w->orWhere('patient_no', (int) $term);
+            $patientNo = self::patientNoFromSearchTerm($term);
+            if ($patientNo !== null) {
+                $w->orWhere('patient_no', $patientNo);
             }
         });
     }

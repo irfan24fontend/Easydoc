@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') | EasyDoc</title>
 
     {{-- Sidebar-er ager obostha page load-er age-i boshiye dei (jate jhikmik na kore) --}}
@@ -118,6 +119,22 @@
 
 @if(\Illuminate\Support\Facades\Route::has('doctor.notifications.poll'))
     @include('doctor.notifications._popup')
+@endif
+
+@if(auth()->user()?->doctor?->isApproved() && \Illuminate\Support\Facades\Route::has('doctor.ads.next'))
+    @php
+        $__adCycleId = session('doctor_ads_cycle_id');
+        if (! is_string($__adCycleId) || $__adCycleId === '') {
+            $__adCycleId = (string) \Illuminate\Support\Str::uuid();
+            session(['doctor_ads_cycle_id' => $__adCycleId]);
+        }
+        $__adIntervalMinutes = \App\Models\AdvertisementSetting::current()->interval_minutes;
+    @endphp
+    @include('doctor.ads.popup', [
+        'adCycleId' => $__adCycleId,
+        'adIntervalMinutes' => $__adIntervalMinutes,
+        'adNextUrl' => route('doctor.ads.next'),
+    ])
 @endif
 
 @stack('scripts')

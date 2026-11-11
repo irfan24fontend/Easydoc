@@ -307,7 +307,7 @@
     "Prescription type": "প্রেসক্রিপশনের ধরন",
     "BP / Pulse / Temperature": "রক্তচাপ / নাড়ি / তাপমাত্রা",
     "Could not verify this prescription.": "এই প্রেসক্রিপশন যাচাই করা যায়নি।",
-    "Mobile or Patient ID (e.g., PT-0007)": "মোবাইল বা রোগী আইডি (যেমন PT-0007)",
+    "Mobile or Patient ID (e.g., 12547)": "মোবাইল বা রোগী আইডি (যেমন 12547)",
     "Save & Print Prescription": "সংরক্ষণ করে প্রেসক্রিপশন প্রিন্ট করুন",
     "Follow-up Date": "ফলো-আপের তারিখ",
     "No active chamber is available.": "কোনো সক্রিয় চেম্বার নেই।",
@@ -500,5 +500,16 @@
     "To year": "শেষের বছর",
     "Your profile link": "আপনার প্রোফাইল লিংক",
     "Inbox": "ইনবক্স",
-    "All messages": "সব বার্তা"
+    "All messages": "সব বার্তা",
+    "Sponsored medicine": "স্পনসরকৃত ওষুধ",
+    "Advertisement": "বিজ্ঞাপন",
+    "Medicine advertisement": "ওষুধের বিজ্ঞাপন",
+    "Ad image unavailable": "বিজ্ঞাপনের ছবি লোড করা যায়নি",
+    "You can read the medicine information while this ad is displayed.": "বিজ্ঞাপনটি চলার সময় ওষুধের তথ্য পড়তে পারেন।",
+    "Read medicine details": "ওষুধের বিস্তারিত পড়ুন",
+    "Hide medicine details": "ওষুধের বিস্তারিত লুকান",
+    "Advertisement is playing.": "বিজ্ঞাপন চলছে।",
+    "Skip is available now.": "এখন বিজ্ঞাপনটি এড়িয়ে যেতে পারেন।",
+    "Skip ad": "বিজ্ঞাপন এড়িয়ে যান",
+    "Ad progress": "বিজ্ঞাপনের অগ্রগতি"
 }

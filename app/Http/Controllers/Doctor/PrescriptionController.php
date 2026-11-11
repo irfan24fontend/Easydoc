@@ -58,9 +58,10 @@ class PrescriptionController extends Controller
                         $w->where('mobile', 'like', "%{$term}%")
                           ->orWhere('name', 'like', "%{$term}%");
 
-                        // Patient ID diye khuja: PT-0007
-                        if (preg_match('/^PT-?\s*(\d+)$/i', $term, $m)) {
-                            $w->orWhere('patient_no', (int) $m[1]);
+                        // Patient ID diye khuja: 12547, 12548, ...
+                        $patientNo = Patient::patientNoFromSearchTerm($term);
+                        if ($patientNo !== null) {
+                            $w->orWhere('patient_no', $patientNo);
                         }
                     });
                 });
@@ -228,7 +229,7 @@ class PrescriptionController extends Controller
     }
 
     /**
-     * Mobile ba Patient ID (PT-0007) diye rogi khuja.
+     * Mobile ba numeric Patient ID (12547...) diye rogi khuja.
      * Ekoi mobile-e ekadhik rogi thakle shobgulo-i ferot dey, proti rogir nijossho
      * "Report-er opekkhay thaka Investigation Advice" shoho.
      */

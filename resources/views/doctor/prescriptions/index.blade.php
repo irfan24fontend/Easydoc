@@ -63,7 +63,7 @@
                 <div class="col-lg-5">
                     <label class="form-label small fw-semibold text-secondary mb-1">Search</label>
                     <input type="text" name="search" value="{{ request('search') }}" class="form-control"
-                           placeholder="Patient ID (PT-0007), name or mobile">
+                           placeholder="Patient ID (12547), name or mobile">
                 </div>
                 <div class="col-6 col-lg-2">
                     <label class="form-label small fw-semibold text-secondary mb-1">From</label>
