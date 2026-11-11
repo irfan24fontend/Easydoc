@@ -7,6 +7,7 @@ use App\Models\Wallet;
 use App\Services\InvoiceService;
 use App\Services\WalletService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
 class WalletController extends Controller
@@ -35,6 +36,42 @@ class WalletController extends Controller
             'admin.wallets.create',
             compact('wallet')
         );
+    }
+
+    public function createCharge(Wallet $wallet)
+    {
+        $wallet->load('doctor.user');
+
+        return view('admin.wallets.charge', [
+            'wallet' => $wallet,
+            'chargeToken' => (string) Str::uuid(),
+        ]);
+    }
+
+    public function storeCharge(Request $request, Wallet $wallet)
+    {
+        $data = $request->validate([
+            'amount' => ['required', 'numeric', 'decimal:0,2', 'gt:0', 'max:99999999.99'],
+            'description' => ['required', 'string', 'max:238'],
+            'charge_token' => ['required', 'uuid'],
+        ]);
+
+        try {
+            $transaction = $this->walletService->debit(
+                $wallet,
+                $data['amount'],
+                'Custom charge: ' . $data['description'],
+                'admin-charge:' . $wallet->id . ':' . $data['charge_token'],
+            );
+        } catch (\RuntimeException $exception) {
+            return back()
+                ->withInput()
+                ->withErrors(['amount' => $exception->getMessage()]);
+        }
+
+        return redirect()
+            ->route('admin.wallets.index')
+            ->with('success', '৳' . number_format((float) $transaction->amount, 2) . ' custom charge deducted from the doctor wallet.');
     }
 
     public function store(

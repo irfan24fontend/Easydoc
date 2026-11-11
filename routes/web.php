@@ -128,6 +128,8 @@ Route::middleware(['auth', 'role:super_admin'])
         Route::get('wallets', [WalletController::class, 'index'])->name('wallets.index');
         Route::get('wallets/{wallet}/recharge', [WalletController::class, 'create'])->name('wallets.create');
         Route::post('wallets/{wallet}/recharge', [WalletController::class, 'store'])->name('wallets.store');
+        Route::get('wallets/{wallet}/charge', [WalletController::class, 'createCharge'])->name('wallets.charge.create');
+        Route::post('wallets/{wallet}/charge', [WalletController::class, 'storeCharge'])->name('wallets.charge.store');
 
         // Recharge invoices
         Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');

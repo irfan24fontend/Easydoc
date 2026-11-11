@@ -54,6 +54,15 @@
         background-color: #059669; 
         color: #ffffff; 
     }
+    .btn-action-text.charge {
+        color: #b91c1c;
+        background-color: #fee2e2;
+        border: 1px solid #fecaca;
+    }
+    .btn-action-text.charge:hover {
+        background-color: #dc2626;
+        color: #ffffff;
+    }
 </style>
 
 <div class="wallet-workspace py-4">
@@ -63,7 +72,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h1 class="h4 fw-bold text-dark m-0">Doctor Wallets</h1>
-                <p class="text-muted small m-0">Monitor balances and issue account credits to medical practitioners.</p>
+                <p class="text-muted small m-0">Monitor balances, recharge accounts, or apply custom wallet charges.</p>
             </div>
             <a href="{{ route('admin.invoices.index') }}" class="btn btn-light border px-4 fw-medium text-secondary">
                 <i class="fa-solid fa-file-invoice me-1"></i> Recharge Invoices
@@ -81,7 +90,7 @@
                             <th>Phone</th>
                             <th>Doctor Code</th>
                             <th>Current Balance</th>
-                            <th width="150" class="text-end">Actions</th>
+                            <th width="240" class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -114,6 +123,9 @@
                                 <td class="text-end">
                                     <a href="{{ route('admin.wallets.create', $wallet->id) }}" class="btn-action-text recharge">
                                         + Recharge
+                                    </a>
+                                    <a href="{{ route('admin.wallets.charge.create', $wallet->id) }}" class="btn-action-text charge">
+                                        Custom charge
                                     </a>
                                 </td>
                             </tr>
