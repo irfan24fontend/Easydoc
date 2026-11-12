@@ -112,6 +112,60 @@
                 @endif
             </form>
         </div>
+
+        <div class="cardx p-4 mt-4">
+            <h5 class="fw-bold mb-1"><i class="fa-solid fa-print text-primary me-2"></i>Find and print a prescription</h5>
+            <p class="text-muted small mb-3">
+                Search by patient ID. Results are limited to {{ $selectedChamber?->chamber_name ?? 'the selected chamber' }}.
+            </p>
+
+            @if($selectedChamber)
+                <form method="GET" action="{{ route('assistant.serials.index') }}" class="mb-3">
+                    <input type="hidden" name="chamber_id" value="{{ $selectedChamber->id }}">
+                    <label class="field-label" for="patientIdSearch">Patient ID</label>
+                    <div class="input-group">
+                        <input type="text" name="patient_id" id="patientIdSearch" value="{{ $patientSearchTerm }}"
+                               class="form-control" placeholder="e.g. 12547" inputmode="numeric" required>
+                        <button class="btn btn-outline-primary" type="submit" aria-label="Search patient ID">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                </form>
+            @else
+                <div class="alert alert-warning small mb-3">No active assigned chamber is available for prescription search.</div>
+            @endif
+
+            @if($patientSearchTerm !== '' && $selectedChamber)
+                @if(!$searchedPatient)
+                    <div class="alert alert-warning small mb-0">No patient found for ID {{ $patientSearchTerm }}.</div>
+                @elseif($patientPrescriptions->isEmpty())
+                    <div class="alert alert-light border small mb-0">
+                        Patient found: <strong>{{ $searchedPatient->name }}</strong> ({{ $searchedPatient->patient_code }}),
+                        but there are no prescriptions from this chamber.
+                    </div>
+                @else
+                    <div class="small text-muted mb-2">
+                        {{ $searchedPatient->name }} · Patient ID {{ $searchedPatient->patient_code }}
+                    </div>
+                    <div class="list-group">
+                        @foreach($patientPrescriptions as $prescription)
+                            <div class="list-group-item d-flex justify-content-between align-items-center gap-2">
+                                <div>
+                                    <div class="fw-semibold">{{ $prescription->created_at->timezone(config('easydoc.timezone'))->format('d M Y, h:i A') }}</div>
+                                    <div class="small text-muted">
+                                        {{ $prescription->type === 'investigation_only' ? 'Investigation advice' : 'Prescription' }}
+                                    </div>
+                                </div>
+                                <a class="btn btn-sm btn-primary flex-shrink-0" target="_blank" rel="noopener"
+                                   href="{{ route('assistant.prescriptions.print', ['prescription' => $prescription->id, 'chamber_id' => $selectedChamber->id, 'autoprint' => 1]) }}">
+                                    <i class="fa-solid fa-print me-1"></i> Print
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            @endif
+        </div>
     </div>
 
     {{-- ============ আজকের কিউ (এই অংশটা নিজে থেকে রিফ্রেশ হয়) ============ --}}

@@ -16,6 +16,7 @@
 
     /* ---------- Mode ---------- */
     $isPublic        = (bool) ($isPublic ?? false);     // true = patient er public link
+    $isAssistant     = (bool) ($isAssistant ?? false);
     $isInvestigation = ($prescription->type ?? null) === 'investigation_only';
     $patientName     = $prescription->patient->name ?? 'Patient';
 
@@ -25,14 +26,15 @@
     /* ---------- JS config ---------- */
     $cfg = [
         'isPublic' => $isPublic,
+        'isAssistant' => $isAssistant,
         'wMm' => $wMm, 'hMm' => $hMm, 'wPx' => $wPx, 'hPx' => $hPx,
         'file' => 'prescription-' . $prescription->id,
         'proxy' => route('prescription.img'),
-        'shareCreate' => $isPublic ? null : route('prescription.share.create', $prescription->id),
-        'shareRevoke' => $isPublic ? null : route('prescription.share.revoke', $prescription->id),
-        'editUrl'   => $isPublic ? null : route('doctor.prescriptions.edit', $prescription->id),
-        'createUrl' => $isPublic ? null : route('doctor.prescriptions.create'),
-        'indexUrl'  => $isPublic ? null : route('doctor.prescriptions.index'),
+        'shareCreate' => ($isPublic || $isAssistant) ? null : route('prescription.share.create', $prescription->id),
+        'shareRevoke' => ($isPublic || $isAssistant) ? null : route('prescription.share.revoke', $prescription->id),
+        'editUrl'   => ($isPublic || $isAssistant) ? null : route('doctor.prescriptions.edit', $prescription->id),
+        'createUrl' => ($isPublic || $isAssistant) ? null : route('doctor.prescriptions.create'),
+        'indexUrl'  => $isPublic ? null : ($isAssistant ? route('assistant.serials.index', ['chamber_id' => $prescription->chamber_id]) : route('doctor.prescriptions.index')),
     ];
 @endphp
 <!DOCTYPE html>
@@ -222,7 +224,7 @@
         <div class="rx-toolbar-inner">
 
             @unless($isPublic)
-                <a href="{{ route('doctor.prescriptions.index') }}" class="btn" title="Back to list (Esc)">
+                <a href="{{ $isAssistant ? route('assistant.serials.index', ['chamber_id' => $prescription->chamber_id]) : route('doctor.prescriptions.index') }}" class="btn" title="Back to list (Esc)">
                     <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.7 5.3a1 1 0 010 1.4L9.4 10l3.3 3.3a1 1 0 11-1.4 1.4l-4-4a1 1 0 010-1.4l4-4a1 1 0 011.4 0z" clip-rule="evenodd"/></svg>
                     <span class="lbl">Back</span>
                 </a>
@@ -257,12 +259,12 @@
 
                 <span class="divider"></span>
 
-                @unless($isPublic)
+                @if(!$isPublic && !$isAssistant)
                     <button type="button" class="btn btn-share keep" id="btnShare" title="Share link">
                         <svg viewBox="0 0 20 20" fill="currentColor"><path d="M15 8a3 3 0 10-2.98-3.35L7.9 6.7a3 3 0 100 4.6l4.12 2.05a3 3 0 10.7-1.4L8.6 9.9a3 3 0 000-.8l4.12-2.05A3 3 0 0015 8z"/></svg>
                         <span class="lbl">Share</span>
                     </button>
-                @endunless
+                @endif
 
                 <button type="button" class="btn btn-jpg keep" data-dl="jpg" title="Download JPG">
                     <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v7.6l2.3-2.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 111.4-1.4L9 11.6V4a1 1 0 011-1zM4 15a1 1 0 011 1v1h10v-1a1 1 0 112 0v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1a1 1 0 011-1z" clip-rule="evenodd"/></svg>
@@ -274,7 +276,7 @@
                     <span class="lbl">PDF</span>
                 </button>
 
-                @unless($isPublic)
+                @if(!$isPublic && !$isAssistant)
                     <span class="divider"></span>
 
                     <a href="{{ route('doctor.prescriptions.show', $prescription->id) }}" class="btn" title="View details">
@@ -308,11 +310,11 @@
                             <span class="lbl">Reprint</span>
                         </button>
                     </form>
-                @endunless
+                @endif
 
                 <button type="button" class="btn btn-primary" onclick="window.print()" title="Print (P)">
                     <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v2H2.5A1.5 1.5 0 001 7.5v5A1.5 1.5 0 002.5 14H3v2a2 2 0 002 2h10a2 2 0 002-2v-2h.5a1.5 1.5 0 001.5-1.5v-5A1.5 1.5 0 0017.5 6H17V4a2 2 0 00-2-2H5zm0 2h10v2H5V4zm0 9h10v3H5v-3z" clip-rule="evenodd"/></svg>
-                    <span class="lbl">Print</span> @unless($isPublic)<kbd>P</kbd>@endunless
+                    <span class="lbl">Print</span> @if(!$isPublic && !$isAssistant)<kbd>P</kbd>@endif
                 </button>
             </div>
         </div>
@@ -341,7 +343,7 @@
     </main>
 
     {{-- ===== Share modal (doctor only) ===== --}}
-    @unless($isPublic)
+    @if(!$isPublic && !$isAssistant)
         <div class="rx-modal" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
             <div class="rx-card">
                 <h3 id="shareTitle">Prescription link share korun</h3>
@@ -361,7 +363,7 @@
                 </div>
             </div>
         </div>
-    @endunless
+    @endif
 
     <div class="rx-toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -411,7 +413,7 @@
         if (window.innerWidth < sheet.offsetWidth + 24) { fit(); }
 
         /* ---------------- Keyboard (doctor only) ---------------- */
-        if (!CFG.isPublic) {
+        if (!CFG.isPublic && !CFG.isAssistant) {
             document.addEventListener('keydown', function (e) {
                 if (e.ctrlKey || e.metaKey || e.altKey) return;
                 var tag = (e.target.tagName || '').toLowerCase();
@@ -435,7 +437,7 @@
         }
 
         /* ---------------- Share (doctor only) ---------------- */
-        if (!CFG.isPublic) {
+        if (!CFG.isPublic && !CFG.isAssistant) {
             var modal = document.getElementById('shareModal');
             var urlInput = document.getElementById('shareUrl');
             var shareUrl = null;

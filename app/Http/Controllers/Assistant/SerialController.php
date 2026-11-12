@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSerialRequest;
 use App\Models\Doctor;
 use App\Models\Patient;
+use App\Models\Prescription;
 use App\Models\Serial;
 use App\Models\Chamber;
 use App\Services\SerialService;
 use Exception;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request;
 class SerialController extends Controller
 {
     public function __construct(protected SerialService $service) {}
@@ -39,12 +40,35 @@ class SerialController extends Controller
         $counts = $this->service->counts($serials);
         $activeChamber = $selectedChamber;
 
+        $patientSearchTerm = trim((string) $request->query('patient_id', ''));
+        $searchedPatient = null;
+        $patientPrescriptions = collect();
+
+        if ($patientSearchTerm !== '' && $selectedChamber) {
+            $patientNo = Patient::patientNoFromSearchTerm($patientSearchTerm);
+            if ($patientNo !== null) {
+                $searchedPatient = Patient::where('doctor_id', $doctor->id)
+                    ->where('patient_no', $patientNo)
+                    ->first();
+
+                if ($searchedPatient) {
+                    $patientPrescriptions = Prescription::where('doctor_id', $doctor->id)
+                        ->where('patient_id', $searchedPatient->id)
+                        ->where('chamber_id', $selectedChamber->id)
+                        ->with('chamber')
+                        ->latest()
+                        ->get();
+                }
+            }
+        }
+
         $maxDate = SerialService::maxDate();
         $upcoming = $selectedChamber ? $this->service->upcomingDates($doctor, 7, $selectedChamber->id) : collect();
 
         return view('assistant.serials.index', compact(
             'doctor', 'serials', 'counts', 'activeChamber',
-            'date', 'today', 'isToday', 'maxDate', 'upcoming', 'operationalChambers', 'selectedChamber'
+            'date', 'today', 'isToday', 'maxDate', 'upcoming', 'operationalChambers', 'selectedChamber',
+            'patientSearchTerm', 'searchedPatient', 'patientPrescriptions'
         ));
     }
 

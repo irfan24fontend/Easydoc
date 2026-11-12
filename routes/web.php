@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\PrescriptionTemplateController;
 use App\Http\Controllers\Admin\WalletController;
 use App\Http\Controllers\Admin\SupportChatController as AdminSupportChatController;
 use App\Http\Controllers\Assistant\SerialController as AssistantSerialController;
+use App\Http\Controllers\Assistant\PrescriptionController as AssistantPrescriptionController;
 use App\Http\Controllers\Doctor\ApprovalStatusController;
 use App\Http\Controllers\Doctor\AdvertisementController as DoctorAdvertisementController;
 use App\Http\Controllers\Doctor\AssistantController;
@@ -303,6 +304,9 @@ Route::middleware(['auth', 'role:assistant'])
     ->name('assistant.')
     ->group(function () {
         Route::get('serials', [AssistantSerialController::class, 'index'])->name('serials.index');
+        Route::get('prescriptions/{prescription}/print', [AssistantPrescriptionController::class, 'print'])
+            ->whereNumber('prescription')
+            ->name('prescriptions.print');
         Route::get('serials/lookup-patient', [AssistantSerialController::class, 'lookupPatient'])
             ->name('serials.lookup-patient');
         Route::post('serials', [AssistantSerialController::class, 'store'])->name('serials.store');

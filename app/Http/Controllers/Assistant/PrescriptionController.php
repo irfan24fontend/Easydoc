@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Http\Controllers\Assistant;
+
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\Doctor\PrescriptionController as DoctorPrescriptionController;
+use App\Models\Chamber;
+use App\Models\Prescription;
+use Illuminate\Http\Request;
+
+class PrescriptionController extends Controller
+{
+    public function print(Request $request, Prescription $prescription)
+    {
+        $profile = auth()->user()->assistantProfile;
+        $doctor = $profile?->doctor;
+        abort_unless($profile && $doctor, 403);
+
+        $chamberId = $request->integer('chamber_id') ?: (int) $prescription->chamber_id;
+        $chamber = $profile->chambers()
+            ->whereKey($chamberId)
+            ->where('chambers.doctor_id', $doctor->id)
+            ->where('request_status', Chamber::REQUEST_APPROVED)
+            ->where('status', true)
+            ->where('doctor_active', true)
+            ->first();
+
+        abort_unless($chamber && (int) $prescription->chamber_id === (int) $chamber->id, 403);
+        abort_unless((int) $prescription->doctor_id === (int) $doctor->id, 403);
+        abort_unless($prescription->patient()->where('doctor_id', $doctor->id)->exists(), 403);
+
+        return app(DoctorPrescriptionController::class)
+            ->printForAssistant($doctor, $prescription);
+    }
+}

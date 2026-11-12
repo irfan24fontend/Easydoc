@@ -22,7 +22,7 @@ use App\Services\WalletService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Validator;
 class PrescriptionController extends Controller
 {
     public function __construct(
@@ -501,13 +501,31 @@ class PrescriptionController extends Controller
         $doctor = $this->currentDoctor();
         abort_unless($prescription->doctor_id === $doctor->id, 403);
 
+        return $this->renderPrint($prescription, $doctor);
+    }
+
+    /** Render the same chamber template for an assistant after their controller authorizes access. */
+    public function printForAssistant(Doctor $doctor, Prescription $prescription)
+    {
+        abort_unless((int) $prescription->doctor_id === (int) $doctor->id, 403);
+
+        return $this->renderPrint($prescription, $doctor, true);
+    }
+
+    protected function renderPrint(Prescription $prescription, Doctor $doctor, bool $isAssistant = false)
+    {
+
         $prescription->load(['patient', 'chamber.template', 'medicines']);
 
         $chamber = $prescription->chamber;
         $template = $chamber?->template;
 
         if (!$template) {
-            return view('doctor.prescriptions.print-fallback', compact('prescription'));
+            if ($isAssistant) {
+                return view('assistant.prescriptions.print-fallback', compact('prescription'));
+            }
+
+            return view('doctor.prescriptions.print-fallback', compact('prescription', 'isAssistant'));
         }
 
         $verificationUrl = route('prescription.verify', $prescription->ensureVerificationToken());
@@ -584,6 +602,7 @@ class PrescriptionController extends Controller
             'paperSize'    => $template->paper_size,
             'verificationUrl' => $verificationUrl,
             'hasVerificationQr' => $hasVerificationQr,
+            'isAssistant' => $isAssistant,
         ]);
     }
 
