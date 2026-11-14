@@ -296,6 +296,7 @@
     </div>
 </div>
 @endif
+@endif
 @endsection
 
 @push('scripts')
