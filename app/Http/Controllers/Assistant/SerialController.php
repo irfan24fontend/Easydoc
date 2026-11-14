@@ -61,6 +61,7 @@ class SerialController extends Controller
                         ->where('chamber_id', $selectedChamber->id)
                         ->with('chamber')
                         ->latest()
+                        ->limit(50)
                         ->get();
                 }
             }

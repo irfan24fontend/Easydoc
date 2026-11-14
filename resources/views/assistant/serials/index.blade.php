@@ -28,7 +28,9 @@
         </div>
         <div class="col-lg-7">
             @if($selectedChamber)
-                <form method="GET" action="{{ route('assistant.serials.index') }}" class="mb-0">
+                <form method="GET" action="{{ route('assistant.serials.index') }}" class="mb-0"
+                      id="patientPrescriptionSearchForm"
+                      data-search-url="{{ route('assistant.prescriptions.search') }}">
                     <input type="hidden" name="section" value="search">
                     <input type="hidden" name="chamber_id" value="{{ $selectedChamber->id }}">
                     <label class="field-label" for="patientIdSearch">Patient ID</label>
@@ -46,8 +48,8 @@
         </div>
     </div>
 
-    @if($patientSearchTerm !== '' && $selectedChamber)
-        <div class="mt-3">
+    <div class="mt-3" id="patientPrescriptionResults" aria-live="polite" aria-busy="false">
+        @if($patientSearchTerm !== '' && $selectedChamber)
             @if(!$searchedPatient)
                 <div class="alert alert-warning small mb-0">No patient found for ID {{ $patientSearchTerm }}.</div>
             @elseif($patientPrescriptions->isEmpty())
@@ -76,8 +78,10 @@
                     @endforeach
                 </div>
             @endif
-        </div>
-    @endif
+        @else
+            <p class="small text-muted mb-0">Enter the patient ID to find prescriptions.</p>
+        @endif
+    </div>
 </section>
 @endif
 
@@ -302,6 +306,132 @@
 @push('scripts')
 <script>
     const LOOKUP_URL = "{{ route('assistant.serials.lookup-patient') }}";
+
+    const patientSearchForm = document.getElementById('patientPrescriptionSearchForm');
+    if (patientSearchForm) {
+        const patientIdInput = document.getElementById('patientIdSearch');
+        const patientResults = document.getElementById('patientPrescriptionResults');
+        const searchUrl = patientSearchForm.dataset.searchUrl;
+        const chamberId = patientSearchForm.querySelector('[name="chamber_id"]')?.value || '';
+        let patientSearchTimer = null;
+        let patientSearchRequest = null;
+
+        function showPatientSearchMessage(message, style = 'text-muted') {
+            const note = document.createElement('p');
+            note.className = `small mb-0 ${style}`;
+            note.textContent = message;
+            patientResults.replaceChildren(note);
+            patientResults.setAttribute('aria-busy', 'false');
+        }
+
+        function renderPatientSearchResults(data) {
+            patientResults.replaceChildren();
+            patientResults.setAttribute('aria-busy', 'false');
+
+            if (!data.found) {
+                showPatientSearchMessage('No patient found for this ID.', 'text-warning-emphasis');
+                return;
+            }
+
+            if (!data.patient || !Array.isArray(data.prescriptions)) {
+                showPatientSearchMessage('Could not read the search result. Please try again.', 'text-danger');
+                return;
+            }
+
+            const patient = document.createElement('div');
+            patient.className = 'small text-muted mb-2';
+            patient.textContent = `${data.patient.name} · Patient ID ${data.patient.patient_id}`;
+            patientResults.appendChild(patient);
+
+            if (!data.prescriptions.length) {
+                const note = document.createElement('div');
+                note.className = 'alert alert-light border small mb-0';
+                note.textContent = 'No prescriptions were found for this patient in the selected chamber.';
+                patientResults.appendChild(note);
+                return;
+            }
+
+            const list = document.createElement('div');
+            list.className = 'list-group';
+
+            data.prescriptions.forEach((prescription) => {
+                const row = document.createElement('div');
+                row.className = 'list-group-item d-flex justify-content-between align-items-center gap-2';
+
+                const details = document.createElement('div');
+                const date = document.createElement('div');
+                date.className = 'fw-semibold';
+                date.textContent = prescription.date;
+                const type = document.createElement('div');
+                type.className = 'small text-muted';
+                type.textContent = prescription.type;
+                details.append(date, type);
+
+                const print = document.createElement('a');
+                print.className = 'btn btn-sm btn-primary flex-shrink-0';
+                print.href = prescription.print_url;
+                print.target = '_blank';
+                print.rel = 'noopener';
+                print.innerHTML = '<i class="fa-solid fa-print me-1" aria-hidden="true"></i> Print';
+
+                row.append(details, print);
+                list.appendChild(row);
+            });
+
+            patientResults.appendChild(list);
+        }
+
+        async function searchPatientPrescription() {
+            const patientId = patientIdInput.value.trim();
+            if (!patientId) {
+                showPatientSearchMessage('Enter the patient ID to find prescriptions.');
+                return;
+            }
+
+            if (/^\d+$/.test(patientId) && patientId.length < 5) {
+                showPatientSearchMessage('Enter the complete patient ID, for example 12547.');
+                return;
+            }
+
+            patientSearchRequest?.abort();
+            patientSearchRequest = new AbortController();
+            const request = patientSearchRequest;
+            patientResults.setAttribute('aria-busy', 'true');
+            showPatientSearchMessage('Searching…');
+            patientResults.setAttribute('aria-busy', 'true');
+
+            const url = new URL(searchUrl, window.location.origin);
+            url.searchParams.set('patient_id', patientId);
+            url.searchParams.set('chamber_id', chamberId);
+
+            try {
+                const response = await fetch(url, {
+                    headers: { 'Accept': 'application/json' },
+                    signal: request.signal,
+                });
+                const data = await response.json().catch(() => ({}));
+                if (patientSearchRequest !== request) return;
+                if (!response.ok) throw new Error(data.message || 'Patient search failed. Please try again.');
+                if (typeof data.found !== 'boolean') throw new Error('Could not read the search result. Please try again.');
+                renderPatientSearchResults(data);
+            } catch (error) {
+                if (error.name === 'AbortError' || patientSearchRequest !== request) return;
+                showPatientSearchMessage(error.message || 'Could not search right now. Please try again.', 'text-danger');
+            }
+        }
+
+        patientIdInput.addEventListener('input', function () {
+            clearTimeout(patientSearchTimer);
+            patientSearchRequest?.abort();
+            patientSearchTimer = setTimeout(searchPatientPrescription, 300);
+        });
+
+        patientSearchForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            clearTimeout(patientSearchTimer);
+            searchPatientPrescription();
+        });
+    }
 
     function lookupPatient() {
         const mobile = document.getElementById('mobile').value.trim();

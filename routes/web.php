@@ -304,6 +304,9 @@ Route::middleware(['auth', 'role:assistant'])
     ->name('assistant.')
     ->group(function () {
         Route::get('serials', [AssistantSerialController::class, 'index'])->name('serials.index');
+        Route::get('prescriptions/search', [AssistantPrescriptionController::class, 'search'])
+            ->middleware('throttle:60,1')
+            ->name('prescriptions.search');
         Route::get('prescriptions/{prescription}/print', [AssistantPrescriptionController::class, 'print'])
             ->whereNumber('prescription')
             ->name('prescriptions.print');
