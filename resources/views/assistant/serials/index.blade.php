@@ -17,11 +17,77 @@
 @endpush
 
 @section('content')
+@if($section === 'search')
+<section class="cardx p-4 mb-4" id="patient-prescription-search">
+    <div class="row align-items-center g-3">
+        <div class="col-lg-5">
+            <h5 class="fw-bold mb-1"><i class="fa-solid fa-print text-primary me-2"></i>Find and print a prescription</h5>
+            <p class="text-muted small mb-0">
+                Search by patient ID. Results are limited to {{ $selectedChamber?->chamber_name ?? 'the selected chamber' }}.
+            </p>
+        </div>
+        <div class="col-lg-7">
+            @if($selectedChamber)
+                <form method="GET" action="{{ route('assistant.serials.index') }}" class="mb-0">
+                    <input type="hidden" name="section" value="search">
+                    <input type="hidden" name="chamber_id" value="{{ $selectedChamber->id }}">
+                    <label class="field-label" for="patientIdSearch">Patient ID</label>
+                    <div class="input-group">
+                        <input type="text" name="patient_id" id="patientIdSearch" value="{{ $patientSearchTerm }}"
+                               class="form-control" placeholder="e.g. 12547" inputmode="numeric" required>
+                        <button class="btn btn-outline-primary" type="submit" aria-label="Search patient ID">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                </form>
+            @else
+                <div class="alert alert-warning small mb-0">No active assigned chamber is available for prescription search.</div>
+            @endif
+        </div>
+    </div>
+
+    @if($patientSearchTerm !== '' && $selectedChamber)
+        <div class="mt-3">
+            @if(!$searchedPatient)
+                <div class="alert alert-warning small mb-0">No patient found for ID {{ $patientSearchTerm }}.</div>
+            @elseif($patientPrescriptions->isEmpty())
+                <div class="alert alert-light border small mb-0">
+                    Patient found: <strong>{{ $searchedPatient->name }}</strong> ({{ $searchedPatient->patient_code }}),
+                    but there are no prescriptions from this chamber.
+                </div>
+            @else
+                <div class="small text-muted mb-2">
+                    {{ $searchedPatient->name }} · Patient ID {{ $searchedPatient->patient_code }}
+                </div>
+                <div class="list-group">
+                    @foreach($patientPrescriptions as $prescription)
+                        <div class="list-group-item d-flex justify-content-between align-items-center gap-2">
+                            <div>
+                                <div class="fw-semibold">{{ $prescription->created_at->timezone(config('easydoc.timezone'))->format('d M Y, h:i A') }}</div>
+                                <div class="small text-muted">
+                                    {{ $prescription->type === 'investigation_only' ? 'Investigation advice' : 'Prescription' }}
+                                </div>
+                            </div>
+                            <a class="btn btn-sm btn-primary flex-shrink-0" target="_blank" rel="noopener"
+                               href="{{ route('assistant.prescriptions.print', ['prescription' => $prescription->id, 'chamber_id' => $selectedChamber->id, 'autoprint' => 1]) }}">
+                                <i class="fa-solid fa-print me-1"></i> Print
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    @endif
+</section>
+@endif
+
+@if(in_array($section, ['new-serial', 'queue'], true))
 <div class="row g-4">
 
     {{-- ============ নতুন সিরিয়াল ============ --}}
-    <div class="col-lg-5">
-        <div class="cardx p-4">
+    @if($section === 'new-serial')
+    <div class="col-12">
+        <div class="cardx p-4" id="new-serial">
             <h5 class="fw-bold mb-1"><i class="fa-solid fa-ticket text-primary me-2"></i>নতুন সিরিয়াল</h5>
             <p class="text-muted small mb-3">রোগীর মোবাইল নাম্বার দিয়ে খুঁজুন। পুরনো রোগী হলে তথ্য নিজে থেকে বসবে।</p>
 
@@ -113,66 +179,18 @@
             </form>
         </div>
 
-        <div class="cardx p-4 mt-4">
-            <h5 class="fw-bold mb-1"><i class="fa-solid fa-print text-primary me-2"></i>Find and print a prescription</h5>
-            <p class="text-muted small mb-3">
-                Search by patient ID. Results are limited to {{ $selectedChamber?->chamber_name ?? 'the selected chamber' }}.
-            </p>
 
-            @if($selectedChamber)
-                <form method="GET" action="{{ route('assistant.serials.index') }}" class="mb-3">
-                    <input type="hidden" name="chamber_id" value="{{ $selectedChamber->id }}">
-                    <label class="field-label" for="patientIdSearch">Patient ID</label>
-                    <div class="input-group">
-                        <input type="text" name="patient_id" id="patientIdSearch" value="{{ $patientSearchTerm }}"
-                               class="form-control" placeholder="e.g. 12547" inputmode="numeric" required>
-                        <button class="btn btn-outline-primary" type="submit" aria-label="Search patient ID">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </div>
-                </form>
-            @else
-                <div class="alert alert-warning small mb-3">No active assigned chamber is available for prescription search.</div>
-            @endif
-
-            @if($patientSearchTerm !== '' && $selectedChamber)
-                @if(!$searchedPatient)
-                    <div class="alert alert-warning small mb-0">No patient found for ID {{ $patientSearchTerm }}.</div>
-                @elseif($patientPrescriptions->isEmpty())
-                    <div class="alert alert-light border small mb-0">
-                        Patient found: <strong>{{ $searchedPatient->name }}</strong> ({{ $searchedPatient->patient_code }}),
-                        but there are no prescriptions from this chamber.
-                    </div>
-                @else
-                    <div class="small text-muted mb-2">
-                        {{ $searchedPatient->name }} · Patient ID {{ $searchedPatient->patient_code }}
-                    </div>
-                    <div class="list-group">
-                        @foreach($patientPrescriptions as $prescription)
-                            <div class="list-group-item d-flex justify-content-between align-items-center gap-2">
-                                <div>
-                                    <div class="fw-semibold">{{ $prescription->created_at->timezone(config('easydoc.timezone'))->format('d M Y, h:i A') }}</div>
-                                    <div class="small text-muted">
-                                        {{ $prescription->type === 'investigation_only' ? 'Investigation advice' : 'Prescription' }}
-                                    </div>
-                                </div>
-                                <a class="btn btn-sm btn-primary flex-shrink-0" target="_blank" rel="noopener"
-                                   href="{{ route('assistant.prescriptions.print', ['prescription' => $prescription->id, 'chamber_id' => $selectedChamber->id, 'autoprint' => 1]) }}">
-                                    <i class="fa-solid fa-print me-1"></i> Print
-                                </a>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-            @endif
-        </div>
     </div>
 
     {{-- ============ আজকের কিউ (এই অংশটা নিজে থেকে রিফ্রেশ হয়) ============ --}}
-    <div class="col-lg-7">
+    @endif
+
+    @if($section === 'queue')
+    <div class="col-12">
 
         {{-- ============ তারিখ ফিল্টার ============ --}}
         <form method="GET" action="{{ route('assistant.serials.index') }}" class="cardx p-3 mb-3 d-flex flex-wrap gap-2 align-items-center">
+            <input type="hidden" name="section" value="queue">
             @if($operationalChambers->isNotEmpty())
                 <select name="chamber_id" class="form-select form-select-sm" style="max-width:220px;" onchange="this.form.submit()">
                     @foreach($operationalChambers as $chamber)
@@ -180,16 +198,16 @@
                     @endforeach
                 </select>
             @endif
-            <a href="{{ route('assistant.serials.index', ['date' => \Carbon\Carbon::parse($date)->subDay()->toDateString()]) }}" class="btn btn-outline-secondary btn-sm" title="আগের দিন"><i class="fa-solid fa-chevron-left"></i></a>
+            <a href="{{ route('assistant.serials.index', ['section' => 'queue', 'chamber_id' => $selectedChamber?->id, 'date' => \Carbon\Carbon::parse($date)->subDay()->toDateString()]) }}" class="btn btn-outline-secondary btn-sm" title="আগের দিন"><i class="fa-solid fa-chevron-left"></i></a>
             <input type="date" name="date" value="{{ $date }}" class="form-control form-control-sm" style="max-width:160px;" onchange="this.form.submit()">
-            <a href="{{ route('assistant.serials.index', ['date' => \Carbon\Carbon::parse($date)->addDay()->toDateString()]) }}" class="btn btn-outline-secondary btn-sm" title="পরের দিন"><i class="fa-solid fa-chevron-right"></i></a>
-            <a href="{{ route('assistant.serials.index') }}" class="btn btn-sm {{ $isToday ? 'btn-primary' : 'btn-outline-primary' }} fw-bold">আজ</a>
+            <a href="{{ route('assistant.serials.index', ['section' => 'queue', 'chamber_id' => $selectedChamber?->id, 'date' => \Carbon\Carbon::parse($date)->addDay()->toDateString()]) }}" class="btn btn-outline-secondary btn-sm" title="পরের দিন"><i class="fa-solid fa-chevron-right"></i></a>
+            <a href="{{ route('assistant.serials.index', ['section' => 'queue', 'chamber_id' => $selectedChamber?->id]) }}" class="btn btn-sm {{ $isToday ? 'btn-primary' : 'btn-outline-primary' }} fw-bold">আজ</a>
 
             @if($upcoming->isNotEmpty())
                 <div class="d-flex flex-wrap gap-1 align-items-center ms-lg-auto">
                     <span class="small text-muted fw-semibold me-1">সিরিয়াল আছে:</span>
                     @foreach($upcoming as $u)
-                        <a href="{{ route('assistant.serials.index', ['date' => $u['date']]) }}"
+                        <a href="{{ route('assistant.serials.index', ['section' => 'queue', 'chamber_id' => $selectedChamber?->id, 'date' => $u['date']]) }}"
                            class="btn btn-sm {{ $date === $u['date'] ? 'btn-primary' : 'btn-outline-secondary' }} py-0 px-2" style="font-size:.75rem;">
                             {{ \Carbon\Carbon::parse($u['date'])->format('d M') }} <span class="badge text-bg-light">{{ $u['count'] }}</span>
                         </a>
@@ -199,7 +217,7 @@
         </form>
 
         <div id="queueWrap">
-            <div class="cardx p-4">
+            <div class="cardx p-4" id="serial-queue">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                     <h5 class="fw-bold mb-0"><i class="fa-solid fa-list-ol text-primary me-2"></i>{{ $isToday ? 'আজকের কিউ' : 'কিউ' }}
                         <small class="text-muted fw-normal ms-1">{{ \Carbon\Carbon::parse($date)->format('d M Y') }}</small>
@@ -277,6 +295,7 @@
         </div>
     </div>
 </div>
+@endif
 @endsection
 
 @push('scripts')
@@ -307,22 +326,28 @@
             });
     }
 
-    document.getElementById('lookupBtn').addEventListener('click', lookupPatient);
-    document.getElementById('serialDate').addEventListener('change', function () {
-        if (document.getElementById('mobile').value.trim()) lookupPatient();
-    });
-    document.getElementById('mobile').addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') { e.preventDefault(); lookupPatient(); }
-    });
+    const lookupBtn = document.getElementById('lookupBtn');
+    const serialDateInput = document.getElementById('serialDate');
+    const mobileInput = document.getElementById('mobile');
+    if (lookupBtn && serialDateInput && mobileInput) {
+        lookupBtn.addEventListener('click', lookupPatient);
+        serialDateInput.addEventListener('change', function () {
+            if (mobileInput.value.trim()) lookupPatient();
+        });
+        mobileInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); lookupPatient(); }
+        });
+    }
 
     // কিউ অংশ ১৫ সেকেন্ড পরপর নিজে থেকে রিফ্রেশ হবে (ফর্ম অক্ষত থাকবে)
-    setInterval(async () => {
+    const queueWrap = document.getElementById('queueWrap');
+    if (queueWrap) setInterval(async () => {
         if (document.hidden) return;
         try {
             const res = await fetch(window.location.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
             const fresh = doc.getElementById('queueWrap');
-            if (fresh) document.getElementById('queueWrap').innerHTML = fresh.innerHTML;
+            if (fresh) queueWrap.innerHTML = fresh.innerHTML;
         } catch (e) {}
     }, 15000);
 </script>

@@ -27,6 +27,10 @@ class SerialController extends Controller
     public function index(Request $request)
     {
         $doctor = $this->doctor();
+        $section = $request->query('section', 'queue');
+        if (! in_array($section, ['search', 'new-serial', 'queue'], true)) {
+            $section = 'queue';
+        }
 
         $today = SerialService::today();
         $date = $this->service->normalizeDate($request->query('date'));
@@ -68,7 +72,7 @@ class SerialController extends Controller
         return view('assistant.serials.index', compact(
             'doctor', 'serials', 'counts', 'activeChamber',
             'date', 'today', 'isToday', 'maxDate', 'upcoming', 'operationalChambers', 'selectedChamber',
-            'patientSearchTerm', 'searchedPatient', 'patientPrescriptions'
+            'patientSearchTerm', 'searchedPatient', 'patientPrescriptions', 'section'
         ));
     }
 
@@ -85,7 +89,7 @@ class SerialController extends Controller
         $dateStr = $serial->serial_date->toDateString();
 
         return redirect()
-            ->route('assistant.serials.index', ['date' => $dateStr, 'chamber_id' => $serial->chamber_id])
+            ->route('assistant.serials.index', ['date' => $dateStr, 'chamber_id' => $serial->chamber_id, 'section' => 'queue'])
             ->with('success', "সিরিয়াল #{$serial->serial_number} দেওয়া হয়েছে ({$serial->serial_date->format('d M Y')})।");
     }
 

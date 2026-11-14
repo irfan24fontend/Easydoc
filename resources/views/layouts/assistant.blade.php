@@ -33,6 +33,25 @@
         .as-logout { background: rgba(220,38,38,.15); color: #fca5a5; border: 1px solid rgba(220,38,38,.3); border-radius: 8px; font-size: .78rem; font-weight: 600; padding: .35rem .8rem; }
         .as-logout:hover { background: #dc2626; color: #fff; }
         .cardx { background: #fff; border: 1px solid var(--ed-line); border-radius: 16px; box-shadow: 0 1px 2px rgba(16,38,43,.04); }
+        .as-app-shell { display: grid; grid-template-columns: 245px minmax(0, 1fr); min-height: calc(100vh - 70px); }
+        .as-sidebar { background: #fff; border-right: 1px solid var(--ed-line); padding: 1.25rem .85rem; }
+        .as-sidebar-title { padding: 0 .75rem .7rem; color: #64748b; font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+        .as-side-link { display: flex; align-items: center; gap: .75rem; border-radius: 10px; color: #475569; font-size: .9rem; font-weight: 650; padding: .75rem; text-decoration: none; transition: background .15s ease, color .15s ease; }
+        .as-side-link i { width: 1.2rem; color: #0c8c84; text-align: center; }
+        .as-side-link:hover, .as-side-link:focus { background: #e8f5f3; color: #075e59; }
+        .as-side-link.active { background: #e8f5f3; color: #075e59; }
+        .as-side-link.active i { color: #075e59; }
+        .as-main { min-width: 0; padding: 1.25rem; }
+        @media (max-width: 991.98px) {
+            .as-app-shell { grid-template-columns: minmax(0, 1fr); }
+            .as-sidebar { display: flex; flex-wrap: wrap; gap: .25rem; border-right: 0; border-bottom: 1px solid var(--ed-line); padding: .75rem; }
+            .as-sidebar-title { width: 100%; padding: .15rem .5rem .35rem; }
+            .as-side-link { flex: 1 1 auto; justify-content: center; padding: .6rem .7rem; }
+            .as-main { padding: 1rem; }
+        }
+        @media (max-width: 575.98px) {
+            .as-side-link { justify-content: flex-start; font-size: .82rem; }
+        }
     </style>
     @stack('styles')
 </head>
@@ -65,18 +84,33 @@
     </div>
 </div>
 
-<div class="container-fluid p-3 p-lg-4">
-    @include('layouts.flash')
+<div class="as-app-shell">
+    <aside class="as-sidebar" aria-label="Assistant dashboard menu">
+        <div class="as-sidebar-title">{{ __('Dashboard Menu') }}</div>
+        <a class="as-side-link {{ ($section ?? '') === 'search' ? 'active' : '' }}" href="{{ route('assistant.serials.index', ['section' => 'search']) }}" @if(($section ?? '') === 'search') aria-current="page" @endif>
+            <i class="fa-solid fa-magnifying-glass"></i><span>{{ __('Find Patient / Print Rx') }}</span>
+        </a>
+        <a class="as-side-link {{ ($section ?? '') === 'new-serial' ? 'active' : '' }}" href="{{ route('assistant.serials.index', ['section' => 'new-serial']) }}" @if(($section ?? '') === 'new-serial') aria-current="page" @endif>
+            <i class="fa-solid fa-ticket"></i><span>{{ __('New Serial') }}</span>
+        </a>
+        <a class="as-side-link {{ ($section ?? 'queue') === 'queue' ? 'active' : '' }}" href="{{ route('assistant.serials.index', ['section' => 'queue']) }}" @if(($section ?? 'queue') === 'queue') aria-current="page" @endif>
+            <i class="fa-solid fa-list-ol"></i><span>{{ __('Serial Queue') }}</span>
+        </a>
+    </aside>
 
-    @if($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0 ps-3">
-                @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
-            </ul>
-        </div>
-    @endif
+    <main class="as-main">
+        @include('layouts.flash')
 
-    @yield('content')
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0 ps-3">
+                    @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
+                </ul>
+            </div>
+        @endif
+
+        @yield('content')
+    </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
