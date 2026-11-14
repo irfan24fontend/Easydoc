@@ -59,7 +59,7 @@ class SerialController extends Controller
                     $patientPrescriptions = Prescription::where('doctor_id', $doctor->id)
                         ->where('patient_id', $searchedPatient->id)
                         ->where('chamber_id', $selectedChamber->id)
-                        ->with('chamber')
+                        ->with(['chamber', 'medicines'])
                         ->latest()
                         ->limit(50)
                         ->get();

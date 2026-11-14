@@ -45,12 +45,35 @@ class PrescriptionController extends Controller
             ->where('chamber_id', $chamber->id)
             ->latest()
             ->limit(50)
-            ->get(['id', 'type', 'created_at'])
+            ->with(['medicines' => fn ($query) => $query->orderBy('sort_order')])
+            ->get([
+                'id', 'type', 'created_at', 'clinical_complaints', 'diagnosis', 'risk_factors',
+                'bp', 'pulse', 'temperature', 'investigations', 'investigation_findings',
+                'advice', 'followup_date',
+            ])
             ->map(fn (Prescription $prescription) => [
                 'date' => $prescription->created_at
                     ->timezone(config('easydoc.timezone'))
                     ->format('d M Y, h:i A'),
                 'type' => $prescription->type === 'investigation_only' ? 'Investigation advice' : 'Prescription',
+                'clinical_complaints' => $prescription->clinical_complaints,
+                'diagnosis' => $prescription->diagnosis,
+                'risk_factors' => $prescription->risk_factors,
+                'vitals' => [
+                    'bp' => $prescription->bp,
+                    'pulse' => $prescription->pulse,
+                    'temperature' => $prescription->temperature,
+                ],
+                'investigations' => $prescription->investigations,
+                'investigation_findings' => $prescription->investigation_findings,
+                'advice' => $prescription->advice,
+                'followup_date' => $prescription->followup_date?->format('d M Y'),
+                'medicines' => $prescription->medicines->map(fn ($medicine) => [
+                    'name' => $medicine->displayName(),
+                    'dose' => $medicine->doseLabel(),
+                    'duration' => $medicine->duration,
+                    'instruction' => $medicine->instruction,
+                ])->values(),
                 'print_url' => route('assistant.prescriptions.print', [
                     'prescription' => $prescription->id,
                     'chamber_id' => $chamber->id,
@@ -64,6 +87,11 @@ class PrescriptionController extends Controller
             'patient' => [
                 'name' => $patient->name,
                 'patient_id' => $patient->patient_code,
+                'mobile' => $patient->mobile,
+                'age' => $patient->age,
+                'gender' => $patient->gender,
+                'weight' => $patient->weight,
+                'blood_group' => $patient->blood_group,
             ],
             'prescriptions' => $prescriptions,
         ]);

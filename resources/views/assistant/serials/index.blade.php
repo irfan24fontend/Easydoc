@@ -13,6 +13,36 @@
     .count-box .l { font-size: .7rem; color: #64748b; font-weight: 600; }
     .field-label { font-size: .72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .03em; }
     .table > :not(caption) > * > * { vertical-align: middle; }
+    .as-search-results { display: grid; gap: 1rem; }
+    .as-patient-summary { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.1rem; border: 1px solid #d9eeeb; border-radius: 14px; background: linear-gradient(120deg, #f0faf8, #fff 72%); }
+    .as-patient-avatar { width: 52px; height: 52px; flex: 0 0 52px; display: grid; place-items: center; border-radius: 15px; background: #d8f0ec; color: #08786f; font-size: 1.05rem; font-weight: 800; }
+    .as-patient-main { display: flex; align-items: center; gap: .65rem; flex-wrap: wrap; }
+    .as-patient-main h6 { margin: 0; color: #172b35; font-weight: 800; }
+    .as-patient-id { border-radius: 999px; background: #e0f2fe; color: #075985; padding: .22rem .6rem; font-size: .76rem; font-weight: 750; }
+    .as-patient-meta { display: flex; flex-wrap: wrap; gap: .45rem 1rem; margin-top: .45rem; color: #64748b; font-size: .82rem; }
+    .as-rx-card { overflow: hidden; border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; box-shadow: 0 2px 8px rgba(15,23,42,.035); }
+    .as-rx-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .9rem 1rem; border-bottom: 1px solid #edf2f7; background: #f8fafc; }
+    .as-rx-date { color: #172b35; font-weight: 750; }
+    .as-rx-type { display: inline-block; margin-top: .2rem; border-radius: 999px; background: #e8f5f3; color: #086b64; padding: .18rem .55rem; font-size: .7rem; font-weight: 750; }
+    .as-rx-body { display: grid; gap: .9rem; padding: 1rem; }
+    .as-rx-info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+    .as-rx-info { min-width: 0; padding: .75rem; border: 1px solid #edf2f7; border-radius: 10px; }
+    .as-rx-label { margin-bottom: .3rem; color: #64748b; font-size: .68rem; font-weight: 800; letter-spacing: .045em; text-transform: uppercase; }
+    .as-rx-value { color: #263746; font-size: .88rem; line-height: 1.5; white-space: pre-line; overflow-wrap: anywhere; }
+    .as-rx-subsection-title { margin: 0 0 .45rem; color: #334155; font-size: .78rem; font-weight: 800; }
+    .as-rx-medicines { display: grid; gap: .45rem; }
+    .as-rx-medicine { padding: .65rem .75rem; border: 1px solid #e8edf2; border-radius: 9px; }
+    .as-rx-medicine-name { color: #172b35; font-size: .86rem; font-weight: 750; }
+    .as-rx-medicine-meta { margin-top: .18rem; color: #64748b; font-size: .78rem; line-height: 1.45; }
+    .as-rx-vitals { display: flex; flex-wrap: wrap; gap: .45rem; }
+    .as-rx-vital { border-radius: 8px; background: #f1f5f9; padding: .35rem .55rem; color: #475569; font-size: .78rem; }
+    @media (max-width: 575.98px) {
+        .as-patient-summary { align-items: flex-start; padding: .85rem; }
+        .as-patient-avatar { width: 44px; height: 44px; flex-basis: 44px; border-radius: 12px; }
+        .as-rx-head { align-items: flex-start; padding: .75rem; }
+        .as-rx-body { padding: .75rem; }
+        .as-rx-info-grid { grid-template-columns: 1fr; }
+    }
 </style>
 @endpush
 
@@ -52,30 +82,102 @@
         @if($patientSearchTerm !== '' && $selectedChamber)
             @if(!$searchedPatient)
                 <div class="alert alert-warning small mb-0">No patient found for ID {{ $patientSearchTerm }}.</div>
-            @elseif($patientPrescriptions->isEmpty())
-                <div class="alert alert-light border small mb-0">
-                    Patient found: <strong>{{ $searchedPatient->name }}</strong> ({{ $searchedPatient->patient_code }}),
-                    but there are no prescriptions from this chamber.
-                </div>
             @else
-                <div class="small text-muted mb-2">
-                    {{ $searchedPatient->name }} · Patient ID {{ $searchedPatient->patient_code }}
-                </div>
-                <div class="list-group">
-                    @foreach($patientPrescriptions as $prescription)
-                        <div class="list-group-item d-flex justify-content-between align-items-center gap-2">
-                            <div>
-                                <div class="fw-semibold">{{ $prescription->created_at->timezone(config('easydoc.timezone'))->format('d M Y, h:i A') }}</div>
-                                <div class="small text-muted">
-                                    {{ $prescription->type === 'investigation_only' ? 'Investigation advice' : 'Prescription' }}
-                                </div>
+                <div class="as-search-results">
+                    <div class="as-patient-summary">
+                        <div class="as-patient-avatar">{{ $searchedPatient->initials }}</div>
+                        <div class="min-w-0">
+                            <div class="as-patient-main">
+                                <h6>{{ $searchedPatient->name }}</h6>
+                                <span class="as-patient-id">Patient ID {{ $searchedPatient->patient_code }}</span>
                             </div>
-                            <a class="btn btn-sm btn-primary flex-shrink-0" target="_blank" rel="noopener"
-                               href="{{ route('assistant.prescriptions.print', ['prescription' => $prescription->id, 'chamber_id' => $selectedChamber->id, 'autoprint' => 1]) }}">
-                                <i class="fa-solid fa-print me-1"></i> Print
-                            </a>
+                            <div class="as-patient-meta">
+                                @if($searchedPatient->mobile)<span><i class="fa-solid fa-phone me-1"></i>{{ $searchedPatient->mobile }}</span>@endif
+                                @if($searchedPatient->age !== null)<span><i class="fa-solid fa-cake-candles me-1"></i>{{ $searchedPatient->age }} years</span>@endif
+                                @if($searchedPatient->gender)<span><i class="fa-solid fa-user me-1"></i>{{ $searchedPatient->gender }}</span>@endif
+                                @if($searchedPatient->blood_group)<span><i class="fa-solid fa-droplet me-1"></i>{{ $searchedPatient->blood_group }}</span>@endif
+                                @if($searchedPatient->weight)<span><i class="fa-solid fa-weight-scale me-1"></i>{{ $searchedPatient->weight }} kg</span>@endif
+                            </div>
                         </div>
-                    @endforeach
+                    </div>
+
+                    @if($patientPrescriptions->isEmpty())
+                        <div class="alert alert-light border small mb-0">Patient found, but there are no prescriptions from this chamber.</div>
+                    @else
+                        @foreach($patientPrescriptions as $prescription)
+                            <article class="as-rx-card">
+                                <div class="as-rx-head">
+                                    <div>
+                                        <div class="as-rx-date"><i class="fa-regular fa-calendar me-1 text-primary"></i>{{ $prescription->created_at->timezone(config('easydoc.timezone'))->format('d M Y, h:i A') }}</div>
+                                        <span class="as-rx-type">{{ $prescription->type === 'investigation_only' ? 'Investigation advice' : 'Prescription' }}</span>
+                                    </div>
+                                    <a class="btn btn-sm btn-primary flex-shrink-0" target="_blank" rel="noopener"
+                                       href="{{ route('assistant.prescriptions.print', ['prescription' => $prescription->id, 'chamber_id' => $selectedChamber->id, 'autoprint' => 1]) }}">
+                                        <i class="fa-solid fa-print me-1"></i> Print
+                                    </a>
+                                </div>
+                                <div class="as-rx-body">
+                                    <div class="as-rx-info-grid">
+                                        @if(filled($prescription->clinical_complaints))
+                                            <div class="as-rx-info"><div class="as-rx-label">Symptoms / complaints</div><div class="as-rx-value">{{ $prescription->clinical_complaints }}</div></div>
+                                        @endif
+                                        @if(filled($prescription->diagnosis))
+                                            <div class="as-rx-info"><div class="as-rx-label">Diagnosis</div><div class="as-rx-value">{{ $prescription->diagnosis }}</div></div>
+                                        @endif
+                                        @if(filled($prescription->risk_factors))
+                                            <div class="as-rx-info"><div class="as-rx-label">Risk factors / history</div><div class="as-rx-value">{{ $prescription->risk_factors }}</div></div>
+                                        @endif
+                                    </div>
+
+                                    @if(filled($prescription->bp) || filled($prescription->pulse) || filled($prescription->temperature))
+                                        <div>
+                                            <div class="as-rx-subsection-title">Vitals</div>
+                                            <div class="as-rx-vitals">
+                                                @if(filled($prescription->bp))<span class="as-rx-vital"><strong>BP</strong> {{ $prescription->bp }}</span>@endif
+                                                @if(filled($prescription->pulse))<span class="as-rx-vital"><strong>Pulse</strong> {{ $prescription->pulse }}</span>@endif
+                                                @if(filled($prescription->temperature))<span class="as-rx-vital"><strong>Temp</strong> {{ $prescription->temperature }}</span>@endif
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <div>
+                                        <div class="as-rx-subsection-title">Medicines ({{ $prescription->medicines->count() }})</div>
+                                        @if($prescription->medicines->isNotEmpty())
+                                            <div class="as-rx-medicines">
+                                                @foreach($prescription->medicines as $medicine)
+                                                    <div class="as-rx-medicine">
+                                                        <div class="as-rx-medicine-name">{{ $medicine->displayName() }}</div>
+                                                        <div class="as-rx-medicine-meta">
+                                                            Dose: {{ $medicine->doseLabel() }}
+                                                            @if($medicine->duration) <span>&middot; Duration: {{ $medicine->duration }}</span>@endif
+                                                            @if($medicine->instruction) <span>&middot; {{ $medicine->instruction }}</span>@endif
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="small text-muted">No medicine recorded for this prescription.</div>
+                                        @endif
+                                    </div>
+
+                                    <div class="as-rx-info-grid">
+                                        @if(filled($prescription->investigations))
+                                            <div class="as-rx-info"><div class="as-rx-label">Tests / investigations</div><div class="as-rx-value">{{ $prescription->investigations }}</div></div>
+                                        @endif
+                                        @if(filled($prescription->investigation_findings))
+                                            <div class="as-rx-info"><div class="as-rx-label">Investigation findings</div><div class="as-rx-value">{{ $prescription->investigation_findings }}</div></div>
+                                        @endif
+                                        @if(filled($prescription->advice))
+                                            <div class="as-rx-info"><div class="as-rx-label">Doctor's advice</div><div class="as-rx-value">{{ $prescription->advice }}</div></div>
+                                        @endif
+                                        @if($prescription->followup_date)
+                                            <div class="as-rx-info"><div class="as-rx-label">Follow-up</div><div class="as-rx-value">{{ $prescription->followup_date->format('d M Y') }}</div></div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </article>
+                        @endforeach
+                    @endif
                 </div>
             @endif
         @else
@@ -324,6 +426,31 @@
             patientResults.setAttribute('aria-busy', 'false');
         }
 
+        function makePatientSearchInfo(label, value) {
+            const cleanValue = String(value ?? '').trim();
+            if (!cleanValue) return null;
+
+            const block = document.createElement('div');
+            block.className = 'as-rx-info';
+            const title = document.createElement('div');
+            title.className = 'as-rx-label';
+            title.textContent = label;
+            const content = document.createElement('div');
+            content.className = 'as-rx-value';
+            content.textContent = cleanValue;
+            block.append(title, content);
+            return block;
+        }
+
+        function appendPatientSearchInfoGrid(parent, entries) {
+            const blocks = entries.map(([label, value]) => makePatientSearchInfo(label, value)).filter(Boolean);
+            if (!blocks.length) return;
+            const grid = document.createElement('div');
+            grid.className = 'as-rx-info-grid';
+            blocks.forEach((block) => grid.appendChild(block));
+            parent.appendChild(grid);
+        }
+
         function renderPatientSearchResults(data) {
             patientResults.replaceChildren();
             patientResults.setAttribute('aria-busy', 'false');
@@ -338,47 +465,146 @@
                 return;
             }
 
-            const patient = document.createElement('div');
-            patient.className = 'small text-muted mb-2';
-            patient.textContent = `${data.patient.name} · Patient ID ${data.patient.patient_id}`;
-            patientResults.appendChild(patient);
+            const results = document.createElement('div');
+            results.className = 'as-search-results';
+
+            const patientCard = document.createElement('div');
+            patientCard.className = 'as-patient-summary';
+            const avatar = document.createElement('div');
+            avatar.className = 'as-patient-avatar';
+            avatar.textContent = (String(data.patient.name || 'PT').trim().slice(0, 2) || 'PT').toUpperCase();
+            const patientDetails = document.createElement('div');
+            patientDetails.className = 'min-w-0';
+            const patientMain = document.createElement('div');
+            patientMain.className = 'as-patient-main';
+            const patientName = document.createElement('h6');
+            patientName.textContent = data.patient.name || 'Patient';
+            const patientId = document.createElement('span');
+            patientId.className = 'as-patient-id';
+            patientId.textContent = `Patient ID ${data.patient.patient_id || ''}`;
+            patientMain.append(patientName, patientId);
+            const patientMeta = document.createElement('div');
+            patientMeta.className = 'as-patient-meta';
+            [
+                data.patient.mobile,
+                data.patient.age !== null && data.patient.age !== undefined ? `${data.patient.age} years` : '',
+                data.patient.gender,
+                data.patient.blood_group,
+                data.patient.weight ? `${data.patient.weight} kg` : '',
+            ].filter((value) => String(value || '').trim()).forEach((value) => {
+                const item = document.createElement('span');
+                item.textContent = value;
+                patientMeta.appendChild(item);
+            });
+            patientDetails.append(patientMain, patientMeta);
+            patientCard.append(avatar, patientDetails);
+            results.appendChild(patientCard);
 
             if (!data.prescriptions.length) {
-                const note = document.createElement('div');
-                note.className = 'alert alert-light border small mb-0';
-                note.textContent = 'No prescriptions were found for this patient in the selected chamber.';
-                patientResults.appendChild(note);
+                const empty = document.createElement('div');
+                empty.className = 'alert alert-light border small mb-0';
+                empty.textContent = 'Patient found, but there are no prescriptions from this chamber.';
+                results.appendChild(empty);
+                patientResults.appendChild(results);
                 return;
             }
 
-            const list = document.createElement('div');
-            list.className = 'list-group';
-
             data.prescriptions.forEach((prescription) => {
-                const row = document.createElement('div');
-                row.className = 'list-group-item d-flex justify-content-between align-items-center gap-2';
-
-                const details = document.createElement('div');
+                const card = document.createElement('article');
+                card.className = 'as-rx-card';
+                const header = document.createElement('div');
+                header.className = 'as-rx-head';
+                const heading = document.createElement('div');
                 const date = document.createElement('div');
-                date.className = 'fw-semibold';
-                date.textContent = prescription.date;
-                const type = document.createElement('div');
-                type.className = 'small text-muted';
-                type.textContent = prescription.type;
-                details.append(date, type);
-
+                date.className = 'as-rx-date';
+                date.textContent = prescription.date || 'Prescription';
+                const type = document.createElement('span');
+                type.className = 'as-rx-type';
+                type.textContent = prescription.type || 'Prescription';
+                heading.append(date, type);
                 const print = document.createElement('a');
                 print.className = 'btn btn-sm btn-primary flex-shrink-0';
                 print.href = prescription.print_url;
                 print.target = '_blank';
                 print.rel = 'noopener';
                 print.innerHTML = '<i class="fa-solid fa-print me-1" aria-hidden="true"></i> Print';
+                header.append(heading, print);
 
-                row.append(details, print);
-                list.appendChild(row);
+                const body = document.createElement('div');
+                body.className = 'as-rx-body';
+                appendPatientSearchInfoGrid(body, [
+                    ['Symptoms / complaints', prescription.clinical_complaints],
+                    ['Diagnosis', prescription.diagnosis],
+                    ['Risk factors / history', prescription.risk_factors],
+                ]);
+
+                const vitals = Object.entries({
+                    BP: prescription.vitals?.bp,
+                    Pulse: prescription.vitals?.pulse,
+                    Temp: prescription.vitals?.temperature,
+                }).filter(([, value]) => String(value ?? '').trim());
+                if (vitals.length) {
+                    const vitalsSection = document.createElement('div');
+                    const vitalsTitle = document.createElement('div');
+                    vitalsTitle.className = 'as-rx-subsection-title';
+                    vitalsTitle.textContent = 'Vitals';
+                    const vitalsList = document.createElement('div');
+                    vitalsList.className = 'as-rx-vitals';
+                    vitals.forEach(([label, value]) => {
+                        const item = document.createElement('span');
+                        item.className = 'as-rx-vital';
+                        item.textContent = `${label}: ${value}`;
+                        vitalsList.appendChild(item);
+                    });
+                    vitalsSection.append(vitalsTitle, vitalsList);
+                    body.appendChild(vitalsSection);
+                }
+
+                const medicines = Array.isArray(prescription.medicines) ? prescription.medicines : [];
+                const medicineSection = document.createElement('div');
+                const medicineTitle = document.createElement('div');
+                medicineTitle.className = 'as-rx-subsection-title';
+                medicineTitle.textContent = `Medicines (${medicines.length})`;
+                medicineSection.appendChild(medicineTitle);
+                if (medicines.length) {
+                    const medicineList = document.createElement('div');
+                    medicineList.className = 'as-rx-medicines';
+                    medicines.forEach((medicine) => {
+                        const item = document.createElement('div');
+                        item.className = 'as-rx-medicine';
+                        const name = document.createElement('div');
+                        name.className = 'as-rx-medicine-name';
+                        name.textContent = medicine.name || 'Medicine';
+                        const meta = document.createElement('div');
+                        meta.className = 'as-rx-medicine-meta';
+                        meta.textContent = [
+                            medicine.dose ? `Dose: ${medicine.dose}` : '',
+                            medicine.duration ? `Duration: ${medicine.duration}` : '',
+                            medicine.instruction || '',
+                        ].filter(Boolean).join(' | ');
+                        item.append(name, meta);
+                        medicineList.appendChild(item);
+                    });
+                    medicineSection.appendChild(medicineList);
+                } else {
+                    const emptyMedicine = document.createElement('div');
+                    emptyMedicine.className = 'small text-muted';
+                    emptyMedicine.textContent = 'No medicine recorded for this prescription.';
+                    medicineSection.appendChild(emptyMedicine);
+                }
+                body.appendChild(medicineSection);
+
+                appendPatientSearchInfoGrid(body, [
+                    ['Tests / investigations', prescription.investigations],
+                    ['Investigation findings', prescription.investigation_findings],
+                    ["Doctor's advice", prescription.advice],
+                    ['Follow-up', prescription.followup_date],
+                ]);
+                card.append(header, body);
+                results.appendChild(card);
             });
 
-            patientResults.appendChild(list);
+            patientResults.appendChild(results);
         }
 
         async function searchPatientPrescription() {
